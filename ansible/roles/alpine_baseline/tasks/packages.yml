@@ -1,0 +1,5 @@
+- name: Install baseline and prerequisite APK packages
+  community.general.apk:
+    name: "{{ baseline_packages }}"
+    state: present
+    update_cache: true

@@ -1,0 +1,35 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNode
+metadata:
+  name: workboi-1
+spec:
+  ipam:
+    podCIDRs:
+      - 10.100.0.0/24
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNode
+metadata:
+  name: workboi-2
+spec:
+  ipam:
+    podCIDRs:
+      - 10.100.1.0/24
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNode
+metadata:
+  name: workboi-3
+spec:
+  ipam:
+    podCIDRs:
+      - 10.100.2.0/24
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNode
+metadata:
+  name: workboi-r # birb will become renamed; "r" for "remote".
+spec:
+  ipam:
+    podCIDRs:
+      - 10.100.3.0/24

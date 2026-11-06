@@ -1,0 +1,17 @@
+- name: Install APK packages
+  ansible.builtin.import_tasks: packages.yml
+
+- name: Configure GRUB and mkinitfs
+  ansible.builtin.import_tasks: kernel_initramfs.yml
+
+- name: Configure /etc/modules
+  ansible.builtin.import_tasks: kernel_modules.yml
+
+- name: Configure sysctl
+  ansible.builtin.import_tasks: sysctl.yml
+
+- name: Enable OpenRC services
+  ansible.builtin.import_tasks: services.yml
+
+- name: Configure optional NFS mountpoints
+  ansible.builtin.import_tasks: nfs_mounts.yml

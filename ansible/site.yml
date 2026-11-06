@@ -1,0 +1,19 @@
+- name: Bootstrap Python on Alpine nodes
+  hosts: kubernetes
+  gather_facts: false
+  tags:
+    - bootstrap
+  tasks:
+    - name: Install python3 with apk via raw
+      ansible.builtin.raw: "sh -c 'apk info -e python3 >/dev/null 2>&1 || apk add --no-cache python3'"
+      register: bootstrap_python
+      changed_when: bootstrap_python.stdout is defined and ('Installing python3' in bootstrap_python.stdout or 'Upgrading python3' in bootstrap_python.stdout)
+      failed_when: bootstrap_python.rc is defined and bootstrap_python.rc != 0
+
+- name: Configure Alpine baseline for k0s nodes
+  hosts: kubernetes
+  gather_facts: true
+  tags:
+    - baseline
+  roles:
+    - alpine_baseline

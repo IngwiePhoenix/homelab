@@ -1,0 +1,67 @@
+- name: Ensure directory for GRUB defaults exists
+  ansible.builtin.file:
+    path: "{{ grub_defaults_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install GRUB defaults
+  ansible.builtin.copy:
+    dest: "{{ grub_defaults_path }}"
+    content: "{{ grub_defaults_content }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: update grub
+
+- name: Ensure mkinitfs configuration directory exists
+  ansible.builtin.file:
+    path: "{{ mkinitfs_conf_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install mkinitfs.conf
+  ansible.builtin.copy:
+    dest: "{{ mkinitfs_conf_path }}"
+    content: "{{ mkinitfs_conf_content }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: rebuild mkinitfs
+
+- name: Ensure mkinitfs features.d directory exists
+  ansible.builtin.file:
+    path: "{{ simpledrm_modules_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Generate simpledrm module and dependency list
+  ansible.builtin.shell: |
+    {
+      echo simpledrm
+      for dep in $(modinfo -F depends simpledrm 2>/dev/null | tr ',' ' '); do
+        if modinfo "$dep" >/dev/null 2>&1; then
+          echo "$dep"
+        fi
+      done
+    } | sort -u
+  args:
+    executable: /bin/sh
+  register: simpledrm_modules_content
+  changed_when: false
+  check_mode: false
+
+- name: Install simpledrm.modules for mkinitfs
+  ansible.builtin.copy:
+    dest: "{{ simpledrm_modules_path }}"
+    content: |
+      {{ simpledrm_modules_content.stdout }}
+    owner: root
+    group: root
+    mode: "0644"
+  notify: rebuild mkinitfs

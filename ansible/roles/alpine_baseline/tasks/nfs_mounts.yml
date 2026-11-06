@@ -1,0 +1,79 @@
+- name: Ensure /mnt exists
+  ansible.builtin.file:
+    path: /mnt
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Stat configured mountpoint paths
+  loop: "{{ optional_nfs_mounts }}"
+  ansible.builtin.stat:
+    path: "{{ item.path }}"
+  register: mountpoint_stats
+
+- name: Fail when a mountpoint path exists but is not a directory
+  loop: "{{ mountpoint_stats.results }}"
+  ansible.builtin.assert:
+    that:
+      - item.stat.isdir
+    fail_msg: "{{ item.item.path }} exists but is not a directory"
+  when: item.stat.exists
+
+- name: Create missing mountpoint directories
+  loop: "{{ mountpoint_stats.results }}"
+  ansible.builtin.file:
+    path: "{{ item.item.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: not item.stat.exists
+
+- name: Write optional NFS fstab entries
+  loop: "{{ optional_nfs_mounts }}"
+  ansible.posix.mount:
+    path: "{{ item.path }}"
+    src: "{{ item.src }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.opts }}"
+    dump: 0
+    passno: 0
+    state: present
+
+- name: Check whether each mountpoint is already mounted
+  loop: "{{ optional_nfs_mounts }}"
+  ansible.builtin.shell: grep -q " {{ item.path }} " /proc/mounts 2>/dev/null
+  args:
+    executable: /bin/sh
+  register: mountpoint_active
+  changed_when: false
+  failed_when: false
+
+- name: Make unmounted mountpoint directories immutable
+  loop: "{{ mountpoint_active.results }}"
+  ansible.builtin.file:
+    path: "{{ item.item.path }}"
+    attributes: "+i"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: item.rc == 1
+
+- name: Install OpenRC service scripts for optional mounts
+  loop: "{{ optional_nfs_mounts }}"
+  ansible.builtin.template:
+    src: openrc-optional-mount.j2
+    dest: "/etc/init.d/{{ item.service_name }}"
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Enable and start optional mount services
+  loop: "{{ optional_nfs_mounts }}"
+  ansible.builtin.service:
+    name: "{{ item.service_name }}"
+    state: started
+    enabled: true
+    use: openrc

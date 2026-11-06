@@ -1,0 +1,67 @@
+baseline_packages:
+  - htop
+  - screen
+  - fastfetch
+  - file
+  - tree
+  - nano
+  # Scripts
+  - kmod
+  - e2fsprogs
+  - nfs-utils
+  # k0s required
+  - xtables-addons
+  - iptables
+  - iptables-legacy
+  - conntrack-tools
+  - ipset
+  - iproute2
+
+baseline_services:
+   - cgroups
+   - sshd
+   - local
+
+baseline_kernel_modules:
+  - bonding
+  - simpledrm
+  # k0s requirement
+  - nf_conntrack
+  - br_netfilter
+  - overlay
+
+# You requested /etc/defaults/grub.
+# If you meant the usual GRUB location, use: /etc/default/grub
+grub_defaults_path: /etc/default/grub
+
+grub_defaults_content: |
+  GRUB_TIMEOUT=1
+  GRUB_DISABLE_SUBMENU=y
+  GRUB_DISABLE_RECOVERY=true
+  GRUB_CMDLINE_LINUX_DEFAULT="modules=sd-mod,usb-storage,ext4,nvme,simpledrm rootfstype=ext4 fbcon=nodefer console=ttyAMA0,115200 console=tty0"
+
+mkinitfs_conf_path: /etc/mkinitfs/mkinitfs.conf
+
+mkinitfs_conf_content: |
+  features="ata base ide scsi usb virtio phy ext4 nvme simpledrm"
+
+simpledrm_modules_path: /etc/mkinitfs/features.d/simpledrm.modules
+
+cgroups_service_name: cgroups
+
+optional_nfs_mounts:
+  - name: bunker
+    path: /mnt/bunker
+    src: "10.1.0.2:/mnt/bunker"
+    fstype: nfs4
+    opts: "noauto,nofail,_netdev"
+    service_name: mount-bunker
+    description: "Optional NFS mount for bunker"
+
+  - name: stash
+    path: /mnt/stash
+    src: "10.1.0.2:/mnt/stash"
+    fstype: nfs4
+    opts: "noauto,nofail,_netdev"
+    service_name: mount-stash
+    description: "Optional NFS mount for stash"

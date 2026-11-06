@@ -1,0 +1,11 @@
+- name: Ensure /etc/modules loads required modules
+  loop: "{{ baseline_kernel_modules }}"
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    line: "{{ item }}"
+    regexp: "^{{ item | regex_escape }}$"
+    state: present
+    create: true
+    owner: root
+    group: root
+    mode: "0644"

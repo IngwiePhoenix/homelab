@@ -1,0 +1,82 @@
+all:
+  vars:
+    ansible_user: root
+
+  hosts:
+    drachennetz:
+      ansible_host: 10.0.0.1
+    birb:
+      ansible_host: 10.0.0.2
+    ultradiskboi:
+      ansible_host: 10.1.0.2
+    senseboi:
+      ansible_host: 10.1.0.3
+    smolriscboi:
+      ansible_host: 10.1.0.4
+    bigriscboi:
+      ansible_host: 10.1.0.5
+    spaceboi:
+      ansible_host: 10.1.0.6
+    piboi:
+      ansible_host: 10.1.0.7
+    bigdergboi:
+      ansible_host: 10.1.0.8
+    smoldergboi:
+      ansible_host: 10.1.0.9
+    kaguya:
+      ansible_host: 10.1.0.10
+    workboi-1:
+      ansible_host: 10.1.0.11
+    workboi-2:
+      ansible_host: 10.1.0.12
+    workboi-3:
+      ansible_host: 10.1.0.13
+    bulkboi:
+      ansible_host: 10.1.0.15
+    bulkboi-kvm:
+      ansible_host: 10.1.0.16
+
+  children:
+    # --- Hardware / Role Groups ---
+    orion-o6:
+      hosts:
+        workboi-1:
+        workboi-2:
+        workboi-3:
+
+    dragon-q6a:
+      hosts:
+        smoldergboi:
+        bigdergboi:
+
+    external-vpn:
+      hosts:
+        drachennetz:
+        birb:
+
+    riscv:
+      hosts:
+        smolriscboi:
+        bigriscboi:
+        spaceboi:
+
+    iot:
+      hosts:
+        piboi:
+        senseboi:
+
+    nas:
+      hosts:
+        ultradiskboi:
+        bulkboi:
+
+    # --- Composite / Service Groups ---
+    kubernetes:
+      #hosts:
+      #  birb:
+      children:
+        orion-o6:
+
+    incus:
+      children:
+        dragon-q6a:

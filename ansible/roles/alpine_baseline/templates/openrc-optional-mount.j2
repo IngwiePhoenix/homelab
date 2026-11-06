@@ -1,0 +1,35 @@
+#!/sbin/openrc-run
+# {{ ansible_managed }}
+
+description="{{ item.description }}"
+
+depend() {
+    after bootmisc localmount networking
+    need net
+}
+
+start() {
+    ebegin "Mounting {{ item.src }} on {{ item.path }}"
+
+    if grep -q " {{ item.path }} " /proc/mounts 2>/dev/null; then
+        eend 0
+        return 0
+    fi
+
+    if timeout 20 mount -t {{ item.fstype }} -o {{ item.opts }} {{ item.src }} {{ item.path }}; then
+        eend 0
+    else
+        ewarn "Optional mount failed: {{ item.path }}"
+        eend 0
+    fi
+}
+
+stop() {
+    ebegin "Unmounting {{ item.path }}"
+
+    if grep -q " {{ item.path }} " /proc/mounts 2>/dev/null; then
+        umount {{ item.path }} || umount -l {{ item.path }} || true
+    fi
+
+    eend 0
+}

@@ -1,0 +1,7 @@
+- name: Enable required OpenRC services
+  loop: "{{ baseline_services }}"
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+    use: openrc

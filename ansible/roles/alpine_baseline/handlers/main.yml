@@ -1,0 +1,21 @@
+- name: Update GRUB if grub-mkconfig is available
+  ansible.builtin.shell: |
+    update-grub
+    echo GRUB_UPDATED
+  args:
+    executable: /bin/sh
+  register: grub_update_result
+  changed_when: "'GRUB_UPDATED' in grub_update_result.stdout"
+  listen: update grub
+
+- name: Rebuild initramfs if mkinitfs is available
+  ansible.builtin.shell: |
+    if command -v mkinitfs >/dev/null 2>&1; then
+      mkinitfs -c {{ mkinitfs_conf_path }} -b / $(uname -r)
+      echo MKINITFS_UPDATED
+    fi
+  args:
+    executable: /bin/sh
+  register: mkinitfs_result
+  changed_when: "'MKINITFS_UPDATED' in mkinitfs_result.stdout"
+  listen: rebuild mkinitfs
