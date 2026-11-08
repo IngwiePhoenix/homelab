@@ -1,0 +1,18 @@
+# kubernetes/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # Let Flux take ownership of the dynamic config from day 2 onwards
+  - k0s/extensions-helm/local-path-provisioner.yaml
+  - k0s/extensions-helm/flux-cd.yaml
+
+  # Your application Flux Kustomizations
+  # (Each app folder contains its own flux.yaml and kustomization.yaml)
+  #- cert-manager/flux.yaml
+  #- cloudnative-pg/flux.yaml
+  #- postgres-main/flux.yaml
+  #- postgres-operator/flux.yaml
+  #- traefik/flux.yaml
+  #- shiori/flux.yaml
+  #- headlamp/flux.yaml
