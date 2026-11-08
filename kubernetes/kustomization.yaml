@@ -7,3 +7,4 @@ resources:
 
   # Base:
   - cert-manager/flux.yaml
+  - cert-manager-issuers/flux.yaml
