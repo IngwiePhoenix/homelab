@@ -6,4 +6,4 @@ resources:
   - k0s/extensions-helm/flux-cd.yaml
 
   # Base:
-  #- cert-manager/flux.yaml
+  - cert-manager/flux.yaml
