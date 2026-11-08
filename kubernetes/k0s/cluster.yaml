@@ -1,0 +1,47 @@
+apiVersion: k0s.k0sproject.io/v1beta1
+kind: ClusterConfig
+metadata:
+  name: k0s
+spec:
+  api:
+    k0sApiPort: 9443
+    port: 6443
+    # Point this to your OPNSense HAProxy/Keepalived VIP or Public DNS
+    externalAddress: 10.1.0.1
+    sans:
+      - 10.1.0.1
+      - k8s.birb.it
+  installConfig:
+    users:
+      etcdUser: etcd
+      kineUser: kube-apiserver
+      konnectivityUser: konnectivity-server
+      kubeAPIserverUser: kube-apiserver
+      kubeSchedulerUser: kube-scheduler
+  konnectivity:
+    adminPort: 8133
+    agentPort: 8132
+  network:
+    provider: calico
+    podCIDR: 10.100.0.0/16
+    serviceCIDR: 10.200.0.0/16
+    #podCIDR: 172.30.0.0/16
+    #serviceCIDR: 172.31.0.0/16
+    dualStack:
+      enabled: true
+      IPv6podCIDR: fd00:10:100::/108
+      IPv6serviceCIDR: fd00:10:200::/108
+    calico:
+      mode: bird
+      #overlay: Always
+      #vxlanPort: 4789
+      ipAutodetectionMethod: kubernetes-internal-ip
+      #envVars:
+      #  FELIX_NFTABLESMODE: "Enabled"
+    kubeProxy:
+      disabled: false
+      mode: nftables
+  storage:
+    type: etcd
+  telemetry:
+    enabled: true

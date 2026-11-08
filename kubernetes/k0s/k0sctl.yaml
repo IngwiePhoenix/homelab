@@ -1,0 +1,93 @@
+apiVersion: k0sctl.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: homelab-k0s
+  user: admin
+spec:
+  hosts:
+  - ssh:
+      # workboi-1
+      address: 10.1.0.11
+      user: root
+      port: 22
+    role: controller+worker
+    noTaints: true
+    uploadBinary: true
+    installFlags:
+      - --labels="homelab/location=internal"
+      - --ignore-pre-flight-checks
+    files:
+      - name: autopilot.yaml
+        dst: /var/lib/k0s/manifests/autopilot/autopilot.yaml
+        data: |
+          apiVersion: autopilot.k0sproject.io/v1beta2
+          kind: UpdateConfig
+          metadata:
+            name: autoupdate
+            namespace: kube-system
+          spec:
+            channel: stable
+            updateServer: https://updates.k0sproject.io/
+            upgradeStrategy:
+              cron: "@daily"
+  - ssh:
+      # workboi-2
+      address: 10.1.0.12
+      user: root
+      port: 22
+    role: controller+worker
+    noTaints: true
+    uploadBinary: true
+    installFlags:
+      - --labels="homelab/location=internal"
+      - --ignore-pre-flight-checks
+  - ssh:
+      # workboi-3
+      address: 10.1.0.13
+      user: root
+      port: 22
+    role: controller+worker
+    noTaints: true
+    uploadBinary: true
+    installFlags:
+      - --labels="homelab/location=internal"
+      - --ignore-pre-flight-checks
+  # TODO:
+  #   The remote node is NOT YET ready to be deployed to.
+  #   It currently runs singular Docker deployments and a Caddy proxy.
+  #   I am leaving it's config here so I can upst `k0sctl apply` later and
+  #   immediately add it to the cluster.
+  #- ssh:
+  #    # workboi-r
+  #    address: 10.0.0.2
+  #    user: root
+  #    port: 22
+  #  role: worker
+  #  privateInterface: wg0
+  #  labels:
+  #    apply:
+  #      - homelab/location=external
+  k0s:
+    version: v1.37.2+k0s.0
+    dynamicConfig: true
+  options:
+    wait:
+      enabled: true
+    drain:
+      enabled: true
+      gracePeriod: 2m0s
+      timeout: 5m0s
+      force: true
+      ignoreDaemonSets: true
+      deleteEmptyDirData: true
+      podSelector: ""
+      skipWaitForDeleteTimeout: 0s
+    concurrency:
+      limit: 30
+      workerDisruptionPercent: 10
+      uploads: 5
+    evictTaint:
+      enabled: false
+      taint: k0sctl.k0sproject.io/evict=true
+      effect: NoExecute
+      controllerWorkers: false

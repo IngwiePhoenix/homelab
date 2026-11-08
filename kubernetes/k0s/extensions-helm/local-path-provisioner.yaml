@@ -1,0 +1,59 @@
+apiVersion: helm.k0sproject.io/v1beta1
+kind: Chart
+metadata:
+  name: local-path-provisioner
+  namespace: kube-system
+spec:
+  chartName: oci://ghcr.io/rancher/local-path-provisioner/charts/local-path-provisioner
+  version: "0.0.37"
+  namespace: local-path-provisioner
+  values: |
+    storageClassConfigs:
+      local-bunker:
+        storageClass:
+          create: true
+          name: local-bunker
+          defaultClass: true
+          pathPattern: "{{ .PVC.Namespace }}/{{ .PVC.Name }}/"
+          userPattern: "{{ index .PVC.Annotations \"local-path-provisioner/uid\" }}"
+          groupPattern: "{{ index .PVC.Annotations \"local-path-provisioner/gid\" }}"
+          permPattern: "{{ index .PVC.Annotations \"local-path-provisioner/perm\" }}"
+        sharedFileSystemPath: /mnt/bunker/Services/k0s
+        nodePathMap: []
+      # Example for adding more later:
+      # nas-extended:
+      #   storageClass:
+      #     create: true
+      #     name: nas-extended
+      #     defaultClass: false
+      #     pathPattern: "{{ .PVC.Namespace }}/{{ .PVC.Name }}/"
+      #   sharedFileSystemPath: /mnt/nas/Services/k0s
+      #   nodePathMap: []
+
+    configmap:
+      setup: |-
+        #!/bin/sh
+        set -eu
+        mkdir -p "$VOL_DIR"
+        # Apply permissions if annotations were provided and rendered into these variables
+        if [ -n "$VOL_USER" ] || [ -n "$VOL_GROUP" ]; then
+          chown ${VOL_USER:-0}:${VOL_GROUP:-0} "$VOL_DIR"
+        fi
+        if [ -n "$VOL_PERM" ]; then
+          chmod "$VOL_PERM" "$VOL_DIR"
+        fi
+      teardown: |-
+        #!/bin/sh
+        set -eu
+        rm -rf "$VOL_DIR"
+
+    # Not neccessarily needed - but a good safety-net.
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+    helperPod:
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
