@@ -10,7 +10,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: homelab-repo
-    namespace: flux-system
   path: ./kubernetes/cert-manager
   prune: true
   wait: true
