@@ -5,11 +5,12 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
+  targetNamespace: cert-manager
   chart:
+    kind: HelmChart
     spec:
       chart: cert-manager
       version: "v1.21.3"
-      targetNamespace: cert-manager
       sourceRef:
         kind: HelmRepository
         name: jetstack-helmrepo
