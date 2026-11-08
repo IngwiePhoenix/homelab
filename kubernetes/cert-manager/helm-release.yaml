@@ -6,6 +6,7 @@ metadata:
 spec:
   interval: 1h
   targetNamespace: cert-manager
+  releaseName: cert-manager
   chart:
     kind: HelmChart
     spec:
