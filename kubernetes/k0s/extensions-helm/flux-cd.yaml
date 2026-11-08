@@ -1,0 +1,16 @@
+apiVersion: helm.k0sproject.io/v1beta1
+kind: Chart
+metadata:
+  name: flux-cd
+  namespace: kube-system
+spec:
+  chartName: oci://ghcr.io/fluxcd-community/charts/flux2
+  version: "2.20.0"
+  namespace: flux-system
+  releaseName: flux-system
+  timeout: 5m
+  values: |
+    # Enable CRD migrations for the future. Could be useful.
+    crds:
+      migration:
+        enabled: true
