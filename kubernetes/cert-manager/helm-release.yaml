@@ -1,0 +1,52 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: cert-manager
+      version: "v1.21.3"
+      sourceRef:
+        kind: HelmRepository
+        name: jetstack-helmrepo
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    crds:
+      enabled: true
+      keep: true # Left here for documentation; set to false to purge it for good.
+    enableCertificateOwnerRef: true
+
+    # TODO: Add IPv6 support?
+    dns01RecursiveNameservers: "9.9.9.9:53,149.112.112.112:53"
+    dns01RecursiveNameserversOnly: true
+
+    # TODO: add deSEC helper
+    #extraEnv:
+    #extraContainers:
+    #volumes:
+
+    # TODO: Be strict about keeping things at home
+    #nodeSelector:
+    #  kubernetes.io/os: linux
+    #  homelab/location: internal
+
+    networkPolicy:
+      enabled: true
+
+    # TODO: Basically the entire Prometheus section lol.
+
+    # TODO: CAInjector also has a networkPolicy section...
+
+    # TODO. Pin to local nodes only if the global one does not apply.
+    #startupapicheck:
+    #  nodeSelector:
+    #    ...
