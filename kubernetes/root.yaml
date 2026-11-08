@@ -2,13 +2,13 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
-  name: homelab
+  name: homelab-repo
   namespace: flux-system
 spec:
   interval: 5m
-  url: https://git.example.com/IngwiePhoenix/homelab.git
+  url: https://github.com/IngwiePhoenix/homelab.git
   ref:
-    branch: main
+    branch: master
   ignore: |
     # Ignore everything except the kubernetes directory
     /*
@@ -23,7 +23,7 @@ spec:
   interval: 10m
   sourceRef:
     kind: GitRepository
-    name: homelab
+    name: homelab-repo
   path: ./kubernetes
   prune: true
   wait: true
