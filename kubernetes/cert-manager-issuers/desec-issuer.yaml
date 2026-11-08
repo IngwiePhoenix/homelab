@@ -8,12 +8,12 @@ spec:
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: desec-letsencrypt-account-key
-      solvers:
-        - dns01:
-            webhook:
-              config:
-                apiKeySecretRef:
-                  key: api-token
-                  name: desec-api-token
-              groupName: acme.pr0ton11.github.com
-              solverName: desec
+    solvers:
+      - dns01:
+          webhook:
+            groupName: acme.pr0ton11.github.com
+            solverName: desec
+            config:
+              apiKeySecretRef:
+                key: api-token
+                name: desec-api-token
