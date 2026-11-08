@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager-desec
+  namespace: flux-system
+spec:
+  interval: 1h
+  targetNamespace: cert-manager-desec
+  releaseName: cm-desec
+  chart:
+    kind: OCIRepository
+    spec:
+      url: oci://ghcr.io/pr0ton11/helm/cert-manager-desec-webhook
+      ref:
+        semver: '0.1.7'
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
