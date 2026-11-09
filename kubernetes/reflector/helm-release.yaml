@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: reflector-helmrelease
+  namespace: flux-system
+spec:
+  interval: 1h
+  releaseName: reflector
+  targetNamespace: reflector
+
+  install:
+    createNamespace: true
+
+  chart:
+    spec:
+      chart: reflector
+      version: "10.0.74"
+      interval: 1h
+      sourceRef:
+        kind: HelmRepository
+        name: emberstack-helmrepo
+        namespace: flux-system
