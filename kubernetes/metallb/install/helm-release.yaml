@@ -1,0 +1,47 @@
+
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: metallb-helmrelease
+  namespace: flux-system
+spec:
+  interval: 30m
+  releaseName: metallb
+  targetNamespace: metallb-system
+
+  chart:
+    spec:
+      chart: metallb
+      version: "0.16.2"
+      interval: 1h
+      sourceRef:
+        kind: HelmRepository
+        name: metallb-helmrepo
+        namespace: flux-system
+
+  install:
+    createNamespace: false # We explicitly configure it!
+    crds: CreateReplace
+
+  upgrade:
+    crds: CreateReplace
+
+  values:
+    crds:
+      enabled: true
+
+    controller:
+      enabled: true
+      nodeSelector:
+        homelab/location: internal
+
+    speaker:
+      enabled: true
+      nodeSelector:
+        homelab/location: internal
+
+      frr:
+        enabled: false
+
+    frrk8s:
+      enabled: false

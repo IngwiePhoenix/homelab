@@ -1,0 +1,10 @@
+
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: home-lb-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.1.0.15-10.1.0.19
+  autoAssign: false
