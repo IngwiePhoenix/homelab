@@ -32,6 +32,7 @@ spec:
           create: true
           name: local-bunker
           defaultClass: true
+          defaultVolumeType: hostPath
           pathPattern: '{{ .PVC.Namespace }}/{{ .PVC.Name }}/'
           userPattern: '{{ index .PVC.Annotations "local-path-provisioner/uid" }}'
           groupPattern: '{{ index .PVC.Annotations "local-path-provisioner/gid" }}'
