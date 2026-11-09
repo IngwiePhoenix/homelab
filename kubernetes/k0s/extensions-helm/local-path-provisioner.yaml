@@ -34,18 +34,47 @@ spec:
       setup: |-
         #!/bin/sh
         set -eu
-        mkdir -p "$VOL_DIR"
-        # Apply permissions if annotations were provided and rendered into these variables
-        if [ -n "$VOL_USER" ] || [ -n "$VOL_GROUP" ]; then
-          chown ${VOL_USER:-0}:${VOL_GROUP:-0} "$VOL_DIR"
+
+        # Recover variables that k0sctl expanded prematurely.
+        if [ -z "$VOL_DIR" ]; then VOL_DIR="$$VOL_DIR"; fi
+        if [ -z "$VOL_USER" ]; then VOL_USER="$$VOL_USER"; fi
+        if [ -z "$VOL_GROUP" ]; then VOL_GROUP="$$VOL_GROUP"; fi
+        if [ -z "$VOL_PERM" ]; then VOL_PERM="$$VOL_PERM"; fi
+
+        # VOL_DIR is mandatory.
+        if [ -z "$$VOL_DIR" ]; then
+          echo "ERROR: VOL_DIR is empty; refusing to create volume." >&2
+          exit 1
         fi
-        if [ -n "$VOL_PERM" ]; then
-          chmod "$VOL_PERM" "$VOL_DIR"
+
+        mkdir -p "$$VOL_DIR"
+
+        # Apply ownership if either UID or GID was provided.
+        if [ -n "$$VOL_USER" ] || [ -n "$$VOL_GROUP" ]; then
+          if [ -z "$$VOL_USER" ]; then VOL_USER=0; fi
+          if [ -z "$$VOL_GROUP" ]; then VOL_GROUP=0; fi
+          chown "$$VOL_USER:$$VOL_GROUP" "$$VOL_DIR"
         fi
+
+        # Apply permissions if provided.
+        if [ -n "$$VOL_PERM" ]; then
+          chmod "$$VOL_PERM" "$$VOL_DIR"
+        fi
+
       teardown: |-
         #!/bin/sh
         set -eu
-        rm -rf "$VOL_DIR"
+
+        # Recover VOL_DIR if k0sctl expanded it prematurely.
+        if [ -z "$VOL_DIR" ]; then VOL_DIR="$$VOL_DIR"; fi
+
+        # Never attempt to remove an empty or root directory.
+        if [ -z "$$VOL_DIR" ] || [ "$$VOL_DIR" = "/" ]; then
+          echo "ERROR: Invalid VOL_DIR; refusing to remove volume." >&2
+          exit 1
+        fi
+
+        rm -rf -- "$$VOL_DIR"
 
     # Not neccessarily needed - but a good safety-net.
     tolerations:
