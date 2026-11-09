@@ -13,3 +13,11 @@ spec:
   path: ./kubernetes/traefik
   prune: true
   wait: true
+  dependsOn:
+    - name: metallb-install
+    - name: metallb-config
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: traefik-internal-helmrelease
+      namespace: flux-system
