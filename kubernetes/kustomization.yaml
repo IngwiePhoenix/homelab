@@ -12,3 +12,4 @@ resources:
   - metallb/flux.yaml
   - reflector/flux.yaml
   - traefik/flux.yaml
+  - common-secrets/flux.yaml

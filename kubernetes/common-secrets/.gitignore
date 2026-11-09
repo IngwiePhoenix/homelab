@@ -1,0 +1,5 @@
+*.yaml
+!*.sops.yaml
+!flux.yaml
+!kustomization.yaml
+!namespace.yaml
