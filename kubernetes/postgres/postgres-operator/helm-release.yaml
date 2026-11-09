@@ -1,0 +1,37 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: postgres-operator-helmrelease
+  namespace: flux-system
+spec:
+  interval: 30m
+  releaseName: postgresql-operator
+  targetNamespace: postgresql-operator
+  timeout: 10m
+
+  chart:
+    spec:
+      chart: postgresql-operator
+      version: "1.8.2"
+      sourceRef:
+        kind: HelmRepository
+        name: postgres-operator-helmrepo
+        namespace: flux-system
+      interval: 1h
+
+  install:
+    createNamespace: true
+    crds: CreateReplace
+    remediation:
+      retries: 3
+
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+
+  values:
+    args:
+      - --leader-elect
+      - --reconcile-timeout=20s
+      - --resync-period=60s

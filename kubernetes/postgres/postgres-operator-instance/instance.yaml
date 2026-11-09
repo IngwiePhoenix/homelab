@@ -1,0 +1,19 @@
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlEngineConfiguration
+metadata:
+  name: default-cluster-instance
+  namespace: postgres
+spec:
+  # PostgreSQL Hostname
+  host: default-cluster-rw.postgres.svc.cluster.local
+  # Secret name in the current namespace to find "user" and "password"
+  secretName: default-cluster-superuser
+  # URI args to add for PostgreSQL URL
+  # Default to ""
+  #uriArgs: sslmode=disabled
+  # Check interval
+  # Default to 30s
+  checkInterval: 30s
+  # Wait for linked resource to be deleted
+  # Default to false
+  waitLinkedResourcesDeletion: true

@@ -1,0 +1,15 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: default-cluster
+  namespace: postgres
+spec:
+  instances: 1
+  enableSuperuserAccess: true
+  storage:
+    storageClass: "local-bunker"
+    size: 10Gi
+  walStorage:
+    # Will move to SSD later. Keep on NFS for now.
+    storageClass: "local-bunker"
+    size: 5Gi
