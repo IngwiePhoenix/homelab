@@ -12,4 +12,5 @@ resources:
   - metallb/flux.yaml
   - reflector/flux.yaml
   - traefik/flux.yaml
+  - postgres/flux.yaml
   - common-secrets/flux.yaml
