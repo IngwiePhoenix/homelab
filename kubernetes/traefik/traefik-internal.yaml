@@ -1,0 +1,75 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik-internal
+  namespace: flux-system
+spec:
+  interval: 30m
+  releaseName: traefik-internal
+  targetNamespace: traefik-internal
+
+  chart:
+    spec:
+      chart: traefik
+      version: "42.3.1"
+      interval: 1h
+      sourceRef:
+        kind: HelmRepository
+        name: traefik-helmrepo
+        namespace: flux-system
+
+  # This is the sole owner of the cluster-wide Traefik CRDs.
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+
+  values:
+    deployment:
+      kind: DaemonSet
+
+    # Create a dedicated, non-default Kubernetes IngressClass.
+    ingressClass:
+      enabled: true
+      isDefaultClass: false
+      name: traefik-internal
+
+    providers:
+      kubernetesCRD:
+        enabled: true
+        ingressClass: traefik-internal
+        allowCrossNamespace: false
+
+      # Only use Traefik's IngressRoute CRDs.
+      kubernetesIngress:
+        enabled: false
+
+    nodeSelector:
+      homelab/location: internal
+
+    ingressRoute:
+      dashboard:
+        enabled: false
+
+    ports:
+      web:
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true
+
+      websecure:
+        http:
+          tls:
+            enabled: true
+
+    service:
+      enabled: true
+      spec:
+        type: LoadBalancer
+
+      annotations:
+        # Replace with the name of your actual Calico LoadBalancer IPPool.
+        projectcalico.org/ipv4pools: '["home-lb-pool"]'
