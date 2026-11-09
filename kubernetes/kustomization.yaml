@@ -2,9 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   # Let Flux take ownership of the dynamic config from day 2 onwards
+  - k0s/cluster.yaml
   - k0s/extensions-helm/local-path-provisioner.yaml
   - k0s/extensions-helm/flux-cd.yaml
 
   # Base:
   - cert-manager/flux.yaml
   - cert-manager-issuers/flux.yaml
+  #- traefik/flux.yaml
