@@ -1,0 +1,86 @@
+
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: local-path-provisioner-helmrelease
+  namespace: flux-system
+spec:
+  interval: 10m
+
+  releaseName: local-path-provisioner
+  targetNamespace: local-path-provisioner
+
+  install:
+    createNamespace: true
+
+  chart:
+    kind: OCIRepository
+    spec:
+      interval: 10m
+      url: oci://ghcr.io/rancher/local-path-provisioner/charts/local-path-provisioner
+      ref:
+        tag: "0.0.37"
+
+  values:
+    # Required when using storageClassConfigs.
+    nodePathMap: []
+
+    storageClassConfigs:
+      local-bunker:
+        sharedFileSystemPath: /mnt/bunker/Services/k0s
+        storageClass:
+          create: true
+          name: local-bunker
+          defaultClass: true
+          pathPattern: '{{ .PVC.Namespace }}/{{ .PVC.Name }}/'
+          userPattern: '{{ index .PVC.Annotations "local-path-provisioner/uid" }}'
+          groupPattern: '{{ index .PVC.Annotations "local-path-provisioner/gid" }}'
+          permPattern: '{{ index .PVC.Annotations "local-path-provisioner/perm" }}'
+
+    configmap:
+      setup: |-
+        #!/bin/sh
+        set -eu
+
+        if [ -z "$VOL_DIR" ]; then
+          echo "ERROR: VOL_DIR is empty. Refusing to create volume." >&2
+          exit 1
+        fi
+
+        mkdir -p "$VOL_DIR"
+
+        if [ -n "$VOL_USER" ] || [ -n "$VOL_GROUP" ]; then
+          uid="$VOL_USER"
+          gid="$VOL_GROUP"
+
+          [ -n "$uid" ] || uid=0
+          [ -n "$gid" ] || gid=0
+
+          chown "$uid:$gid" "$VOL_DIR"
+        fi
+
+        if [ -n "$VOL_PERM" ]; then
+          chmod "$VOL_PERM" "$VOL_DIR"
+        fi
+
+      teardown: |-
+        #!/bin/sh
+        set -eu
+
+        if [ -z "$VOL_DIR" ] || [ "$VOL_DIR" = "/" ]; then
+          echo "ERROR: Invalid VOL_DIR. Refusing to remove volume." >&2
+          exit 1
+        fi
+
+        rm -rf "$VOL_DIR"
+
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+
+    helperPod:
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule

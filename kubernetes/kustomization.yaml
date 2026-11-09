@@ -5,6 +5,9 @@ resources:
   - k0s/cluster.yaml
   - k0s/extensions-helm/flux-cd.yaml
 
+  # Core
+  - local-path-provisioner/flux.yaml
+
   # Base:
   - cert-manager/flux.yaml
   - cert-manager-issuers/flux.yaml
