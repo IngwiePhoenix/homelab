@@ -26,7 +26,7 @@ spec:
       volumes:
         - name: config-vol
           persistentVolumeClaim:
-            claimName: voidauth-config
+            claimName: voidauth-config-pvc
 
       initContainers:
         - name: wait-for-postgres
