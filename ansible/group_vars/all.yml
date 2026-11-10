@@ -54,7 +54,8 @@ optional_nfs_mounts:
     path: /mnt/bunker
     src: "10.1.0.2:/mnt/bunker"
     fstype: nfs4
-    opts: "noauto,nofail,_netdev"
+    #opts: "noauto,nofail,_netdev"
+    opts: "noauto,nofail,_netdev,vers=4.2,timeo=100,retrans=5,nconnect=4,rsize=262144,wsize=262144"
     service_name: mount-bunker
     description: "Optional NFS mount for bunker"
 
@@ -62,6 +63,7 @@ optional_nfs_mounts:
     path: /mnt/stash
     src: "10.1.0.2:/mnt/stash"
     fstype: nfs4
-    opts: "noauto,nofail,_netdev"
+    #opts: "noauto,nofail,_netdev"
+    opts: "noauto,nofail,_netdev,vers=4.2,timeo=100,retrans=5,nconnect=4,rsize=262144,wsize=262144"
     service_name: mount-stash
     description: "Optional NFS mount for stash"
