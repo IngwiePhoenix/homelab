@@ -16,7 +16,7 @@ spec:
   dependsOn:
     - name: postgres-operator
     - name: cert-manager-issuers
-    - name: traefik-internal
+    - name: traefik
     - name: reflector
     - name: reloader
     #- name: traefik-external
