@@ -12,7 +12,7 @@ spec:
     name: homelab-repo
   path: ./kubernetes/voidauth
   prune: true
-  wait: true
+  wait: false # Fow now.
   dependsOn:
     - name: postgres-operator
     - name: cert-manager-issuers
