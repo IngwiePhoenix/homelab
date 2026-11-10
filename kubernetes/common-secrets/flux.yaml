@@ -15,3 +15,7 @@ spec:
   wait: true
   dependsOn:
     - name: reflector
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
