@@ -50,20 +50,23 @@ name: '{{ .component }}: patch updates'
 pipelineid: '{{ .component }}-patch'
 
 sources:
-  chartVersion:
-    kind: helmchart
-    spec:
-      url: '{{ .chartRepository }}'
-      name: '{{ .chartName }}'
-      versionfilter:
-        kind: semver
-        pattern: '{{ $v := semver (source "currentVersion") }}~{{ $v.Major }}.{{ $v.Minor }}'
   currentVersion:
     kind: yaml
     scmid: homelab
     spec:
       file: '{{ .manifest }}'
       key: $.spec.version
+
+  chartVersion:
+    kind: helmchart
+    dependson:
+      - source#currentVersion
+    spec:
+      url: '{{ .chartRepository }}'
+      name: '{{ .chartName }}'
+      versionfilter:
+        kind: semver
+        pattern: '{{ $v := semver (source "currentVersion") }}~{{ $v.Major }}.{{ $v.Minor }}'
 
 conditions:
   chartIdentity:
@@ -95,20 +98,23 @@ name: '{{ .component }}: minor updates'
 pipelineid: '{{ .component }}-upgrades'
 
 sources:
-  chartVersion:
-    kind: helmchart
-    spec:
-      url: '{{ .chartRepository }}'
-      name: '{{ .chartName }}'
-      versionfilter:
-        kind: semver
-        pattern: '{{ $v := semver (source "currentVersion") }}>= {{ $v.Major }}.{{ add1 $v.Minor }}.0 < {{ add1 $v.Major }}.0.0'
   currentVersion:
     kind: yaml
     scmid: homelab
     spec:
       file: '{{ .manifest }}'
       key: $.spec.version
+
+  chartVersion:
+    kind: helmchart
+    dependson:
+      - source#currentVersion
+    spec:
+      url: '{{ .chartRepository }}'
+      name: '{{ .chartName }}'
+      versionfilter:
+        kind: semver
+        pattern: '{{ $v := semver (source "currentVersion") }}~{{ $v.Major }}.{{ $v.Minor }}'
 
 conditions:
   chartIdentity:
@@ -140,20 +146,23 @@ name: '{{ .component }}: major updates'
 pipelineid: '{{ .component }}-upgrades'
 
 sources:
-  chartVersion:
-    kind: helmchart
-    spec:
-      url: '{{ .chartRepository }}'
-      name: '{{ .chartName }}'
-      versionfilter:
-        kind: semver
-        pattern: '{{ $v := semver (source "currentVersion") }}>={{ add1 $v.Major }}.0.0'
   currentVersion:
     kind: yaml
     scmid: homelab
     spec:
       file: '{{ .manifest }}'
       key: $.spec.version
+
+  chartVersion:
+    kind: helmchart
+    dependson:
+      - source#currentVersion
+    spec:
+      url: '{{ .chartRepository }}'
+      name: '{{ .chartName }}'
+      versionfilter:
+        kind: semver
+        pattern: '{{ $v := semver (source "currentVersion") }}~{{ $v.Major }}.{{ $v.Minor }}'
 
 conditions:
   chartIdentity:
