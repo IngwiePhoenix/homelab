@@ -12,7 +12,6 @@ spec:
     name: homelab-repo
   path: ./kubernetes/cert-manager/install
   prune: true
-  wait: true
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
