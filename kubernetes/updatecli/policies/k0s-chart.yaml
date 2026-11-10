@@ -84,6 +84,7 @@ conditions:
   chartIdentity:
     kind: yaml
     scmid: homelab
+    disablesourceinput: true
     spec:
       file: '{{ .manifest }}'
       key: $.spec.chartName
@@ -91,6 +92,7 @@ conditions:
 
 targets:
   chartVersion:
+    name: "Update k0s Flux bootstrap chart version"
     kind: yaml
     scmid: homelab
     sourceid: chartVersion
@@ -149,6 +151,7 @@ conditions:
   chartIdentity:
     kind: yaml
     scmid: homelab
+    disablesourceinput: true
     spec:
       file: '{{ .manifest }}'
       key: $.spec.chartName
@@ -156,6 +159,7 @@ conditions:
 
 targets:
   chartVersion:
+    name: "Update k0s Flux bootstrap chart version"
     kind: yaml
     scmid: homelab
     sourceid: chartVersion
@@ -209,6 +213,7 @@ conditions:
   chartIdentity:
     kind: yaml
     scmid: homelab
+    disablesourceinput: true
     spec:
       file: '{{ .manifest }}'
       key: $.spec.chartName
@@ -216,6 +221,7 @@ conditions:
 
 targets:
   chartVersion:
+    name: "Update k0s Flux bootstrap chart version"
     kind: yaml
     scmid: homelab
     sourceid: chartVersion
