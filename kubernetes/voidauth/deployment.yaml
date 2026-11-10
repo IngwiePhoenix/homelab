@@ -37,7 +37,7 @@ spec:
                 name: voidauth-db-creds
           args:
             - postgres
-            - postgres://$(LOGIN):$(PASSWORD)@$(HOST):$(PORT)/$(DATABASE)'
+            - postgres://$(LOGIN):$(PASSWORD)@$(HOST):$(PORT)/$(DATABASE)
 
       containers:
         - name: app
