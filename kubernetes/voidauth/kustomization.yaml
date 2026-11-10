@@ -9,4 +9,6 @@ resources:
   - pvc.yaml
   - deployment.yaml
   - service.yaml
+  - cert.yaml
   - traefik-middleware.yaml
+  - traefik-internal-ingressroute.yaml

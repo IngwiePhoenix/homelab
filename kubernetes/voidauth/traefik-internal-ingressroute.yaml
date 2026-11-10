@@ -1,0 +1,19 @@
+
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: voidauth
+  namespace: voidauth
+  annotations:
+    kubernetes.io/ingress.class: traefik-internal
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`auth.birb.it`)
+      kind: Rule
+      services:
+        - name: voidaouth-svc
+          port: 3000
+  tls:
+    secretName: voidauth-tls

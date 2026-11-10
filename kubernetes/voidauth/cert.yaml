@@ -1,0 +1,14 @@
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: voidauth-tls
+  namespace: voidauth
+spec:
+  secretName: voidauth-tls
+  dnsNames:
+    - auth.birb.it
+  issuerRef:
+    name: letsencrypt-cloudflare
+    kind: ClusterIssuer
+    group: cert-manager.io
