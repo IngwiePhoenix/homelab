@@ -15,7 +15,7 @@ spec:
   chart:
     spec:
       chart: traefik
-      version: "42.3.1"
+      version: 42.3.2
       interval: 1h
       sourceRef:
         kind: HelmRepository
@@ -23,6 +23,7 @@ spec:
         namespace: flux-system
 
   # CRDs are already installed and managed by traefik-internal.
+
   install:
     crds: Skip
   upgrade:
@@ -44,9 +45,13 @@ spec:
         allowCrossNamespace: false
 
         # Optional additional restriction:
+
         # Only watch namespaces that are allowed to have public routes.
+
         # namespaces:
+
         #   - voidauth
+
         #   - other-public-apps
 
       kubernetesIngress:
@@ -76,6 +81,8 @@ spec:
             enabled: true
 
     # We don't need a Kubernetes LoadBalancer Service here.
+
     # Traffic enters through the host ports.
+
     service:
       enabled: false
