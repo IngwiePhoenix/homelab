@@ -4,9 +4,8 @@ kind: IngressRoute
 metadata:
   name: voidauth
   namespace: voidauth
-  annotations:
-    kubernetes.io/ingress.class: traefik-internal
 spec:
+  ingressClassName: traefik-internal
   entryPoints:
     - websecure
   routes:
