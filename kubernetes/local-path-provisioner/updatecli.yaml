@@ -1,0 +1,12 @@
+# NOTE: this component uses an inline chart.kind: OCIRepository in its HelmRelease.
+# The Updatecli Flux crawler does not update that inline form. See the bundle README.
+name: Kubernetes / Local Path Provisioner
+
+policies:
+  - name: Local Path Provisioner
+    id: local-path-provisioner
+    config:
+      - ../updatecli/policies/component.yaml
+    valuesinline:
+      component: local-path-provisioner
+      rootdir: kubernetes/local-path-provisioner

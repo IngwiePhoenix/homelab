@@ -1,0 +1,10 @@
+name: Kubernetes / VoidAuth
+
+policies:
+  - name: VoidAuth
+    id: voidauth
+    config:
+      - ../updatecli/policies/component.yaml
+    valuesinline:
+      component: voidauth
+      rootdir: kubernetes/voidauth

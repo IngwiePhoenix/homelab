@@ -1,0 +1,10 @@
+name: Kubernetes / Cert-Manager
+
+policies:
+  - name: Cert-Manager
+    id: cert-manager
+    config:
+      - ../updatecli/policies/component.yaml
+    valuesinline:
+      component: cert-manager
+      rootdir: kubernetes/cert-manager

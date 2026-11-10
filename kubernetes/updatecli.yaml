@@ -1,0 +1,13 @@
+name: Kubernetes
+
+include:
+  - cert-manager/updatecli.yaml
+  - local-path-provisioner/updatecli.yaml
+  - metallb/updatecli.yaml
+  - postgres/cloudnative-pg/updatecli.yaml
+  - postgres/postgres-operator/updatecli.yaml
+  - reflector/updatecli.yaml
+  - reloader/updatecli.yaml
+  - traefik/updatecli.yaml
+  - vaultwarden/updatecli.yaml
+  - voidauth/updatecli.yaml

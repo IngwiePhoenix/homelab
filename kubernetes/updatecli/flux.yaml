@@ -1,0 +1,19 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: updatecli
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/updatecli
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+
+  # Copy the same SOPS decryption block used by your existing Flux Kustomizations
+  # if this Kustomization needs to decrypt github-token.sops.yaml, for example:
+  # decryption:
+  #   provider: sops
+  #   secretRef:
+  #     name: sops-age

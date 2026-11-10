@@ -1,0 +1,159 @@
+{{- define "scm" }}
+scms:
+  homelab:
+    kind: github
+    spec:
+      owner: '{{ requiredEnv "UPDATECLI_GITHUB_OWNER" }}'
+      repository: '{{ requiredEnv "UPDATECLI_GITHUB_REPOSITORY" }}'
+      branch: '{{ requiredEnv "UPDATECLI_GITHUB_BRANCH" }}'
+      user: updatecli-bot
+      email: updatecli-bot@example.invalid
+      workingbranch: true
+      force: false
+{{- end }}
+
+{{- define "patchAction" }}
+actions:
+  pr:
+    kind: github/pullrequest
+    scmid: homelab
+    title: 'chore({{ .component }}): patch updates'
+    spec:
+      labels:
+        - dependencies
+      merge:
+        strategy: auto
+      mergemethod: squash
+{{- end }}
+
+{{- define "manualAction" }}
+actions:
+  pr:
+    kind: github/pullrequest
+    scmid: homelab
+    title: 'chore({{ .component }}): dependency upgrades'
+    spec:
+      labels:
+        - dependencies
+{{- end }}
+
+# ----------------------------------------------------------
+# Patch updates: separate PR, eligible for GitHub Auto-merge
+# ----------------------------------------------------------
+
+{{ template "scm" . }}
+{{ template "patchAction" . }}
+
+name: '{{ .component }}: patch updates'
+pipelineid: '{{ .component }}-patch'
+
+autodiscovery:
+  scmid: homelab
+  actionid: pr
+  groupby: all
+  crawlers:
+{{ if .docker }}
+    dockercompose:
+      rootdir: '{{ .rootdir }}'
+      digest: false
+      versionfilter:
+        kind: semver
+        pattern: patch
+{{ else }}
+    kubernetes:
+      rootdir: '{{ .rootdir }}'
+      digest: false
+      versionfilter:
+        kind: semver
+        pattern: patch
+    flux:
+      rootdir: '{{ .rootdir }}'
+      helmrelease: true
+      ocirepository: true
+      digest: false
+      versionfilter:
+        kind: semver
+        pattern: patch
+{{ end }}
+
+---
+
+# ----------------------------------------------------------
+# Minor updates: shares component upgrade PR with major
+# ----------------------------------------------------------
+
+{{ template "scm" . }}
+{{ template "manualAction" . }}
+
+name: '{{ .component }}: minor updates'
+pipelineid: '{{ .component }}-upgrades'
+
+autodiscovery:
+  scmid: homelab
+  actionid: pr
+  groupby: all
+  crawlers:
+{{ if .docker }}
+    dockercompose:
+      rootdir: '{{ .rootdir }}'
+      digest: false
+      versionfilter:
+        kind: semver
+        pattern: minoronly
+{{ else }}
+    kubernetes:
+      rootdir: '{{ .rootdir }}'
+      digest: false
+      versionfilter:
+        kind: semver
+        pattern: minoronly
+    flux:
+      rootdir: '{{ .rootdir }}'
+      helmrelease: true
+      ocirepository: true
+      digest: false
+      versionfilter:
+        kind: semver
+        pattern: minoronly
+{{ end }}
+
+---
+
+# ----------------------------------------------------------
+# Major updates: same component upgrade PR as minor
+# ----------------------------------------------------------
+
+{{ template "scm" . }}
+{{ template "manualAction" . }}
+
+name: '{{ .component }}: major updates'
+pipelineid: '{{ .component }}-upgrades'
+
+autodiscovery:
+  scmid: homelab
+  actionid: pr
+  groupby: all
+  crawlers:
+{{ if .docker }}
+    dockercompose:
+      rootdir: '{{ .rootdir }}'
+      digest: false
+      versionfilter:
+        kind: semver
+        pattern: majoronly
+{{ else }}
+    kubernetes:
+      rootdir: '{{ .rootdir }}'
+      digest: false
+      versionfilter:
+        kind: semver
+        pattern: majoronly
+    flux:
+      rootdir: '{{ .rootdir }}'
+      helmrelease: true
+      ocirepository: true
+      digest: false
+      versionfilter:
+        kind: semver
+        pattern: majoronly
+{{ end }}

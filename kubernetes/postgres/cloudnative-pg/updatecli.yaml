@@ -1,0 +1,10 @@
+name: Kubernetes / CloudNative-PG
+
+policies:
+  - name: CloudNative-PG
+    id: cloudnative-pg
+    config:
+      - ../../updatecli/policies/component.yaml
+    valuesinline:
+      component: cloudnative-pg
+      rootdir: kubernetes/postgres/cloudnative-pg

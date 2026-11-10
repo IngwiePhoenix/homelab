@@ -1,0 +1,10 @@
+name: Kubernetes / Vaultwarden
+
+policies:
+  - name: Vaultwarden
+    id: vaultwarden
+    config:
+      - ../updatecli/policies/component.yaml
+    valuesinline:
+      component: vaultwarden
+      rootdir: kubernetes/vaultwarden

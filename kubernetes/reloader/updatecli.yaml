@@ -1,0 +1,10 @@
+name: Kubernetes / Reloader
+
+policies:
+  - name: Reloader
+    id: reloader
+    config:
+      - ../updatecli/policies/component.yaml
+    valuesinline:
+      component: reloader
+      rootdir: kubernetes/reloader

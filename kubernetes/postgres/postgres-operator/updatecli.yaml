@@ -1,0 +1,10 @@
+name: Kubernetes / Postgres Operator
+
+policies:
+  - name: Postgres Operator
+    id: postgres-operator
+    config:
+      - ../../updatecli/policies/component.yaml
+    valuesinline:
+      component: postgres-operator
+      rootdir: kubernetes/postgres/postgres-operator

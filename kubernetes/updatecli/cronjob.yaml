@@ -1,0 +1,82 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: updatecli
+  namespace: updatecli
+spec:
+  schedule: "17 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      ttlSecondsAfterFinished: 86400
+      template:
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+
+          # The core GitHub repository is assumed to be publicly readable.
+          # This checkout is only to make the nested Compose files and shared policy
+          # template available to the Updatecli process. Updatecli separately clones
+          # the repository through its configured GitHub SCM.
+          initContainers:
+            - name: checkout-config
+              image: alpine/git:v2.54.0
+              imagePullPolicy: IfNotPresent
+              command: ["sh", "-ec"]
+              args:
+                - >-
+                  git clone --depth 1 --single-branch
+                  https://github.com/IngwiePhoenix/homelab.git
+                  /workspace
+              volumeMounts:
+                - name: workspace
+                  mountPath: /workspace
+
+          containers:
+            - name: updatecli
+              image: ghcr.io/updatecli/updatecli:v0.123.0
+              imagePullPolicy: IfNotPresent
+              workingDir: /workspace
+              args:
+                - compose
+                - diff
+              env:
+                - name: UPDATECLI_GITHUB_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: updatecli-github
+                      key: UPDATECLI_GITHUB_TOKEN
+
+                # GitHub App alternative:
+                # Remove UPDATECLI_GITHUB_TOKEN above, then provide these instead.
+                # - name: UPDATECLI_GITHUB_APP_CLIENT_ID
+                #   valueFrom:
+                #     secretKeyRef:
+                #       name: updatecli-github-app
+                #       key: client-id
+                # - name: UPDATECLI_GITHUB_APP_INSTALLATION_ID
+                #   valueFrom:
+                #     secretKeyRef:
+                #       name: updatecli-github-app
+                #       key: installation-id
+                # - name: UPDATECLI_GITHUB_APP_PRIVATE_KEY_PATH
+                #   value: /var/run/secrets/github-app/private-key.pem
+              volumeMounts:
+                - name: workspace
+                  mountPath: /workspace
+                # GitHub App alternative:
+                # - name: github-app
+                #   mountPath: /var/run/secrets/github-app
+                #   readOnly: true
+
+          volumes:
+            - name: workspace
+              emptyDir: {}
+            # GitHub App alternative:
+            # - name: github-app
+            #   secret:
+            #     secretName: updatecli-github-app

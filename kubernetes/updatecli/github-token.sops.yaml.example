@@ -1,0 +1,10 @@
+# Copy to github-token.sops.yaml, replace the placeholder, then encrypt with SOPS.
+# Do not commit this example as a live Secret.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: updatecli-github
+  namespace: updatecli
+type: Opaque
+stringData:
+  UPDATECLI_GITHUB_TOKEN: REPLACE_WITH_FINE_GRAINED_GITHUB_TOKEN

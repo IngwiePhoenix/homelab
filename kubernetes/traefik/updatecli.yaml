@@ -1,0 +1,10 @@
+name: Kubernetes / Traefik
+
+policies:
+  - name: Traefik
+    id: traefik
+    config:
+      - ../updatecli/policies/component.yaml
+    valuesinline:
+      component: traefik
+      rootdir: kubernetes/traefik

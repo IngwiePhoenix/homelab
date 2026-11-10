@@ -1,0 +1,11 @@
+name: Homelab
+
+environments:
+  UPDATECLI_GITHUB_OWNER: IngwiePhoenix
+  UPDATECLI_GITHUB_REPOSITORY: homelab
+  UPDATECLI_GITHUB_BRANCH: master
+
+include:
+  - kubernetes/updatecli.yaml
+  # Enable when Docker Compose deployments are ready:
+  # - docker/updatecli.yaml

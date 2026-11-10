@@ -1,0 +1,10 @@
+name: Kubernetes / Reflector
+
+policies:
+  - name: Reflector
+    id: reflector
+    config:
+      - ../updatecli/policies/component.yaml
+    valuesinline:
+      component: reflector
+      rootdir: kubernetes/reflector

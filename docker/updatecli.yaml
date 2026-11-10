@@ -1,0 +1,8 @@
+# Future Docker Compose update policies.
+# Uncomment this file in /updatecli-compose.yaml when the Docker layout exists.
+name: Docker
+
+# include:
+#   - node-01/media-server/updatecli.yaml
+#   - node-01/backup/updatecli.yaml
+#   - node-02/monitoring/updatecli.yaml
