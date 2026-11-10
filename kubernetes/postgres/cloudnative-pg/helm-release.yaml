@@ -29,3 +29,8 @@ spec:
     crds: CreateReplace
     remediation:
       retries: 3
+
+  values:
+    config:
+      data:
+        ENABLE_INSTANCE_MANAGER_INPLACE_UPDATES: "true"

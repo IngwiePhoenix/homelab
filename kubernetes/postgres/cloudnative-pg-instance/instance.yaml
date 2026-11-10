@@ -4,7 +4,13 @@ metadata:
   name: default-cluster
   namespace: postgres
 spec:
-  instances: 1
+  instances: 2
+
+  livenessProbeTimeout: 120
+    probes:
+      liveness:
+        timeoutSeconds: 10
+
   enableSuperuserAccess: true
   storage:
     storageClass: "local-bunker"
