@@ -30,7 +30,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: homelab-repo
-  path: ./kubernetes/cert-manager-issuers/config
+  path: ./kubernetes/cert-manager/config
   prune: true
   wait: true
   dependsOn:
