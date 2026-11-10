@@ -10,7 +10,6 @@ resources:
 
   # Base:
   - cert-manager/flux.yaml
-  - cert-manager-issuers/flux.yaml
   - metallb/flux.yaml
   - reflector/flux.yaml
   - traefik/flux.yaml
