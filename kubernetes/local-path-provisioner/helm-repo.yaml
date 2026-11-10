@@ -1,0 +1,15 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: local-path-provisioner-helmrepo
+  namespace: flux-system
+spec:
+  interval: 10m
+
+  url: oci://ghcr.io/rancher/local-path-provisioner/charts/local-path-provisioner
+  ref:
+    tag: "0.0.37"
+
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy

@@ -12,13 +12,10 @@ spec:
   install:
     createNamespace: true
 
-  chart:
+  chartRef:
     kind: OCIRepository
-    spec:
-      interval: 10m
-      url: oci://ghcr.io/rancher/local-path-provisioner/charts/local-path-provisioner
-      ref:
-        tag: "0.0.37"
+    name: local-path-provisioner-helmrepo
+    namespace: flux-system
 
   values:
     # Required when using storageClassConfigs.
