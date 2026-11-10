@@ -6,6 +6,7 @@ metadata:
 spec:
   interval: 30m
   releaseName: reloader
+  targetNamespace: reloader
   chart:
     spec:
       chart: reloader
