@@ -1,6 +1,7 @@
 name: Kubernetes
 
 include:
+  - k0s/updatecli.yaml
   - cert-manager/updatecli.yaml
   - local-path-provisioner/updatecli.yaml
   - metallb/updatecli.yaml

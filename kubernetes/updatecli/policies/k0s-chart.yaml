@@ -1,0 +1,153 @@
+
+{{- define "scm" }}
+scms:
+  homelab:
+    kind: github
+    spec:
+      owner: '{{ requiredEnv "UPDATECLI_GITHUB_OWNER" }}'
+      repository: '{{ requiredEnv "UPDATECLI_GITHUB_REPOSITORY" }}'
+      branch: '{{ requiredEnv "UPDATECLI_GITHUB_BRANCH" }}'
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      user: updatecli-bot
+      email: updatecli-bot@example.invalid
+      workingbranch: true
+      force: false
+{{- end }}
+
+{{- define "patchAction" }}
+actions:
+  pr:
+    kind: github/pullrequest
+    scmid: homelab
+    title: 'chore({{ .component }}): patch updates'
+    spec:
+      labels:
+        - dependencies
+      merge:
+        strategy: auto
+      mergemethod: squash
+{{- end }}
+
+{{- define "manualAction" }}
+actions:
+  pr:
+    kind: github/pullrequest
+    scmid: homelab
+    title: 'chore({{ .component }}): dependency upgrades'
+    spec:
+      labels:
+        - dependencies
+{{- end }}
+
+# ----------------------------------------------------------
+# Patch updates
+# ----------------------------------------------------------
+
+{{ template "scm" . }}
+{{ template "patchAction" . }}
+
+name: '{{ .component }}: patch updates'
+pipelineid: '{{ .component }}-patch'
+
+sources:
+  chartVersion:
+    kind: helmchart
+    spec:
+      url: '{{ .chartRepository }}'
+      name: '{{ .chartName }}'
+      versionfilter:
+        kind: semver
+        pattern: patch
+
+conditions:
+  chartIdentity:
+    kind: yaml
+    scmid: homelab
+    spec:
+      file: '{{ .manifest }}'
+      key: $.spec.chartName
+      value: '{{ .chartReference }}'
+
+targets:
+  chartVersion:
+    kind: yaml
+    scmid: homelab
+    spec:
+      file: '{{ .manifest }}'
+      key: $.spec.version
+
+---
+# ----------------------------------------------------------
+# Minor updates
+# ----------------------------------------------------------
+
+{{ template "scm" . }}
+{{ template "manualAction" . }}
+
+name: '{{ .component }}: minor updates'
+pipelineid: '{{ .component }}-upgrades'
+
+sources:
+  chartVersion:
+    kind: helmchart
+    spec:
+      url: '{{ .chartRepository }}'
+      name: '{{ .chartName }}'
+      versionfilter:
+        kind: semver
+        pattern: minoronly
+
+conditions:
+  chartIdentity:
+    kind: yaml
+    scmid: homelab
+    spec:
+      file: '{{ .manifest }}'
+      key: $.spec.chartName
+      value: '{{ .chartReference }}'
+
+targets:
+  chartVersion:
+    kind: yaml
+    scmid: homelab
+    spec:
+      file: '{{ .manifest }}'
+      key: $.spec.version
+
+---
+# ----------------------------------------------------------
+# Major updates
+# ----------------------------------------------------------
+
+{{ template "scm" . }}
+{{ template "manualAction" . }}
+
+name: '{{ .component }}: major updates'
+pipelineid: '{{ .component }}-upgrades'
+
+sources:
+  chartVersion:
+    kind: helmchart
+    spec:
+      url: '{{ .chartRepository }}'
+      name: '{{ .chartName }}'
+      versionfilter:
+        kind: semver
+        pattern: majoronly
+
+conditions:
+  chartIdentity:
+    kind: yaml
+    scmid: homelab
+    spec:
+      file: '{{ .manifest }}'
+      key: $.spec.chartName
+      value: '{{ .chartReference }}'
+
+targets:
+  chartVersion:
+    kind: yaml
+    scmid: homelab
+    spec:
+      file: '{{ .manifest }}'
+      key: $.spec.version

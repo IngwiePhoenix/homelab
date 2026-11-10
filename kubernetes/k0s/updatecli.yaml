@@ -1,0 +1,16 @@
+name: Kubernetes / k0s
+
+policies:
+  - name: k0s / Flux CD bootstrap
+    id: k0s-flux-cd
+
+    config:
+      - ../updatecli/policies/k0s-chart.yaml
+
+    valuesinline:
+      component: k0s-flux-cd
+      manifest: kubernetes/k0s/extensions-helm/flux-cd.yaml
+
+      chartRepository: oci://ghcr.io/fluxcd-community/charts/
+      chartName: flux2
+      chartReference: oci://ghcr.io/fluxcd-community/charts/flux2
