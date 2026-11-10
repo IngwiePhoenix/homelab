@@ -1,4 +1,3 @@
-
 {{- define "scm" }}
 scms:
   homelab:
