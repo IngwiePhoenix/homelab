@@ -1,0 +1,10 @@
+name: Kubernetes / updatecli
+
+policies:
+  - name: updatecli
+    id: updatecli
+    config:
+      - ../updatecli/policies/component.yaml
+    valuesinline:
+      component: updatecli
+      rootdir: kubernetes/updatecli
