@@ -6,7 +6,7 @@ metadata:
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
-  replicas: 0 # temp, for install
+  replicas: 1
   revisionHistoryLimit: 3
 
   # Avoid PVC multi-attach conflicts during upgrades.
