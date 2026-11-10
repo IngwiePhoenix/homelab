@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: updatecli
+  name: updatecli-cron
   namespace: updatecli
 spec:
   schedule: "17 */6 * * *"
@@ -18,10 +18,6 @@ spec:
           restartPolicy: Never
           automountServiceAccountToken: false
 
-          # The core GitHub repository is assumed to be publicly readable.
-          # This checkout is only to make the nested Compose files and shared policy
-          # template available to the Updatecli process. Updatecli separately clones
-          # the repository through its configured GitHub SCM.
           initContainers:
             - name: checkout-config
               image: alpine/git:v2.54.0

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: updatecli-github
+    namespace: updatecli
+type: Opaque
+stringData:
+    UPDATECLI_GITHUB_TOKEN: ENC[AES256_GCM,data:fm7q5Nf1jNKAclbxtcvYDCGH/ESGPg0t1ltehl2+JK8rUtVBmvaOAH2jY5u1h0EFa8pr0dRI45QSnC3KUpIEZr9V86oU1CWAFwS6n/+nut1Vo25KeWf8xkYGxHhH,iv:Dz/1zgOygTbhbdk6k8BeZ1DSAt1fbJJ5V009Qe/OZOc=,tag:1QMExgNCTdAgeKTcuBWwhA==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAzNDhSWVY4ZWkwWVQ5T25P
+            ZEhTRklDYVN4dDVuT1BPMFNNOGNNZXExUENvCjZIbjM0ekQvcXBvT2s2ZDRvTUhy
+            UnltdGFKVldHemk4dnJ3NEV4WW1yNGsKLS0tIGlPc1dYQkVHUmJrWkhRbllFbDgz
+            VnhIZjRmQTZDKzBVdkhUMm51cTZ0WmcKApHTJ3vl/nN6pk8wZ8YhTYDM9laJZP8S
+            wmngBBb3ZoLfBGDb9CgJ5UT4rQzDKOGVOUZKiaRi6irCATWxHJ6oHA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-10T20:01:31Z"
+    mac: ENC[AES256_GCM,data:oAh69FoXhsw8+TG15Vr1l2vvLXWjLDGi4jo7ooldLVixfs0NZS9+oYNRR8K28kOB8iCakD+I5z2NYwVsvUJ/XgQIj4lhgdf+tfpyQ2txdlPkLiKa9QCZA1/LMGP9GLRgUWUBk6e4BDagigLyKhTodflvbujU2VUBisOEGRT1KfA=,iv:Mgt9bC5qIj8KOIQ506EY5n48CEwK2W2qX9xMBC7Lm7I=,tag:nIx5yjKoRdDji5V4qVns7Q==,type:str]
+    version: 3.13.3

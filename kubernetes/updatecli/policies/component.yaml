@@ -66,6 +66,9 @@ autodiscovery:
       versionfilter:
         kind: semver
         pattern: patch
+      ignore:
+        - images:
+          - "wait4x/wait4x"
     flux:
       rootdir: '{{ .rootdir }}'
       helmrelease: true
@@ -107,6 +110,9 @@ autodiscovery:
       versionfilter:
         kind: semver
         pattern: minoronly
+      ignore:
+        - images:
+          - "wait4x/wait4x"
     flux:
       rootdir: '{{ .rootdir }}'
       helmrelease: true
@@ -148,6 +154,9 @@ autodiscovery:
       versionfilter:
         kind: semver
         pattern: majoronly
+      ignore:
+        - images:
+          - "wait4x/wait4x"
     flux:
       rootdir: '{{ .rootdir }}'
       helmrelease: true
