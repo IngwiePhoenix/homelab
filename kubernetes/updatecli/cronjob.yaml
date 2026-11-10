@@ -40,7 +40,7 @@ spec:
               workingDir: /workspace
               args:
                 - compose
-                - diff
+                - apply
               env:
                 - name: UPDATECLI_GITHUB_TOKEN
                   valueFrom:
