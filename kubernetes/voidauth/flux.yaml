@@ -15,6 +15,7 @@ spec:
   wait: true
   dependsOn:
     - name: postgres-operator
+    - name: cert-manager-issuers
     - name: traefik-internal
     - name: reflector
     - name: reloader
