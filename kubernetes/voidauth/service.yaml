@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: voidauth-svc
+  namespace: voidauth
+spec:
+  type: ClusterIP
+
+  selector:
+    app: voidauth
+
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+      protocol: TCP

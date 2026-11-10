@@ -1,0 +1,152 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voidauth-app
+  namespace: voidauth
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+
+  # Avoid PVC multi-attach conflicts during upgrades.
+  strategy:
+    type: Recreate
+
+  selector:
+    matchLabels:
+      app: voidauth
+
+  template:
+    metadata:
+      labels:
+        app: voidauth
+    spec:
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: config-vol
+          persistentVolumeClaim:
+            claimName: voidauth-config
+
+      initContainers:
+        - name: wait-for-postgres
+          image: wait4x/wait4x:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: voidauth-db-creds
+          args:
+            - postgres
+            - postgres://$LOGIN:$PASSWORD@$HOST:$PORT/$DATABASE'
+
+      containers:
+        - name: app
+          image: voidauth/voidauth:v1.19.0
+          imagePullPolicy: IfNotPresent
+
+          envFrom:
+            - configMapRef:
+                name: voidauth-env
+            - secretRef:
+                name: voidauth-creds
+          env:
+            # PostgreSQL operator-generated credentials
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: voidauth-db-creds
+                  key: HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: voidauth-db-creds
+                  key: PORT
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: voidauth-db-creds
+                  key: DATABASE
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: voidauth-db-creds
+                  key: LOGIN
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: voidauth-db-creds
+                  key: PASSWORD
+            # Proton SMTP credentials (via Reflector)
+            - name: SMTP_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mirror-proton-smtp-creds
+                  key: SMTP_SERVER
+            - name: SMTP_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: mirror-proton-smtp-creds
+                  key: SMTP_PORT
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mirror-proton-smtp-creds
+                  key: SMTP_USER
+            - name: SMTP_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mirror-proton-smtp-creds
+                  key: SMTP_PASS
+            # Proton SMTP tokens are tied to a sender address.
+            - name: SMTP_FROM
+              valueFrom:
+                secretKeyRef:
+                  name: mirror-proton-smtp-creds
+                  key: SMTP_USER
+            # Port 587 uses STARTTLS, not implicit TLS.
+            - name: SMTP_SECURE
+              value: "false"
+
+          volumeMounts:
+            - name: config-vol
+              mountPath: /app/config
+
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+            # Enable later, when LDAP_ENABLED=true
+            # - name: ldap
+            #   containerPort: 3890
+            #   protocol: TCP
+
+          startupProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            periodSeconds: 5
+            failureThreshold: 60
+
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi

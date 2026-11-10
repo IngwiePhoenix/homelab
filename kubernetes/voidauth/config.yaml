@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: voidauth-env
+  namespace: voidauth
+data:
+  # App settings
+  APP_URL: "https://auth.birb.it"
+  TRUSTED_PROXIES: "10.200.0.0/16" # podCIDR, IPv4
+  #SESSION_DOMAIN: # "birb.it"?
+  #DEFAULT_REDIRECT unused
+  SIGNUP: "false"
+  SIGNUP_REQUIRES_APPROVAL: "true"
+  EMAIL_VERIFICATION: "true"
+  MFA_REQUIRED: "true"
+  #DISABLE_FILE_UPLOADS
+  #DISABLE_USER_AVATAR_UPLOADS
+  #API_RATELIMIT
+  #ENABLE_DEBUG
+
+  # App Customization
+  APP_TITLE: "BirbAuth"
+  #APP_PORT unused
+  #APP_COLOR hex color, change later
+  #APP_FONT unused
+  CONTACT_EMAIL: "ingwie@birb.it"
+
+  # Database settings
+  DB_ADAPTER: "postgres"
+  #DB_HOST via operator
+  #DB_PASSWORD via operator
+  #DB_PORT via operator
+  #DB_USER via operator
+  #DB_NAME via operator
+  #DB_SSL also via operator, i think...?
+  #DB_SSL_VERIFICATION unused
+
+  # Database Migration - completely unused.
+
+  # SMTP Settings
+  #SMTP_HOST should be a secret...
+  #SMTP_FROM same
+  #SMTP_PORT same
+  #SMTP_SECURE same
+  #SMTP_USER
+  #SMTP_PASS
+  #SMTP_NOAUTH probably unused
+  #SMTP_IGNORE_CERT shouldnt matter
+  #SMTP_TLS_CIPHERS this one neither
+  #SMTP_TLS_MIN_VERSION nope.
+
+  # LDAP Settings
+  LDAP_ENABLED: "false" # Absolutely enable later!
+  LDAP_PORT: "3890" # Use LoadBalancer to fix this one.
+  LDAP_BASE_DN: "dc=it,dc=birb" # Should be somewhat similiar to APP_URL or SESSION_DOMAIN
+  LDAP_BIND_DN: "cn=ldap_bind,dc=voidauth"
+  #LDAP_BIND_PASSWORD see secret
+  #LDAP_TLS_CERT_FILE Provide via Cert-Manager, mount in deployment and point
+  #LDAP_TLS_KEY_FILE same
+
+  # Misc
+  PASSWORD_STRENGTH: "3" # wtf?
+  ADMIN_EMAILS: "daily" # i thiiiiink...
+  DEFAULT_USER_EXPIRES_IN: "30 minutes" # untill user is borked, methinks?

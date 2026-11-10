@@ -1,0 +1,28 @@
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlDatabase
+metadata:
+  name: voidauth-db
+  namespace: voidauth
+spec:
+  engineConfiguration:
+    name: default-cluster-instance
+    namespace: postgres
+  database: voidauth
+  masterRole: "voidauth-role"
+  dropOnDelete: true
+  waitLinkedResourcesDeletion: true
+---
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlUserRole
+metadata:
+  name: voidauth-db-user
+  namespace: voidauth
+spec:
+  mode: MANAGED
+  rolePrefix: "voidauth"
+  userPasswordRotationDuration: 720h
+  privileges:
+    - privilege: OWNER
+      database:
+        name: voidauth-db
+      generatedSecretName: voidauth-db-creds
