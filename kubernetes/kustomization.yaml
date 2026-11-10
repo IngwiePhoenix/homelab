@@ -16,3 +16,6 @@ resources:
   - traefik/flux.yaml
   - postgres/flux.yaml
   - common-secrets/flux.yaml
+
+  # Apps
+  #- voidauth/flux.yaml
