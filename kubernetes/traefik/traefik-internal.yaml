@@ -14,7 +14,7 @@ spec:
   chart:
     spec:
       chart: traefik
-      version: "42.3.1"
+      version: 42.3.2
       interval: 1h
       sourceRef:
         kind: HelmRepository
@@ -100,8 +100,11 @@ spec:
         allocateLoadBalancerNodePorts: false
 
     # Avoids two Traefik instances to sit on the same node.
+
     # When a pod is scheduled, it plops a label on the respective node.
+
     # Because that label now exists, another pod is not put here.
+
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
