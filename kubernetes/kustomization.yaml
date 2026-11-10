@@ -18,4 +18,4 @@ resources:
   - common-secrets/flux.yaml
 
   # Apps
-  #- voidauth/flux.yaml
+  - voidauth/flux.yaml
