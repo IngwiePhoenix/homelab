@@ -12,6 +12,7 @@ resources:
   - cert-manager/flux.yaml
   - metallb/flux.yaml
   - reflector/flux.yaml
+  - reloader/flux.yaml
   - traefik/flux.yaml
   - postgres/flux.yaml
   - common-secrets/flux.yaml
