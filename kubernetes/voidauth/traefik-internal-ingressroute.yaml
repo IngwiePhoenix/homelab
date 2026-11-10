@@ -13,7 +13,7 @@ spec:
     - match: Host(`auth.birb.it`)
       kind: Rule
       services:
-        - name: voidaouth-svc
+        - name: voidauth-svc
           port: 3000
   tls:
     secretName: voidauth-tls
