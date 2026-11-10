@@ -1,7 +1,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: cert-manager-helmchart
+  name: cert-manager-helmrelease
   namespace: flux-system
 spec:
   interval: 1h
