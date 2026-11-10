@@ -4,7 +4,8 @@ metadata:
   name: updatecli-cron
   namespace: updatecli
 spec:
-  schedule: "17 */6 * * *"
+  schedule: "15 */6 * * *"
+  timeZone: Europe/Berlin
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
