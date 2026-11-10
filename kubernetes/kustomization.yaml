@@ -9,6 +9,7 @@ resources:
   - local-path-provisioner/flux.yaml
 
   # Base:
+  - updatecli/flux.yaml
   - cert-manager/flux.yaml
   - metallb/flux.yaml
   - reflector/flux.yaml

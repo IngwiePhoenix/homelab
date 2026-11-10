@@ -12,3 +12,4 @@ include:
   - traefik/updatecli.yaml
   - vaultwarden/updatecli.yaml
   - voidauth/updatecli.yaml
+  - updatecli/updatecli.yaml
