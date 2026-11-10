@@ -7,9 +7,9 @@ spec:
   instances: 2
 
   livenessProbeTimeout: 120
-    probes:
-      liveness:
-        timeoutSeconds: 10
+  probes:
+    liveness:
+      timeoutSeconds: 10
 
   enableSuperuserAccess: true
   storage:
