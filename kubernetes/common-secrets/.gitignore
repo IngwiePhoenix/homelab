@@ -3,3 +3,4 @@
 !flux.yaml
 !kustomization.yaml
 !namespace.yaml
+crowdsec-bouncer-key.yaml

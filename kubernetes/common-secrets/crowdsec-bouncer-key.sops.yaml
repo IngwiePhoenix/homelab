@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: crowdsec-bouncer-keys
+    namespace: common-secrets
+    annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: traefik-internal,traefik-external,crowdsec
+        reflector.v1.k8s.emberstack.com/reflection-auto: "true"
+type: Opaque
+stringData:
+    traefik: ENC[AES256_GCM,data:ziekOFx9Rn3hQR81DYnnXlfSKsFXoR0NfYWf+8gEjfSrCirU9w+LZcxJ4YrLfCXU+nBd/KndHKw02cqSScntnw==,iv:1E+Pa8yySwpyxqwxWO2nbuozoyBSDHWEqIj7/qP2MjQ=,tag:LTnFmC4TBtcRJ0SMjSodZg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBxWkpNZ3pxVzROeUNOMTgw
+            UkRyVGR1NUc2K0hTSzlmVnVQU093bGl2T2pnCm5SU1dmTlpoZ29XN0tnc0lrMzZi
+            cnVLdUMxSURlYTB5MWF2UGc4NlNjak0KLS0tIExyYzMza0I3NVp5ckZKTFJzMGxY
+            R0hJZEt6RnRFaGE3UDNMT0Nuc0dnWmMK+xadqJWmpGd0wFHqBfxjlbhlFYKWKhvl
+            fu+NudYP4AgBA3yj3lnF/4LYFqCO/2RgTuQPOTqL18yxAPz4eRENxQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-11T19:51:34Z"
+    mac: ENC[AES256_GCM,data:DQQdfp4+6qquJiESv4YnotQydwirIc24HZwKbgzK8QJ2IYiOys5DFA8vVL5ixOM3k7+NmnmUUv7trhkI6i2a8cXHeWDqpHg3Ihp07m1gKC5l626WqVZUCAanDQjGerm1ctWTeIUIgMyKQetlJvfrMjxMmyNA6XbE+hIDCiKXc1U=,iv:f/yUlywn3SMbo/WHLhOodlkoMLkwfpIcaqB3HmMc38w=,tag:MIZ4pzCV2FmDPuloZlFOiQ==,type:str]
+    version: 3.13.3
