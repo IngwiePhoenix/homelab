@@ -30,6 +30,6 @@ spec:
       name: crowdsec-web-ui
       namespace: crowdsec
   dependsOn:
-    - name: traefik-install
+    - name: traefik-ingress
     - name: common-secrets
     - name: reflector
