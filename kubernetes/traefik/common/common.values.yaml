@@ -64,7 +64,7 @@ ports:
       tls:
         enabled: true
       middlewares:
-        - internal-chain-tm@kubernetescrd
+        - traefik-ingress-internal-chain-tm@kubernetescrd@kubernetescrd
 
   # Entrypoint for external/VPS
   edge-web:
@@ -88,7 +88,7 @@ ports:
       tls:
         enabled: true
       middlewares:
-        - external-chain-tm@kubernetescrd
+        - traefik-ingress-external-chain-tm@kubernetescrd@kubernetescrd
 
 # Optional hardening, requires Traefik >= 3.7.11 (GHSA-g55h-rg46-x9c5):
 core:
