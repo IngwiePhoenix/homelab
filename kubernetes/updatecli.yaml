@@ -14,3 +14,4 @@ include:
   - vaultwarden/updatecli.yaml
   - voidauth/updatecli.yaml
   - updatecli/updatecli.yaml
+  - piped/updatecli.yaml
