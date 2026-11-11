@@ -79,6 +79,9 @@ ports:
           permanent: true
   edge:
     port: 8444
+    # Fixes this error during apply:
+    # `.spec.template.spec.containers[name="traefik-internal"].args[26]: expected string, got &value.valueUnstructured{Value:map[string]interface {}{"--entryPoints.edge-web.http.redirections.entryPoint.to=":interface {}(nil)}}`
+    exposedPort: 8444
     expose:
       default: false
     http:
