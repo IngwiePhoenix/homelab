@@ -22,7 +22,7 @@ actions:
       labels:
         - dependencies
       merge:
-        strategy: auto
+        strategy: client
       mergemethod: squash
 {{- end }}
 
