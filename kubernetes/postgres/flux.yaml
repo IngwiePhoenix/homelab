@@ -5,6 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m
+  timeout: 30m
   path: ./kubernetes/postgres/cloudnative-pg
   prune: true
   sourceRef:
@@ -66,7 +67,7 @@ spec:
       namespace: flux-system
   dependsOn:
     - name: postgres-cnpg
-    - name: postgres-cnpg-instance
+    #- name: postgres-cnpg-instance
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
