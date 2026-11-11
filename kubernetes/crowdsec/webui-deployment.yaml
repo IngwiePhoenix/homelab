@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crowdsec-webui
+  namespace: crowdsec
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: crowdsec-webui
+  template:
+    metadata:
+      labels:
+        app: crowdsec-webui
+    spec:
+      nodeSelector:
+        homelab/location: internal
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: ghcr.io/theduffman85/crowdsec-web-ui:2026.11.8
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: CONFIG_INSTANCE_LAPI_URL
+              value: "http://crowdsec-service.crowdsec.svc.cluster.local:8080"
+            - name: CONFIG_INSTANCE_LAPI_AUTH_USERNAME
+              value: "crowdsec-web-ui"
+            - name: CONFIG_INSTANCE_LAPI_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: crowdsec-web-ui-machine
+                  key: password
+            - name: CONFIG_AUTH_ENABLED
+              value: "true"
+            - name: CONFIG_AUTH_OIDC_ISSUER_URL
+              value: "https://auth.birb.it"
+            - name: CONFIG_AUTH_OIDC_CLIENT_ID
+              value: "crowdsec-webui"
+            - name: CONFIG_AUTH_OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: crowdsec-webui-oidc
+                  key: client-secret
+            - name: CONFIG_AUTH_OIDC_SCOPE
+              value: "openid profile email"
+            - name: CONFIG_AUTH_OIDC_GROUPS_CLAIM
+              value: "groups"
+            - name: CONFIG_AUTH_OIDC_ADMIN_GROUPS
+              value: "crowdsec-admins"
+            - name: CONFIG_AUTH_OIDC_READ_ONLY_GROUPS
+              value: "crowdsec-viewers"
+            - name: CONFIG_AUTH_OIDC_UNMATCHED_ROLE
+              value: "deny"
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: crowdsec-webui-pvc

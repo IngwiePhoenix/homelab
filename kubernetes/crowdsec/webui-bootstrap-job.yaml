@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: crowdsec-webui-bootstrap
+  namespace: crowdsec
+spec:
+  backoffLimit: 10
+  activeDeadlineSeconds: 900
+  template:
+    spec:
+      serviceAccountName: crowdsec-webui-bootstrap
+      restartPolicy: Never
+      nodeSelector:
+        homelab/location: internal
+      containers:
+        - name: bootstrap
+          # Verify this tag exists for linux/arm64 and is within ±1 minor of k0s (1.37).
+          # alpine/k8s:1.37.2 is a fine alternative. Pin via updatecli.
+          image: bitnami/kubectl:1.37
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              NS="crowdsec"
+              SECRET="crowdsec-web-ui-machine"
+              MACHINE="crowdsec-web-ui"
+              # adjust if your LAPI Deployment is named differently
+              LAPI="deploy/crowdsec-lapi"
+
+              if kubectl -n "$NS" get secret "$SECRET" >/dev/null 2>&1; then
+                echo "[bootstrap] $SECRET exists; nothing to do."
+                exit 0
+              fi
+
+              echo "[bootstrap] waiting for CrowdSec LAPI..."
+              until kubectl -n "$NS" exec "$LAPI" -- cscli lapi status >/dev/null 2>&1; do
+                sleep 5
+              done
+
+              # Generate, register, THEN persist. Secret exists => registration succeeded.
+              PW="$(cat /proc/sys/kernel/random/uuid | tr -d '-')$(cat /proc/sys/kernel/random/uuid | tr -d '-')"
+              kubectl -n "$NS" exec "$LAPI" -- \
+                cscli machines add "$MACHINE" --password "$PW" --force
+              kubectl -n "$NS" create secret generic "$SECRET" \
+                --from-literal=password="$PW"
+              echo "[bootstrap] registered $MACHINE and created $SECRET."

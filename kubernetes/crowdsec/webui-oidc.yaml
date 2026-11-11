@@ -1,0 +1,13 @@
+# BEFORE COMMITTING:
+#   1. Create the OIDC app in VoidAuth for crowdsec.birb.it.
+#   2. Put the generated client secret below.
+#   3. Encrypt in place:
+#        sops --encrypt --in-place kubernetes/crowdsec/web-ui-oidc.sops.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: crowdsec-webui-oidc
+  namespace: crowdsec
+type: Opaque
+stringData:
+  client-secret: "REPLACE_ME_from_voidauth"

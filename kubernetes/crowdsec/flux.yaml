@@ -1,0 +1,35 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: crowdsec
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+  path: ./kubernetes/crowdsec
+  prune: true
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: crowdsec-helmrelease
+      namespace: flux-system
+    - apiVersion: batch/v1
+      kind: Job
+      name: crowdsec-webui-bootstrap
+      namespace: crowdsec
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: crowdsec-web-ui
+      namespace: crowdsec
+  dependsOn:
+    - name: traefik-install
+    - name: common-secrets
+    - name: reflector

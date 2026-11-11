@@ -1,0 +1,107 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: crowdsec-helmrelease
+  namespace: flux-system
+spec:
+  interval: 30m
+  releaseName: crowdsec
+  targetNamespace: crowdsec
+  chart:
+    spec:
+      chart: crowdsec
+      version: "0.24.3"
+      interval: 1h
+      sourceRef:
+        kind: HelmRepository
+        name: crowdsec-helmrepo
+        namespace: flux-system
+  install:
+    createNamespace: true
+  values:
+    # k0s uses containerd. The agent reads Traefik pod logs directly (CRI format).
+    container_runtime: containerd
+
+    agent:
+      # DaemonSet by default; runs on every node so it sees both Traefik instances.
+      tolerations:
+        - key: homelab/location
+          operator: Equal
+          value: external
+          effect: NoSchedule
+
+      acquisition:
+        - namespace: traefik-internal
+          podName: "traefik-internal-*"
+          program: traefik
+        - namespace: traefik-external
+          podName: "traefik-external-*"
+          program: traefik
+
+      env:
+        - name: COLLECTIONS
+          value: >-
+            crowdsecurity/traefik
+            crowdsecurity/base-http-scenarios
+            crowdsecurity/http-cve
+            crowdsecurity/linux
+            crowdsecurity/sshd
+
+    lapi:
+      nodeSelector:
+        homelab/location: internal
+
+      env:
+        - name: BOUNCER_KEY_traefik
+          valueFrom:
+            secretKeyRef:
+              name: crowdsec-bouncer-keys
+              key: traefik
+
+      # TODO: Verify those options
+      persistentVolume:
+        config:
+          enabled: true
+          storageClassName: local-bunker
+          accessModes: ["ReadWriteOnce"]
+          size: 1Gi
+        data:
+          enabled: true
+          storageClassName: local-bunker
+          accessModes: ["ReadWriteOnce"]
+          size: 5Gi
+
+    appsec:
+      enabled: true
+      nodeSelector:
+        homelab/location: internal
+
+      acquisitions:
+        - source: appsec
+          listen_addr: "0.0.0.0:7422"
+          path: /
+          appsec_configs:
+            - crowdsecurity/appsec-default
+            - crowdsecurity/appsec-bot-*
+          labels:
+            type: appsec
+
+      env:
+        - name: COLLECTIONS
+          value: >-
+            crowdsecurity/appsec-virtual-patching
+            crowdsecurity/appsec-generic-rules
+            crowdsecurity/appsec-bot-challenge
+
+    config:
+      config.yaml.local: |
+        api:
+          server:
+            auto_registration:
+              enabled: true
+              token: "${REGISTRATION_TOKEN}"   # auto-generated and handled by the chart
+              allowed_ranges:
+                - "127.0.0.1/32"
+                - "10.0.0.0/8"
+                - "192.168.0.0/16"
+                - "172.16.0.0/12"

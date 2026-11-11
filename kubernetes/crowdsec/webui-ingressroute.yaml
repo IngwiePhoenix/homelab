@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: crowdsec-webui-ir
+  namespace: crowdsec
+spec:
+  # Internal-only. Auth is handled by the app's native OIDC (VoidAuth),
+  # so no forwardAuth middleware is needed here.
+  entryPoints: [websecure]
+  routes:
+    - match: Host(`crowdsec.birb.it`)
+      kind: Rule
+      services:
+        - name: crowdsec-webui-svc
+          port: 3000
