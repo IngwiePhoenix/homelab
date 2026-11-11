@@ -1,0 +1,33 @@
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: piped
+---
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlDatabase
+metadata:
+  name: piped-db
+  namespace: piped
+spec:
+  engineConfiguration:
+    name: default-cluster-instance
+    namespace: postgres
+  database: piped
+  masterRole: piped-role
+  dropOnDelete: true
+  waitLinkedResourcesDeletion: true
+---
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlUserRole
+metadata:
+  name: piped-db-user
+  namespace: piped
+spec:
+  mode: MANAGED
+  rolePrefix: piped
+  privileges:
+    - privilege: OWNER
+      database:
+        name: piped-db
+      generatedSecretName: piped-db-creds

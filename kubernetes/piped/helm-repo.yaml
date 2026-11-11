@@ -1,0 +1,9 @@
+
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: piped-helmrepo
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://helm.piped.video
