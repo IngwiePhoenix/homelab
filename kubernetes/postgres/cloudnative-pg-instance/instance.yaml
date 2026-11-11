@@ -11,6 +11,11 @@ spec:
     liveness:
       timeoutSeconds: 10
 
+  # Ensure everyone is forced out after 30sec.
+  # My cluster isnt ultra fast over NFS on HDDs - so uh, yeah.
+  # Get fucked? xD
+  smartShutdownTimeout: 30
+
   # Fix the container's uid/gid pair
   postgresUID: 26
   postgresGID: 26
