@@ -31,6 +31,8 @@ spec:
       retries: 3
 
   values:
+    nodeSelector:
+      homelab/location: internal
     config:
       data:
         ENABLE_INSTANCE_MANAGER_INPLACE_UPDATES: "true"

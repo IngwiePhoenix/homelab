@@ -29,3 +29,7 @@ spec:
     # Will move to SSD later. Keep on NFS for now.
     storageClass: "local-bunker"
     size: 5Gi
+
+  affinity:
+    nodeSelector:
+      homelab/location: internal

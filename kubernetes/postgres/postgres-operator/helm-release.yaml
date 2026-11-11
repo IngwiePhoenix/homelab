@@ -31,6 +31,9 @@ spec:
       retries: 3
 
   values:
+    nodeSelector:
+      homelab/location: internal
+
     args:
       - --leader-elect
       - --reconcile-timeout=20s
