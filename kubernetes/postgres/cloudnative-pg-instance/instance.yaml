@@ -11,6 +11,16 @@ spec:
     liveness:
       timeoutSeconds: 10
 
+  # Fix the container's uid/gid pair
+  postgresUID: 26
+  postgresGID: 26
+
+  inheritedMetadata:
+    annotations:
+      local-path-provisioner/uid: "26"
+      local-path-provisioner/gid: "26"
+      local-path-provisioner/perm: "0700"
+
   enableSuperuserAccess: true
   storage:
     storageClass: "local-bunker"
