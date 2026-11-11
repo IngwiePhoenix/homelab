@@ -14,7 +14,7 @@ spec:
   prune: true
   wait: false # Fow now.
   dependsOn:
-    - name: postgres-operator
+    - name: postgres-instance
     - name: cert-manager-issuers
     - name: traefik
     - name: reflector
