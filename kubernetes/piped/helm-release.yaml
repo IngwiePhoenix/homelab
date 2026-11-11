@@ -35,21 +35,18 @@ spec:
 
     ingress:
       backend:
-        ingressClassName: traefik-internal
         hosts:
           - host: pipedapi.birb.it
             paths:
               - path: /
 
       main:
-        ingressClassName: traefik-internal
         hosts:
           - host: piped.birb.it
             paths:
               - path: /
 
       ytproxy:
-        ingressClassName: traefik-internal
         hosts:
           - host: pipedproxy.birb.it
             paths:

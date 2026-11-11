@@ -4,7 +4,6 @@ metadata:
   name: shiori-ir-internal
   namespace: shiori
 spec:
-  ingressClassName: "traefik-internal"
   entryPoints:
     - websecure
   routes:

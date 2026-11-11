@@ -4,9 +4,9 @@ metadata:
   name: vaultwarden-tr
   namespace: vaultwarden
 spec:
-  ingressClassName: "traefik-internal"
   entryPoints:
     - websecure
+    #- edge
   routes:
     - match: Host(`vault.birb.it`)
       kind: Rule
