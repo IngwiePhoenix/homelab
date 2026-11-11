@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vaultwarden-app
+  namespace: vaultwarden
+  labels:
+    app: vaultwarden
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vaultwarden
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: vaultwarden
+    spec:
+      # securityContext:
+      #   fsGroup: 1000
+      volumes:
+        - name: vaultwarden-vol
+          persistentVolumeClaim:
+            claimName: vaultwarden-pvc
+      containers:
+        - image: "vaultwarden/server:1.37.4-alpine"
+          name: vaultwarden
+          imagePullPolicy: Always
+          env:
+            - name: ORG_GROUPS_ENABLED
+              value: "true"
+            - name: EXPERIMENTAL_CLIENT_FEATURE_FLAGS
+              value: >-
+                inline-menu-positioning-improvements,
+                inline-menu-totp,
+                ssh-agent,
+                ssh-key-vault-item,
+                export-attachments
+            - name: "WEBSOCKET_ENABLED"
+              value: "true"
+            - name: "EVENTS_DAYS_RETAIN"
+              value: "30"
+            - name: "SIGNUPS_ALLOWED"
+              value: "false"
+            - name: "ADMIN_TOKEN"
+              valueFrom:
+                secretKeyRef:
+                  name: vaultwarden-creds
+                  key: admin-token
+            - name: "DOMAIN"
+              value: "https://vault.birb.it"
+            # Proton SMTP credentials (via Reflector)
+            - name: SMTP_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mirror-proton-smtp-creds
+                  key: SMTP_SERVER
+            - name: SMTP_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: mirror-proton-smtp-creds
+                  key: SMTP_PORT
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mirror-proton-smtp-creds
+                  key: SMTP_USER
+            - name: SMTP_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mirror-proton-smtp-creds
+                  key: SMTP_PASS
+            # Proton SMTP tokens are tied to a sender address.
+            - name: SMTP_FROM
+              valueFrom:
+                secretKeyRef:
+                  name: mirror-proton-smtp-creds
+                  key: SMTP_USER
+            - name: "SMTP_FROM_NAME"
+              value: "Vaultwarden"
+            - name: "SMTP_SECURITY"
+              value: "starttls"
+          ports:
+            - containerPort: 80
+              name: vw-webui
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data
+              name: vaultwarden-vol

@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: vaultwarden-tr
+  namespace: vaultwarden
+spec:
+  ingressClassName: "traefik-internal"
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`vault.birb.it`)
+      kind: Rule
+      services:
+        - name: vaultwarden-svc
+          port: web
