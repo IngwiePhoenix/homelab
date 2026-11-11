@@ -7,4 +7,4 @@ policies:
       - ../updatecli/policies/component.yaml
     valuesinline:
       component: rclone-csi
-      rootdir: kubernetes/local-path-provisioner
+      rootdir: kubernetes/rclone-csi

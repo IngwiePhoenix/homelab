@@ -1,0 +1,10 @@
+name: Kubernetes / Piped
+
+policies:
+  - name: Piped
+    id: piped
+    config:
+      - ../updatecli/policies/component.yaml
+    valuesinline:
+      component: piped
+      rootdir: kubernetes/piped
