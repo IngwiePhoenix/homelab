@@ -1,0 +1,77 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: crowdsec-tm
+  namespace: traefik-ingress
+spec:
+  plugin:
+    bouncer:
+      enabled: true
+      crowdsecMode: stream
+      # LAPI
+      crowdsecLapiScheme: http
+      crowdsecLapiHost: crowdsec-service.crowdsec.svc.cluster.local:8080
+      crowdsecLapiPath: /
+      crowdsecLapiKeyFile: /etc/traefik/crowdsec/traefik
+      # AppSec
+      crowdsecAppsecEnabled: true
+      crowdsecAppsecHost: crowdsec-appsec-service.crowdsec.svc.cluster.local:7422
+      crowdsecAppsecPath: /
+      crowdsecAppsecFailureBlock: true
+      crowdsecAppsecUnreachableBlock: true
+      crowdsecAppsecBodyLimit: 10485760
+      # Exclude machine-to-machine hosts from AppSec (LAPI bans still apply).
+      # Each entry is a WAF bypass for that host — keep them narrow.
+      # crowdsecAppsecExcludedLocations:
+      #   - vault.birb.it
+      #   - piped-api.birb.it
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: ratelimit-tm
+  namespace: traefik-ingress
+spec:
+  rateLimit:
+    average: 100
+    burst: 200
+    period: 1s
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: sec-headers-tm
+  namespace: traefik-ingress
+spec:
+  headers:
+    contentTypeNosniff: true
+    frameDeny: true
+    referrerPolicy: strict-origin-when-cross-origin
+    stsSeconds: 31536000
+    stsIncludeSubdomains: true
+    # NOTE(Qwen):
+    #   If you add a Content-Security-Policy later, put it in a SEPARATE headers
+    #   middleware listed AFTER the bouncer in the chain — the PoW challenge
+    #   needs inline scripts + blob: workers and sets its own CSP.
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: external-chain-tm
+  namespace: traefik-ingress
+spec:
+  chain:
+    middlewares:
+      - name: crowdsec-tm
+      - name: ratelimit-tm
+      - name: sec-headers-tm
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: internal-chain-tm
+  namespace: traefik-ingress
+spec:
+  chain:
+    middlewares:
+      - name: sec-headers-tm

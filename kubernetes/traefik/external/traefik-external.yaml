@@ -1,0 +1,55 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik-external-helmrelease
+  namespace: flux-system
+spec:
+  interval: 30m
+  releaseName: traefik-external
+  targetNamespace: traefik-external
+  dependsOn:
+    - name: traefik-internal-helmrelease
+  chart:
+    spec:
+      chart: traefik
+      version: 42.3.2
+      interval: 1h
+      sourceRef:
+        kind: HelmRepository
+        name: traefik-helmrepo
+        namespace: flux-system
+  # CRDs are installed and managed by traefik-internal.
+  install:
+    crds: Skip
+    createNamespace: true
+  upgrade:
+    crds: Skip
+  valuesFrom:
+    - kind: ConfigMap
+      name: traefik-common-values
+  values:
+    deployment:
+      kind: DaemonSet
+    nodeSelector:
+      homelab/location: external
+    tolerations:
+      - key: homelab/location
+        operator: Equal
+        value: external
+        effect: NoSchedule
+    ingressClass:
+      enabled: false
+    ingressRoute:
+      dashboard:
+        enabled: true
+        # Default entryPoints ["traefik"] (port 8080) — published nowhere.
+        # Reach it with: kubectl -n traefik-external port-forward ds/traefik-external 9000:8080
+    ports:
+      # Expose the external ports only on external instance
+      edge-web:
+        hostPort: 80
+      edge:
+        hostPort: 443
+        # hostIP: <public IP>   # optional: don't serve edge on the WG interface
+    service:
+      enabled: false

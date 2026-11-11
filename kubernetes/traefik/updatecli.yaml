@@ -8,3 +8,23 @@ policies:
     valuesinline:
       component: traefik
       rootdir: kubernetes/traefik
+---
+name: Traefik / CrowdSec bouncer plugin
+sources:
+  plugin:
+    kind: githubrelease
+    spec:
+      owner: maxlerebourg
+      repository: crowdsec-bouncer-traefik-plugin
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      versionfilter:
+        kind: semver
+        pattern: ">=1.8.0"
+targets:
+  plugin-version:
+    name: Bump bouncer plugin
+    kind: yaml
+    sourceid: plugin
+    spec:
+      file: kubernetes/traefik/common/common.values.yaml
+      key: experimental.plugins.bouncer.version

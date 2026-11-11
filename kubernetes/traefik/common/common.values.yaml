@@ -1,0 +1,92 @@
+# Shared by BOTH Traefik instances.
+# All four entrypoints exist everywhere; each instance publishes only its own.
+# Exposure is decided by IngressRoute.spec.entryPoints, not by ingressClassName.
+
+log:
+  level: INFO
+  format: json
+
+accessLog:
+  enabled: true
+  format: json
+  fields:
+    defaultMode: keep
+    headers:
+      defaultMode: drop
+
+experimental:
+  # fail closed: do not start with a broken bouncer
+  abortOnPluginFailure: true
+  plugins:
+    bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      # TODO: Need to find out how to pick this up in updatecli...
+      version: v1.8.1
+
+providers:
+  kubernetesCRD:
+    enabled: true
+    ingressClass: ""
+    allowCrossNamespace: true
+    # Requires Traefik >= 3.7.11 (check `helm show chart traefik/traefik --version 42.3.2`).
+    # Safe to leave commented: only one default TLSStore exists (in traefik-ingress).
+    # defaultTLSResourcesNamespace: traefik-ingress
+  kubernetesIngress:
+    # plain Ingress = internal-only; enabled on internal below
+    enabled: false
+
+# Bouncer API key, reflected into both traefik namespaces by reflector.
+# NOTE: pods stay ContainerCreating until this Secret exists (see README bootstrap order).
+volumes:
+  - name: crowdsec-bouncer-keys
+    mountPath: /etc/traefik/crowdsec
+    type: secret
+
+ports:
+  # Entrypoint for internal
+  web:
+    asDefault: true
+    port: 8000
+    expose:
+      default: false
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    asDefault: true
+    port: 8443
+    expose:
+      default: false
+    http:
+      tls:
+        enabled: true
+      middlewares:
+        - internal-chain-tm@kubernetescrd
+
+  # Entrypoint for external/VPS
+  edge-web:
+    port: 8001
+    expose:
+      default: false
+    http:
+      redirections:
+        entryPoint:
+          to: edge
+          scheme: https
+          permanent: true
+  edge:
+    port: 8444
+    expose:
+      default: false
+    http:
+      tls:
+        enabled: true
+      middlewares:
+        - external-chain-tm@kubernetescrd
+
+# Optional hardening, requires Traefik >= 3.7.11 (GHSA-g55h-rg46-x9c5):
+core:
+  strictTLSOptions: true
