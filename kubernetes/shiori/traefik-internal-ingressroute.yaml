@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: shiori-ir-internal
+  namespace: shiori
+spec:
+  ingressClassName: "traefik-internal"
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`shiori.birb.it`)
+      kind: Rule
+      services:
+        - name: shiori-svc
+          port: http

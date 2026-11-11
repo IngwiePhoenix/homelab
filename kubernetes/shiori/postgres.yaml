@@ -1,0 +1,28 @@
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlDatabase
+metadata:
+  name: shiori-db
+  namespace: shiori
+spec:
+  engineConfiguration:
+    name: default-cluster-instance
+    namespace: postgres
+  database: shiori
+  masterRole: "shiori-role"
+  dropOnDelete: true
+  waitLinkedResourcesDeletion: true
+---
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlUserRole
+metadata:
+  name: shiori-db-user
+  namespace: shiori
+spec:
+  mode: MANAGED
+  rolePrefix: "shiori"
+  userPasswordRotationDuration: 720h
+  privileges:
+    - privilege: OWNER
+      database:
+        name: shiori-db
+      generatedSecretName: shiori-db-creds

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shiori-app
+  namespace: shiori
+  labels:
+    app: shiori
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shiori
+  template:
+    metadata:
+      labels:
+        app: shiori
+    spec:
+      volumes:
+        - name: shiori-vol
+          persistentVolumeClaim:
+            claimName: shiori-pvc
+      containers:
+        - name: app
+          image: ghcr.io/go-shiori/shiori:alpine-v1.8.0
+          imagePullPolicy: Always
+          env:
+          - name: SHIORI_DIR
+            value: /srv/shiori
+          - name: SHIORI_HTTP_ROOT_PATH
+            value: /
+          - name: POSTGRES_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: shiori-db-creds
+                key: LOGIN
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: shiori-db-creds
+                key: PASSWORD
+          - name: POSTGRES_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: shiori-db-creds
+                key: DATABASE
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: shiori-db-creds
+                key: HOST
+          - name: SHIORI_DATABASE_URL
+            value: postgres://$(POSTGRES_USERNAME):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST)/$(POSTGRES_DATABASE)
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - mountPath: /srv/shiori
+              name: shiori-vol
