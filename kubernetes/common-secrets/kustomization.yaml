@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - proton-smtp-creds.sops.yaml
-  - crowdsec-bouncer-key.yaml
+  - crowdsec-bouncer-key.sops.yaml
