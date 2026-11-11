@@ -1,0 +1,10 @@
+name: Kubernetes / RClone CSI
+
+policies:
+  - name: RClone CSI
+    id: rclone-csi
+    config:
+      - ../updatecli/policies/component.yaml
+    valuesinline:
+      component: rclone-csi
+      rootdir: kubernetes/local-path-provisioner
