@@ -27,4 +27,4 @@ spec:
   path: ./kubernetes
   prune: true
   wait: true
-  timeout: 10m
+  timeout: 40m
