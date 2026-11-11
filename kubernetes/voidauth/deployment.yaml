@@ -41,7 +41,7 @@ spec:
 
       containers:
         - name: app
-          image: ghcr.io/voidauth/voidauth:1.19.0
+          image: ghcr.io/voidauth/voidauth:1.19.1
           imagePullPolicy: IfNotPresent
 
           envFrom:
