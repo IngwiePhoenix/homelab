@@ -1,0 +1,50 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: rclone-csi
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/rclone-csi/install
+  prune: true
+  #wait: true
+  timeout: 10m
+
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: rclone-csi-helmrelease
+      namespace: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: rclone-csi-storageclasses
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/rclone-csi/config
+  prune: true
+  wait: true
+  timeout: 10m
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+
+  dependsOn:
+    - name: rclone-csi
+
+  #healthChecks:
+  #  - apiVersion: helm.toolkit.fluxcd.io/v2
+  #    kind: HelmRelease
+  #    name: rclone-csi-helmrelease
+  #    namespace: flux-system
+
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

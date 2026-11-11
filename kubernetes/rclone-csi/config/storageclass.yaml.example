@@ -1,0 +1,28 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rclone-plik
+provisioner: rclone.csi.veloxpack.io
+
+parameters:
+  # Exact section name in rclone.conf, without brackets.
+  remote: "my-cloud"
+
+  # Path inside that remote.
+  remotePath: "k0s/${pvc.metadata.namespace}/${pvc.metadata.name}"
+
+  # Reuse the complete configuration.
+  csi.storage.k8s.io/node-publish-secret-name: "rclone-config"
+  csi.storage.k8s.io/node-publish-secret-namespace: "rclone-csi"
+
+  # Separate cache and temporary directories for this volume.
+  cache_dir: "/var/lib/rclone-cache/my-cloud"
+  temp_dir: "/var/lib/rclone-cache/tmp/my-cloud"
+
+mountOptions:
+  - vfs-cache-mode=writes
+  - vfs-write-back=5s
+  - dir-cache-time=5m
+
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
