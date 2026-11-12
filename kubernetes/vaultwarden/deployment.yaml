@@ -27,7 +27,7 @@ spec:
           persistentVolumeClaim:
             claimName: vaultwarden-pvc
       containers:
-        - image: "vaultwarden/server:1.37.4-alpine"
+        - image: vaultwarden/server:1.37.5-alpine
           name: vaultwarden
           imagePullPolicy: Always
           env:
