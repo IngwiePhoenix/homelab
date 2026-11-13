@@ -14,6 +14,14 @@
   hosts: kubernetes
   gather_facts: true
   tags:
-    - baseline
+    - kubernetes
   roles:
     - alpine_baseline
+
+- name: Configure PostmarketOS baseline for Dragon Q6a nodes
+  hosts: dragon-q6a
+  gather_facts: true
+  tags:
+    - postmarketos
+  roles:
+    - postmarketos_baseline

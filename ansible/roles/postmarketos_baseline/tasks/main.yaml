@@ -1,0 +1,67 @@
+---
+# Remove the default PostmarketOS account.
+
+- name: Remove default PostmarketOS user
+  ansible.builtin.user:
+    name: user
+    state: absent
+    remove: true
+
+- name: Remove leftover default user home
+  ansible.builtin.file:
+    path: /home/user
+    state: absent
+
+
+# Remove the default login message.
+
+- name: Clear login MOTD
+  ansible.builtin.copy:
+    dest: /etc/motd
+    content: ""
+    owner: root
+    group: root
+    mode: "0644"
+
+
+# Configure NFS mounts using systemd automounts.
+
+- name: Ensure NFS mountpoint directories exist
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: "{{ optional_nfs_mounts }}"
+
+- name: Configure optional NFS mounts in fstab
+  ansible.posix.mount:
+    path: "{{ item.path }}"
+    src: "{{ item.src }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.opts }},x-systemd.automount"
+    dump: 0
+    passno: 0
+    state: present
+  loop: "{{ optional_nfs_mounts }}"
+
+- name: Reload systemd configuration
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Start NFS automount units
+  ansible.builtin.systemd_service:
+    name: "mnt-{{ item.name }}.automount"
+    state: started
+  loop: "{{ optional_nfs_mounts }}"
+
+
+# Disable and mask the PostmarketOS-specific zram swap service.
+
+- name: Stop and mask PostmarketOS zram swap
+  ansible.builtin.systemd_service:
+    name: postmarketos-zram-swap.service
+    enabled: false
+    masked: true
+    state: stopped
