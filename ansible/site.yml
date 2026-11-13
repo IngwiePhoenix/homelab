@@ -17,3 +17,37 @@
     - baseline
   roles:
     - alpine_baseline
+
+- name: Bootstrap Python on PostmarketOS Incus nodes
+  hosts: incus
+  gather_facts: false
+  tags:
+    - bootstrap
+    - incus
+  tasks:
+    - name: Install python3 with apk via raw
+      ansible.builtin.raw: "sh -c 'apk info -e python3 >/dev/null 2>&1 || apk add --no-cache python3'"
+      register: bootstrap_python
+      changed_when: bootstrap_python.stdout is defined and ('Installing python3' in bootstrap_python.stdout or 'Upgrading python3' in bootstrap_python.stdout)
+      failed_when: bootstrap_python.rc is defined and bootstrap_python.rc != 0
+
+- name: Install Incus on PostmarketOS Dragon Q6a nodes
+  hosts: incus
+  gather_facts: true
+  tags:
+    - incus
+  roles:
+    - incus
+
+- name: Form the Incus cluster
+  hosts: incus
+  gather_facts: false
+  tags:
+    - incus
+    - incus-cluster
+  tasks:
+    - name: Bootstrap the Incus cluster and join the remaining nodes
+      ansible.builtin.include_role:
+        name: incus
+        tasks_from: cluster.yml
+      run_once: true
