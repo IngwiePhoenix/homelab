@@ -1,0 +1,23 @@
+[Unit]
+Description=Incus daemon
+Documentation=https://linuxcontainers.org/incus/docs/main/
+Wants=network-online.target
+After=network-online.target dbus.service
+
+[Service]
+Type=simple
+ExecStart={{ incus_daemon_path }} --group incus-admin
+ExecStartPost={{ incus_client_path }} admin waitready --timeout=600
+ExecStop={{ incus_daemon_path }} shutdown
+KillMode=process
+TimeoutStartSec=600s
+TimeoutStopSec=600s
+Restart=on-failure
+RestartSec=5s
+Delegate=yes
+LimitNOFILE=1048576
+LimitNPROC=infinity
+TasksMax=infinity
+
+[Install]
+WantedBy=multi-user.target
