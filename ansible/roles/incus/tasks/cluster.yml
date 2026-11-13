@@ -1,84 +1,18 @@
 ---
-- name: Validate Incus cluster inventory
-  ansible.builtin.assert:
-    that:
-      - incus_cluster_group in groups
-      - incus_cluster_seed in groups[incus_cluster_group]
-      - groups[incus_cluster_group] | length >= 2
-      - hostvars[incus_cluster_seed].ansible_host is defined
-      - groups[incus_cluster_group] | difference([incus_cluster_seed]) | length >= 1
-    fail_msg: >-
-      The Incus cluster needs at least two hosts in {{ incus_cluster_group }};
-      incus_cluster_seed must name one of them and have an ansible_host address.
-
-- name: Wait for the seed Incus daemon
+- name: Read Incus state on the cluster seed
   ansible.builtin.command:
     argv:
-      - "{{ incus_client_path }}"
-      - admin
-      - waitready
-      - --timeout=120
-  delegate_to: "{{ incus_cluster_seed }}"
-  changed_when: false
-
-- name: Inspect the seed Incus server
-  ansible.builtin.command:
-    argv:
-      - "{{ incus_client_path }}"
+      - incus
       - info
       - --format=json
   delegate_to: "{{ incus_cluster_seed }}"
   register: incus_seed_info
   changed_when: false
-  failed_when: false
 
-- name: Reject a seed that already belongs to another Incus cluster
-  ansible.builtin.assert:
-    that:
-      - >-
-        incus_seed_info.rc != 0 or
-        not ((incus_seed_info.stdout | from_json).environment.server_clustered | bool) or
-        (incus_seed_info.stdout | from_json).environment.server_name == incus_cluster_seed
-    fail_msg: >-
-      {{ incus_cluster_seed }} is already part of a different Incus cluster.
-      The role will not attempt to adopt or modify that cluster.
-
-- name: Inspect existing seed configuration
+- name: Bootstrap the Incus cluster on the seed
   ansible.builtin.command:
     argv:
-      - "{{ incus_client_path }}"
-      - admin
-      - init
-      - --dump
-  delegate_to: "{{ incus_cluster_seed }}"
-  register: incus_seed_config_dump
-  changed_when: false
-  failed_when: false
-  when: >-
-    incus_seed_info.rc != 0 or
-    not ((incus_seed_info.stdout | from_json).environment.server_clustered | bool)
-
-- name: Ensure a standalone seed has no local Incus resources
-  ansible.builtin.assert:
-    that:
-      - incus_seed_config_dump.rc == 0
-      - (incus_seed_config_dump.stdout | from_yaml).storage_pools | default([]) | length == 0
-      - (incus_seed_config_dump.stdout | from_yaml).networks | default([]) | length == 0
-      - (incus_seed_config_dump.stdout | from_yaml).profiles | default([]) | length == 0
-    fail_msg: >-
-      {{ incus_cluster_seed }} appears to have an existing standalone Incus
-      configuration. This role only bootstraps a fresh seed and will not risk
-      overwriting configured pools, networks, or profiles. Review the existing
-      configuration and cluster it manually, or reset it deliberately first.
-  delegate_to: "{{ incus_cluster_seed }}"
-  when: >-
-    incus_seed_info.rc != 0 or
-    not ((incus_seed_info.stdout | from_json).environment.server_clustered | bool)
-
-- name: Initialize a fresh seed as the first cluster member
-  ansible.builtin.command:
-    argv:
-      - "{{ incus_client_path }}"
+      - incus
       - admin
       - init
       - --preseed
@@ -89,130 +23,39 @@
         server_name: "{{ incus_cluster_seed }}"
         enabled: true
   delegate_to: "{{ incus_cluster_seed }}"
-  when: >-
-    incus_seed_info.rc != 0 or
-    not ((incus_seed_info.stdout | from_json).environment.server_clustered | bool)
+  when: not (incus_seed_info.stdout | from_json).environment.server_clustered
   changed_when: true
 
-- name: Verify the seed is a cluster member
+- name: Read current cluster members
   ansible.builtin.command:
     argv:
-      - "{{ incus_client_path }}"
-      - info
-      - --format=json
-  delegate_to: "{{ incus_cluster_seed }}"
-  register: incus_seed_info_after
-  changed_when: false
-
-- name: Assert the seed is clustered with the expected member name
-  ansible.builtin.assert:
-    that:
-      - incus_seed_info_after.rc == 0
-      - (incus_seed_info_after.stdout | from_json).environment.server_clustered | bool
-      - (incus_seed_info_after.stdout | from_json).environment.server_name == incus_cluster_seed
-    fail_msg: >-
-      Incus on {{ incus_cluster_seed }} is not ready as the expected cluster seed.
-      Inspect its existing Incus configuration before retrying.
-
-- name: Read existing cluster members
-  ansible.builtin.command:
-    argv:
-      - "{{ incus_client_path }}"
+      - incus
       - cluster
       - list
       - --format=json
   delegate_to: "{{ incus_cluster_seed }}"
-  register: incus_cluster_members_before
+  register: incus_cluster_members
   changed_when: false
 
-- name: Save existing cluster member names
-  ansible.builtin.set_fact:
-    incus_cluster_member_names: "{{ incus_cluster_members_before.stdout | from_json | map(attribute='server_name') | list }}"
-
-- name: Wait for joining Incus daemons
+- name: Add any missing nodes to the cluster
   ansible.builtin.command:
     argv:
-      - "{{ incus_client_path }}"
-      - admin
-      - waitready
-      - --timeout=120
-  delegate_to: "{{ item }}"
-  loop: "{{ groups[incus_cluster_group] | difference([incus_cluster_seed]) }}"
-  changed_when: false
-
-- name: Inspect joining servers before attempting to join them
-  ansible.builtin.command:
-    argv:
-      - "{{ incus_client_path }}"
-      - info
-      - --format=json
-  delegate_to: "{{ item }}"
-  loop: "{{ groups[incus_cluster_group] | difference([incus_cluster_seed]) }}"
-  register: incus_joiner_info
-  changed_when: false
-  failed_when: false
-
-- name: Refuse joining nodes that belong to another Incus cluster
-  ansible.builtin.assert:
-    that:
-      - >-
-        item.rc != 0 or
-        not ((item.stdout | from_json).environment.server_clustered | bool) or
-        (item.stdout | from_json).environment.server_name in incus_cluster_member_names
-    fail_msg: >-
-      {{ item.item }} already belongs to a different Incus cluster. The role
-      will not attempt to reinitialize or migrate that server.
-  loop: "{{ incus_joiner_info.results }}"
-
-- name: Inspect existing standalone configuration on joining nodes
-  ansible.builtin.command:
-    argv:
-      - "{{ incus_client_path }}"
-      - admin
-      - init
-      - --dump
-  delegate_to: "{{ item.item }}"
-  loop: "{{ incus_joiner_info.results }}"
-  register: incus_joiner_config_dumps
-  changed_when: false
-  failed_when: false
-  when: >-
-    item.rc != 0 or
-    not ((item.stdout | from_json).environment.server_clustered | bool)
-
-- name: Refuse joining nodes with existing local Incus resources
-  ansible.builtin.assert:
-    that:
-      - item.rc == 0
-      - (item.stdout | from_yaml).storage_pools | default([]) | length == 0
-      - (item.stdout | from_yaml).networks | default([]) | length == 0
-      - (item.stdout | from_yaml).profiles | default([]) | length == 0
-    fail_msg: >-
-      {{ item.item }} appears to have an existing standalone Incus configuration.
-      Joining a cluster can discard local Incus state. The role will not wipe or
-      reinitialize it; inspect and reset that node deliberately before retrying.
-  loop: "{{ incus_joiner_config_dumps.results }}"
-  when: not (item.skipped | default(false))
-
-- name: Generate single-use join tokens for missing cluster members
-  ansible.builtin.command:
-    argv:
-      - "{{ incus_client_path }}"
+      - incus
       - cluster
       - add
       - "{{ item }}"
       - --quiet
   delegate_to: "{{ incus_cluster_seed }}"
-  loop: "{{ groups[incus_cluster_group] | difference([incus_cluster_seed]) }}"
-  when: item not in incus_cluster_member_names
-  register: incus_cluster_join_tokens
+  loop: "{{ groups['incus'] | difference([incus_cluster_seed]) }}"
+  when: item not in (incus_cluster_members.stdout | from_json | map(attribute='server_name') | list)
+  register: incus_join_tokens
   changed_when: true
   no_log: true
 
-- name: Join new nodes using Incus preseed tokens
+- name: Join nodes using their single-use tokens
   ansible.builtin.command:
     argv:
-      - "{{ incus_client_path }}"
+      - incus
       - admin
       - init
       - --preseed
@@ -222,43 +65,10 @@
         server_address: "{{ hostvars[item.item].ansible_host }}:{{ incus_cluster_port }}"
         cluster_token: "{{ item.stdout | trim }}"
   delegate_to: "{{ item.item }}"
-  loop: "{{ incus_cluster_join_tokens.results }}"
+  loop: "{{ incus_join_tokens.results }}"
   when:
     - not (item.skipped | default(false))
     - item.rc == 0
     - item.stdout | trim | length > 0
   changed_when: true
   no_log: true
-
-- name: Wait for all Incus cluster members to become ready
-  ansible.builtin.command:
-    argv:
-      - "{{ incus_client_path }}"
-      - admin
-      - waitready
-      - --timeout=120
-  delegate_to: "{{ item }}"
-  loop: "{{ groups[incus_cluster_group] }}"
-  changed_when: false
-
-- name: Read final Incus cluster membership
-  ansible.builtin.command:
-    argv:
-      - "{{ incus_client_path }}"
-      - cluster
-      - list
-      - --format=json
-  delegate_to: "{{ incus_cluster_seed }}"
-  register: incus_cluster_members_after
-  changed_when: false
-
-- name: Verify all inventory members joined the Incus cluster
-  ansible.builtin.assert:
-    that:
-      - >-
-        (groups[incus_cluster_group]
-         | difference(incus_cluster_members_after.stdout | from_json | map(attribute='server_name') | list)
-         | length) == 0
-    fail_msg: >-
-      Not all hosts in {{ incus_cluster_group }} appear in the Incus cluster.
-      Check incus cluster list on {{ incus_cluster_seed }}.
