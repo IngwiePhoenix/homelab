@@ -43,7 +43,7 @@
       {{ incus_cluster_seed }} is already part of a different Incus cluster.
       The role will not attempt to adopt or modify that cluster.
 
-- name: Inspect the existing standalone seed configuration
+- name: Inspect existing seed configuration
   ansible.builtin.command:
     argv:
       - "{{ incus_client_path }}"
@@ -54,11 +54,11 @@
   register: incus_seed_config_dump
   changed_when: false
   failed_when: false
-  when:
-    - incus_seed_info.rc == 0
-    - not ((incus_seed_info.stdout | from_json).environment.server_clustered | bool)
+  when: >-
+    incus_seed_info.rc != 0 or
+    not ((incus_seed_info.stdout | from_json).environment.server_clustered | bool)
 
-- name: Ensure an existing standalone seed has no local Incus resources
+- name: Ensure a standalone seed has no local Incus resources
   ansible.builtin.assert:
     that:
       - incus_seed_config_dump.rc == 0
@@ -71,9 +71,9 @@
       overwriting configured pools, networks, or profiles. Review the existing
       configuration and cluster it manually, or reset it deliberately first.
   delegate_to: "{{ incus_cluster_seed }}"
-  when:
-    - incus_seed_info.rc == 0
-    - not ((incus_seed_info.stdout | from_json).environment.server_clustered | bool)
+  when: >-
+    incus_seed_info.rc != 0 or
+    not ((incus_seed_info.stdout | from_json).environment.server_clustered | bool)
 
 - name: Initialize a fresh seed as the first cluster member
   ansible.builtin.command:
@@ -150,12 +150,14 @@
   loop: "{{ groups[incus_cluster_group] | difference([incus_cluster_seed]) }}"
   register: incus_joiner_info
   changed_when: false
+  failed_when: false
 
-- name: Refuse joining a node that already belongs to another cluster
+- name: Refuse joining nodes that belong to another Incus cluster
   ansible.builtin.assert:
     that:
       - >-
-        not (item.stdout | from_json).environment.server_clustered or
+        item.rc != 0 or
+        not ((item.stdout | from_json).environment.server_clustered | bool) or
         (item.stdout | from_json).environment.server_name in incus_cluster_member_names
     fail_msg: >-
       {{ item.item }} already belongs to a different Incus cluster. The role
@@ -174,7 +176,9 @@
   register: incus_joiner_config_dumps
   changed_when: false
   failed_when: false
-  when: not ((item.stdout | from_json).environment.server_clustered | bool)
+  when: >-
+    item.rc != 0 or
+    not ((item.stdout | from_json).environment.server_clustered | bool)
 
 - name: Refuse joining nodes with existing local Incus resources
   ansible.builtin.assert:
