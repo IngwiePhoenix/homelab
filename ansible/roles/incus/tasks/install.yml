@@ -7,6 +7,13 @@
       The Incus role installs a systemd unit for the PostmarketOS systemd image.
       This host reports {{ ansible_service_mgr | default('an unknown service manager') }}.
 
+- name: Ensure the running kernel meets Incus minimum requirements
+  ansible.builtin.assert:
+    that:
+      - ansible_kernel is version('6.12', '>=')
+    fail_msg: >-
+      Incus requires Linux kernel 6.12 or newer. Detected {{ ansible_kernel }}.
+
 - name: Add tagged Alpine edge repositories for Incus
   ansible.builtin.lineinfile:
     path: /etc/apk/repositories
