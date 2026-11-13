@@ -1,0 +1,4 @@
+---
+# bigdergboi (10.1.0.8) bootstraps the cluster; smoldergboi joins it.
+incus_cluster_seed: bigdergboi
+incus_cluster_port: 8443
