@@ -12,7 +12,6 @@ incus_packages:
 incus_install_vm_support: false
 incus_vm_package: incus-vm@incus-edge-community
 
-incus_daemon_path: /usr/sbin/incusd
 incus_client_path: /usr/bin/incus
 incus_systemd_unit_path: /etc/systemd/system/incus.service
 
