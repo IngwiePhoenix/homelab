@@ -71,6 +71,7 @@
     executable: /bin/sh
   register: incus_daemon_binary
   changed_when: false
+  check_mode: false
 
 - name: Locate the installed Incus client binary
   ansible.builtin.shell: command -v incus
@@ -78,6 +79,7 @@
     executable: /bin/sh
   register: incus_client_binary
   changed_when: false
+  check_mode: false
 
 - name: Set Incus executable paths from APK installation
   ansible.builtin.set_fact:
