@@ -7,7 +7,7 @@ After=network-online.target dbus.service
 [Service]
 Type=simple
 ExecStart={{ incus_daemon_path }} --group incus-admin
-ExecStartPost={{ incus_client_path }} admin waitready --timeout=600
+ExecStartPost={{ incus_daemon_path }} waitready --timeout=600
 ExecStop={{ incus_daemon_path }} shutdown
 KillMode=process
 TimeoutStartSec=600s
