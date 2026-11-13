@@ -20,7 +20,9 @@ fails rather than wiping existing standalone configuration.
 
 ## Requirements and caveats
 
-- The hosts must use the PostmarketOS systemd variant.
+- The hosts must use the PostmarketOS systemd variant and a Linux 6.12+
+  kernel. Incus also requires the needed user/mount/network namespaces,
+  cgroups, seccomp, and native Linux AIO kernel support.
 - Alpine edge main and community repositories are added with APK tags so
   edge packages are opt-in rather than the default source for unrelated
   upgrades. Incus is not being installed from a PostmarketOS-specific package
