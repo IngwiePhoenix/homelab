@@ -58,6 +58,25 @@
     group: root
     mode: "0644"
 
+- name: Locate the installed Incus daemon binary
+  ansible.builtin.shell: command -v incusd
+  args:
+    executable: /bin/sh
+  register: incus_daemon_binary
+  changed_when: false
+
+- name: Locate the installed Incus client binary
+  ansible.builtin.shell: command -v incus
+  args:
+    executable: /bin/sh
+  register: incus_client_binary
+  changed_when: false
+
+- name: Set Incus executable paths from APK installation
+  ansible.builtin.set_fact:
+    incus_daemon_path: "{{ incus_daemon_binary.stdout | trim }}"
+    incus_client_path: "{{ incus_client_binary.stdout | trim }}"
+
 - name: Install Incus systemd unit
   ansible.builtin.template:
     src: incus.service.j2
