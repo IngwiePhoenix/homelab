@@ -1,0 +1,74 @@
+---
+- name: Read Incus state on the cluster seed
+  ansible.builtin.command:
+    argv:
+      - incus
+      - info
+      - --format=json
+  delegate_to: "{{ incus_cluster_seed }}"
+  register: incus_seed_info
+  changed_when: false
+
+- name: Bootstrap the Incus cluster on the seed
+  ansible.builtin.command:
+    argv:
+      - incus
+      - admin
+      - init
+      - --preseed
+    stdin: |
+      config:
+        core.https_address: "{{ hostvars[incus_cluster_seed].ansible_host }}:{{ incus_cluster_port }}"
+      cluster:
+        server_name: "{{ incus_cluster_seed }}"
+        enabled: true
+  delegate_to: "{{ incus_cluster_seed }}"
+  when: not (incus_seed_info.stdout | from_json).environment.server_clustered
+  changed_when: true
+
+- name: Read current cluster members
+  ansible.builtin.command:
+    argv:
+      - incus
+      - cluster
+      - list
+      - --format=json
+  delegate_to: "{{ incus_cluster_seed }}"
+  register: incus_cluster_members
+  changed_when: false
+
+- name: Add any missing nodes to the cluster
+  ansible.builtin.command:
+    argv:
+      - incus
+      - cluster
+      - add
+      - "{{ item }}"
+      - --quiet
+  delegate_to: "{{ incus_cluster_seed }}"
+  loop: "{{ groups['incus'] | difference([incus_cluster_seed]) }}"
+  when: item not in (incus_cluster_members.stdout | from_json | map(attribute='server_name') | list)
+  register: incus_join_tokens
+  changed_when: true
+  no_log: true
+
+- name: Join nodes using their single-use tokens
+  ansible.builtin.command:
+    argv:
+      - incus
+      - admin
+      - init
+      - --preseed
+    stdin: |
+      cluster:
+        enabled: true
+        server_address: "{{ hostvars[item.item].ansible_host }}:{{ incus_cluster_port }}"
+        cluster_token: "{{ item.stdout | trim }}"
+  delegate_to: "{{ item.item }}"
+  loop: "{{ incus_join_tokens.results }}"
+  when:
+    - not (item.skipped | default(false))
+    - item.rc == 0
+    - item.stdout | trim | length > 0
+  changed_when: true
+  no_log: true

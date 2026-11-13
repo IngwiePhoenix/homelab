@@ -1,0 +1,70 @@
+---
+- name: Install Incus and its client from the configured APK repositories
+  community.general.apk:
+    name:
+      - incus
+      - incus-client
+    state: present
+    update_cache: true
+
+- name: Ensure the Incus admin group exists
+  ansible.builtin.group:
+    name: incus-admin
+    system: true
+    state: present
+
+- name: Check whether an Incus systemd unit is already installed
+  ansible.builtin.command:
+    argv:
+      - systemctl
+      - cat
+      - incus.service
+  register: incus_systemd_unit
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Install a small systemd fallback only when the package provides no unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/incus.service
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Incus daemon
+      Wants=network-online.target
+      After=network-online.target
+
+      [Service]
+      ExecStart=/usr/sbin/incusd --group incus-admin
+      ExecStartPost=/usr/bin/incus admin waitready --timeout=600
+      ExecStop=/usr/sbin/incusd shutdown
+      KillMode=process
+      TimeoutStartSec=600
+      TimeoutStopSec=600
+      Restart=on-failure
+      Delegate=yes
+      LimitNOFILE=1048576
+      LimitNPROC=infinity
+      TasksMax=infinity
+
+      [Install]
+      WantedBy=multi-user.target
+  when: incus_systemd_unit.rc != 0
+
+- name: Enable and start Incus
+  ansible.builtin.systemd_service:
+    name: incus.service
+    daemon_reload: true
+    enabled: true
+    state: started
+
+- name: Wait for the Incus API
+  ansible.builtin.command:
+    argv:
+      - incus
+      - admin
+      - waitready
+      - --timeout=120
+  changed_when: false
