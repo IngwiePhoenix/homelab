@@ -3,7 +3,8 @@
 This role installs Incus from Alpine's edge repositories and runs incusd under
 systemd. The Alpine package provides the daemon and client, but its documented
 service integration is OpenRC-specific, so this role supplies a systemd unit
-for the PostmarketOS systemd image.
+for the PostmarketOS systemd image. The role discovers the binary paths from
+the package installation rather than assuming a distro-specific location.
 
 The inventory already has an incus group containing the two Dragon Q6a nodes.
 group_vars/incus.yml selects bigdergboi (10.1.0.8) as the bootstrap member;
@@ -26,10 +27,10 @@ fails rather than wiping existing standalone configuration.
   repository here; test package compatibility on the installed PostmarketOS
   release before rolling it out to both nodes.
 - Permit TCP port 8443 between the two nodes and ensure their clocks are
-  synchronized. Incus requires cluster-member latency below 10 ms.
-- This is a two-member cluster, not a highly available cluster. Incus requires
-  at least three members for a cluster to retain database quorum after losing
-  one member.
+  synchronized. The Incus members need a reliable, low-latency connection.
+- Two members can form a cluster, but Incus strongly recommends at least three
+  members so the distributed database can retain quorum after one member is
+  lost.
 - The role only bootstraps and joins members that are listed in the incus
   inventory group. Add future nodes to that group before applying the playbook.
 - VM support is disabled by default. Set incus_install_vm_support: true if
