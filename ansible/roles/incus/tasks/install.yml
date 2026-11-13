@@ -1,0 +1,83 @@
+---
+- name: Ensure Incus is running on a systemd-based PostmarketOS host
+  ansible.builtin.assert:
+    that:
+      - ansible_service_mgr == 'systemd'
+    fail_msg: >-
+      The Incus role installs a systemd unit for the PostmarketOS systemd image.
+      This host reports {{ ansible_service_mgr | default('an unknown service manager') }}.
+
+- name: Add tagged Alpine edge repositories for Incus
+  ansible.builtin.lineinfile:
+    path: /etc/apk/repositories
+    line: "{{ item }}"
+    state: present
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ incus_apk_repositories }}"
+
+- name: Install Incus and its client
+  community.general.apk:
+    name: "{{ incus_packages }}"
+    state: present
+    update_cache: true
+
+- name: Install optional Incus virtual machine support
+  community.general.apk:
+    name: "{{ incus_vm_package }}"
+    state: present
+  when: incus_install_vm_support | bool
+
+- name: Ensure Incus access groups exist
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - incus
+    - incus-admin
+
+- name: Configure subordinate UID range for Incus
+  ansible.builtin.lineinfile:
+    path: /etc/subuid
+    line: "root:{{ incus_subid_start }}:{{ incus_subid_count }}"
+    state: present
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Configure subordinate GID range for Incus
+  ansible.builtin.lineinfile:
+    path: /etc/subgid
+    line: "root:{{ incus_subid_start }}:{{ incus_subid_count }}"
+    state: present
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install Incus systemd unit
+  ansible.builtin.template:
+    src: incus.service.j2
+    dest: "{{ incus_systemd_unit_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Reload systemd and enable Incus
+  ansible.builtin.systemd_service:
+    name: incus.service
+    daemon_reload: true
+    enabled: true
+    state: started
+
+- name: Wait for the Incus daemon API to become ready
+  ansible.builtin.command:
+    argv:
+      - "{{ incus_client_path }}"
+      - admin
+      - waitready
+      - --timeout=120
+  changed_when: false
