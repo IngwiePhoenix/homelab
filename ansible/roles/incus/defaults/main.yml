@@ -1,0 +1,24 @@
+---
+# Incus is packaged in Alpine edge/main and edge/community. Repository tags
+# make edge packages opt-in instead of making the entire edge branch preferred.
+incus_apk_repositories:
+  - "@incus-edge-main https://dl-cdn.alpinelinux.org/alpine/edge/main"
+  - "@incus-edge-community https://dl-cdn.alpinelinux.org/alpine/edge/community"
+
+incus_packages:
+  - incus@incus-edge-community
+  - incus-client@incus-edge-community
+
+incus_install_vm_support: false
+incus_vm_package: incus-vm@incus-edge-community
+
+incus_daemon_path: /usr/sbin/incusd
+incus_client_path: /usr/bin/incus
+incus_systemd_unit_path: /etc/systemd/system/incus.service
+
+incus_subid_start: 1000000
+incus_subid_count: 1000000000
+
+incus_cluster_group: incus
+incus_cluster_port: 8443
+incus_cluster_seed: bigdergboi
