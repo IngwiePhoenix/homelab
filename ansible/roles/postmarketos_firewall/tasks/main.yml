@@ -67,9 +67,11 @@
   ansible.builtin.assert:
     that:
       - pmos_nftables_unit.rc == 0
+      - pmos_nftables_unit.stdout is search('/etc/nftables.nft')
     fail_msg: >-
-      nftables.service is not installed. Refusing to proceed because
-      postmarketOS owns the native firewall lifecycle.
+      The postmarketOS nftables.service is missing or does not load
+      /etc/nftables.nft. Refusing to change firewall services until its
+      native ruleset can be verified.
 
 - name: Check whether the old UFW systemd unit is installed
   ansible.builtin.command:
