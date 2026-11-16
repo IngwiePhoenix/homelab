@@ -1,0 +1,12 @@
+#!/usr/sbin/nft -f
+# Managed by Ansible. postmarketOS loads this file from /etc/nftables.d/.
+# Keep this file ordered before 99_drop_log.nft so explicit allows are applied
+# before the default terminal drop rule.
+
+table inet filter {
+    chain input {
+{% for port in (['22/tcp'] + (ufw_ports_allowed | default([])) + (ufw_ports_allowed_extra | default([]))) | unique %}
+        {{ port.split('/') | last }} dport {{ port.split('/') | first }} accept comment "Managed by Ansible"
+{% endfor %}
+    }
+}
