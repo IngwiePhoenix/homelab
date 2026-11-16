@@ -1,0 +1,132 @@
+---
+- name: Install the native nftables firewall tooling
+  community.general.apk:
+    name:
+      - nftables
+      - postmarketos-config-nftables
+    state: present
+    update_cache: true
+
+- name: Ensure the postmarketOS nftables drop-in directory exists
+  ansible.builtin.file:
+    path: /etc/nftables.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Check for the postmarketOS nftables main configuration
+  ansible.builtin.stat:
+    path: /etc/nftables.nft
+  register: pmos_nftables_config
+
+- name: Require the postmarketOS nftables configuration
+  ansible.builtin.assert:
+    that:
+      - pmos_nftables_config.stat.exists
+      - pmos_nftables_config.stat.isreg
+    fail_msg: >-
+      /etc/nftables.nft is missing. Refusing to activate a firewall without
+      validating the postmarketOS native nftables ruleset.
+
+- name: Validate configured firewall port specifications
+  ansible.builtin.assert:
+    that:
+      - item is match('^[0-9]{1,5}(-[0-9]{1,5})?/(tcp|udp)$')
+    fail_msg: "Invalid firewall port '{{ item }}'; expected PORT/(tcp|udp)."
+  loop: "{{ (['22/tcp'] + (ufw_ports_allowed | default([])) + (ufw_ports_allowed_extra | default([]))) | unique }}"
+
+- name: Install the managed postmarketOS nftables port rules
+  ansible.builtin.template:
+    src: homelab-ports.nft.j2
+    dest: /etc/nftables.d/90-homelab-ports.nft
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Validate the complete postmarketOS nftables configuration
+  ansible.builtin.command:
+    argv:
+      - /usr/sbin/nft
+      - -c
+      - -f
+      - /etc/nftables.nft
+  changed_when: false
+  check_mode: false
+
+- name: Unmask the native nftables unit disabled by the previous UFW rollout
+  ansible.builtin.command:
+    argv:
+      - systemctl
+      - unmask
+      - nftables.service
+  register: pmos_nftables_unmask
+  changed_when: "'Removed' in (pmos_nftables_unmask.stdout | default(''))"
+  failed_when: false
+  check_mode: false
+
+- name: Check whether the native nftables systemd unit is installed
+  ansible.builtin.command:
+    argv:
+      - systemctl
+      - cat
+      - nftables.service
+  register: pmos_nftables_unit
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Require the postmarketOS native nftables systemd service
+  ansible.builtin.assert:
+    that:
+      - pmos_nftables_unit.rc == 0
+      - pmos_nftables_unit.stdout is search('/etc/nftables.nft')
+    fail_msg: >-
+      The postmarketOS nftables.service is missing or does not load
+      /etc/nftables.nft. Refusing to change firewall services until its
+      native ruleset can be verified.
+
+- name: Check whether the old UFW systemd unit is installed
+  ansible.builtin.command:
+    argv:
+      - systemctl
+      - cat
+      - ufw.service
+  register: pmos_ufw_unit
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Disable the old UFW service before restoring native nftables
+  ansible.builtin.command:
+    argv:
+      - systemctl
+      - disable
+      - --now
+      - ufw.service
+  register: pmos_ufw_disable
+  changed_when: pmos_ufw_disable.rc == 0
+  failed_when: false
+  when: pmos_ufw_unit.rc == 0
+
+- name: Restore and enable the postmarketOS native nftables firewall
+  ansible.builtin.systemd_service:
+    name: nftables.service
+    daemon_reload: true
+    masked: false
+    enabled: true
+    state: restarted
+
+- name: Remove the UFW systemd unit installed by the previous firewall role
+  ansible.builtin.file:
+    path: /etc/systemd/system/ufw.service
+    state: absent
+
+- name: Remove UFW from postmarketOS nodes
+  community.general.apk:
+    name: ufw
+    state: absent
+
+- name: Reload systemd after removing the obsolete UFW unit
+  ansible.builtin.systemd_service:
+    daemon_reload: true
