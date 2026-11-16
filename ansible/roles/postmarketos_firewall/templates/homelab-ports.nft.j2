@@ -5,7 +5,7 @@
 
 table inet filter {
     chain input {
-{% for port in (['22/tcp'] + (ufw_ports_allowed | default([])) + (ufw_ports_allowed_extra | default([]))) | unique %}
+{% for port in ((firewall_ports | default([])) + (firewall_ports_extra | default([]))) | unique %}
         {{ port.split('/') | last }} dport {{ port.split('/') | first }} accept comment "Managed by Ansible"
 {% endfor %}
     }

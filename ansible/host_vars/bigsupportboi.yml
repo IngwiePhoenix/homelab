@@ -1,0 +1,5 @@
+---
+# Docker deployments publish ports directly on the host.
+# Add each host-published port here as PORT/tcp or PORT/udp.
+# This list is independent of other hosts' firewall_ports_extra values.
+firewall_ports_extra: []

@@ -34,7 +34,7 @@
     that:
       - item is match('^[0-9]{1,5}(-[0-9]{1,5})?/(tcp|udp)$')
     fail_msg: "Invalid firewall port '{{ item }}'; expected PORT/(tcp|udp)."
-  loop: "{{ (['22/tcp'] + (ufw_ports_allowed | default([])) + (ufw_ports_allowed_extra | default([]))) | unique }}"
+  loop: "{{ ((firewall_ports | default([])) + (firewall_ports_extra | default([]))) | unique }}"
 
 - name: Install the managed postmarketOS nftables port rules
   ansible.builtin.template:

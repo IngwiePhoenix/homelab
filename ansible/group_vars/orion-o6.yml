@@ -1,6 +1,6 @@
 ---
 # Services exposed by the Orion O6 Kubernetes nodes.
-ufw_ports_allowed_extra:
+firewall_ports_extra:
   - "9443/tcp"
   - "6443/tcp"
   - "8132/tcp"

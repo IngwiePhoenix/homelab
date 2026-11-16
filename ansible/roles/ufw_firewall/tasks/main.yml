@@ -101,14 +101,14 @@
     policy: allow
     direction: outgoing
 
-- name: Allow configured UFW ports
+- name: Allow configured firewall ports
   community.general.ufw:
     rule: allow
     direction: in
     proto: "{{ item.split('/') | last }}"
     to_port: "{{ item.split('/') | first }}"
     comment: Managed by Ansible
-  loop: "{{ (['22/tcp'] + (ufw_ports_allowed | default([])) + (ufw_ports_allowed_extra | default([]))) | unique }}"
+  loop: "{{ ((firewall_ports | default([])) + (firewall_ports_extra | default([]))) | unique }}"
 
 - name: Enable UFW
   community.general.ufw:

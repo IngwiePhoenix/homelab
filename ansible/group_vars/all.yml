@@ -30,9 +30,9 @@ baseline_kernel_modules:
   - br_netfilter
   - overlay
 
-# Common firewall ports. UFW manages Alpine; postmarketOS uses native nftables.
+# Common ports allowed on every managed host, independent of the firewall backend.
 # SSH must remain reachable on every managed node.
-ufw_ports_allowed:
+firewall_ports:
   - "22/tcp"
 
 # You requested /etc/defaults/grub.
