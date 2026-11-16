@@ -30,6 +30,10 @@ baseline_kernel_modules:
   - br_netfilter
   - overlay
 
+# Common UFW rules. SSH must remain reachable on every managed node.
+ufw_ports_allowed:
+  - "22/tcp"
+
 # You requested /etc/defaults/grub.
 # If you meant the usual GRUB location, use: /etc/default/grub
 grub_defaults_path: /etc/default/grub
