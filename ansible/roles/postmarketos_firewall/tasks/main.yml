@@ -1,7 +1,9 @@
 ---
 - name: Install the native nftables firewall tooling
   community.general.apk:
-    name: nftables
+    name:
+      - nftables
+      - postmarketos-config-nftables
     state: present
     update_cache: true
 
