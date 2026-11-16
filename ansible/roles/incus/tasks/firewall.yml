@@ -1,0 +1,116 @@
+---
+- name: Install UFW
+  community.general.apk:
+    name: ufw
+    state: present
+    update_cache: true
+
+- name: Install a systemd unit for UFW
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ufw.service
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Uncomplicated Firewall
+      Documentation=man:ufw(8)
+      DefaultDependencies=no
+      Before=network-pre.target
+      Wants=network-pre.target
+      After=local-fs.target
+      Conflicts=nftables.service
+      ConditionPathExists=/etc/ufw/ufw.conf
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/usr/lib/ufw/ufw-init start quiet
+      ExecStop=/usr/lib/ufw/ufw-init stop
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Set the default incoming policy to deny
+  community.general.ufw:
+    policy: deny
+    direction: incoming
+
+- name: Set the default outgoing policy to allow
+  community.general.ufw:
+    policy: allow
+    direction: outgoing
+
+- name: Keep SSH reachable
+  community.general.ufw:
+    rule: allow
+    direction: in
+    proto: tcp
+    to_port: "{{ incus_ufw_ssh_port }}"
+    comment: SSH administration
+
+- name: Allow the Incus API only from superdiskboi
+  community.general.ufw:
+    rule: allow
+    direction: in
+    proto: tcp
+    from_ip: "{{ incus_ufw_api_source }}"
+    to_port: "{{ incus_https_port | string }}"
+    comment: Incus API from superdiskboi
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+
+- name: Check whether the native nftables systemd service exists
+  ansible.builtin.command:
+    argv:
+      - systemctl
+      - cat
+      - nftables.service
+  register: incus_nftables_service
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Disable and mask the native nftables service
+  ansible.builtin.systemd_service:
+    name: nftables.service
+    enabled: false
+    masked: true
+    state: stopped
+  when: incus_nftables_service.rc == 0
+
+- name: Check whether the postmarketOS native firewall table is still loaded
+  ansible.builtin.command:
+    argv:
+      - nft
+      - list
+      - table
+      - inet
+      - filter
+  register: incus_native_nft_table
+  changed_when: false
+  failed_when: incus_native_nft_table.rc > 1
+  check_mode: false
+
+- name: Remove the postmarketOS native firewall table
+  ansible.builtin.command:
+    argv:
+      - nft
+      - delete
+      - table
+      - inet
+      - filter
+  when: incus_native_nft_table.rc == 0
+  changed_when: true
+
+- name: Reload systemd unit definitions
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Enable and start UFW at boot
+  ansible.builtin.systemd_service:
+    name: ufw.service
+    enabled: true
+    state: started
