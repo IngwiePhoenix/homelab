@@ -1,0 +1,25 @@
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: incus-smallsupportboi
+  namespace: flux-system
+spec:
+  interval: 1h
+  path: ./opentofu
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+    namespace: flux-system
+  # Deliberately omit approvePlan: plans require explicit approval.
+  destroyResourcesOnDeletion: false
+  disableDriftDetection: false
+  runnerPodTemplate:
+    spec:
+      volumes:
+        - name: incus-client-config
+          secret:
+            secretName: incus-client-config
+      volumeMounts:
+        - name: incus-client-config
+          mountPath: /etc/incus
+          readOnly: true
