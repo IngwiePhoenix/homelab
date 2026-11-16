@@ -7,7 +7,7 @@ spec:
   hosts:
   - ssh:
       # workboi-1
-      address: 10.1.0.11
+      address: 10.1.1.11
       user: root
       port: 22
     role: controller+worker
@@ -32,7 +32,7 @@ spec:
               cron: "@daily"
   - ssh:
       # workboi-2
-      address: 10.1.0.12
+      address: 10.1.1.12
       user: root
       port: 22
     role: controller+worker
@@ -43,7 +43,7 @@ spec:
       - --ignore-pre-flight-checks
   - ssh:
       # workboi-3
-      address: 10.1.0.13
+      address: 10.1.1.13
       user: root
       port: 22
     role: controller+worker
