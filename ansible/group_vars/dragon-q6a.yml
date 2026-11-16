@@ -1,0 +1,4 @@
+---
+# Incus HTTPS API on Dragon Q6a nodes.
+ufw_ports_allowed_extra:
+  - "8443/tcp"
