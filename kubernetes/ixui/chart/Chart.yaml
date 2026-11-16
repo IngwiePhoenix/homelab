@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ixui
+description: Static IXUI frontend with a same-origin reverse proxy to a standalone Incus server
+type: application
+version: 0.1.0
+appVersion: "26.11.4"
