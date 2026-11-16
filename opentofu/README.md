@@ -13,10 +13,28 @@ responsibilities for Ansible.
   attached to the host bridge `br30`.
 - Optional native Incus OIDC server configuration.
 
-The storage path is on the NFS mount configured by Ansible. Ensure the mount is
-available before the first apply. The directory storage driver does not provide
-block-level snapshots or quotas. Do not unmount or remount the NFS export while
-instances are running.
+## Storage warning: NFS-backed instance root filesystems
+
+The requested storage path is on the Ansible-managed NFS mount. This is
+implemented as a directory (`dir`) storage pool because Incus has no general
+NFS storage-pool driver for full instance root filesystems.
+
+This is a pragmatic stopgap, not a recommended high-performance or fully
+supported storage design. The directory driver is slower than copy-on-write
+backends and performs full filesystem copies for instance/snapshot operations.
+NFS locking and filesystem semantics can also be problematic for complete
+container root filesystems; upstream Incus discussion of an NFS driver has
+specifically called out limiting NFS-backed storage to custom filesystem
+volumes rather than full instance storage.
+
+Before placing important workloads here, test container start/stop, snapshots,
+backups, file ownership/ID mapping, locking, and recovery after a NAS/network
+interruption. Keep independent application backups. If any workload depends on
+strict local filesystem semantics (for example SQLite), prefer local NVMe for
+its live database and use the NAS for bulk data and backups.
+
+Ensure the NFS mount is available before the first apply and before Incus starts
+workloads. Do not unmount or remount the export while instances are running.
 
 The `homelab` profile is not attached to Incus's `default` profile and does
 not change existing instances. New instances must explicitly include it, for

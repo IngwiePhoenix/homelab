@@ -20,6 +20,11 @@ variable "incus_oidc_client_id" {
   description = "Dedicated OIDC client ID registered in VoidAuth for Incus."
   type        = string
   default     = ""
+
+  validation {
+    condition     = !var.incus_oidc_enabled || length(trimspace(var.incus_oidc_client_id)) > 0
+    error_message = "incus_oidc_client_id must be set when incus_oidc_enabled is true."
+  }
 }
 
 variable "incus_oidc_scopes" {
