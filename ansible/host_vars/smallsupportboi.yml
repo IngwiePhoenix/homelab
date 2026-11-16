@@ -1,0 +1,4 @@
+---
+# Incus HTTPS API exposed by smallsupportboi.
+firewall_ports_extra:
+  - "8443/tcp"
