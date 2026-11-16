@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ixui-tls
+  namespace: ixui
+spec:
+  secretName: ixui-tls
+  dnsNames:
+    - incus.birb.it
+  issuerRef:
+    name: letsencrypt-cloudflare
+    kind: ClusterIssuer
+    group: cert-manager.io

@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tofu-controller-helmrelease
+  namespace: flux-system
+spec:
+  interval: 1h
+  releaseName: tofu-controller
+  targetNamespace: flux-system
+  chart:
+    spec:
+      chart: tofu-controller
+      version: "0.17.0"
+      interval: 1h
+      sourceRef:
+        kind: HelmRepository
+        name: tofu-controller-helmrepo
+        namespace: flux-system
+  install:
+    crds: Create
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  values:
+    replicaCount: 1
+    watchAllNamespaces: true
+    concurrency: 4
+    image:
+      tag: v0.17.0
+    runner:
+      image:
+        tag: v0.17.0
+      serviceAccount:
+        allowedNamespaces:
+          - flux-system
