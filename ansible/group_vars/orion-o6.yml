@@ -1,6 +1,14 @@
 ---
 # Services exposed by the Orion O6 Kubernetes nodes.
 firewall_ports_extra:
+  - "2380/tcp"
+  - "4789/udp"
+  - "10250/tcp"
   - "9443/tcp"
   - "6443/tcp"
   - "8132/tcp"
+  - "8133/tcp"
+  - "8092/tcp"
+  - "179/tcp"
+  - "30000:32767/tcp"
+  - "30000:32767/udp"
