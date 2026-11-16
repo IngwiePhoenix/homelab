@@ -1,6 +1,2 @@
 ---
 incus_https_port: 8443
-
-# Only the management host may reach the Incus HTTPS API.
-incus_ufw_api_source: "10.1.1.2"
-incus_ufw_ssh_port: "22"
