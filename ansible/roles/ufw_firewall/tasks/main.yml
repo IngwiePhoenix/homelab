@@ -57,9 +57,8 @@
 - name: Check whether nft is installed
   ansible.builtin.command:
     argv:
-      - command
-      - -v
       - nft
+      - --version
   register: ufw_nft_binary
   changed_when: false
   failed_when: false
