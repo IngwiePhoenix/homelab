@@ -110,6 +110,37 @@
     comment: Managed by Ansible
   loop: "{{ ((firewall_ports | default([])) + (firewall_ports_extra | default([]))) | unique }}"
 
+- name: Allow IPIP (protocol 4) in UFW before rules
+  ansible.builtin.lineinfile:
+    path: /etc/ufw/before.rules
+    insertbefore: '^COMMIT'
+    line: '-A ufw-before-input -p 4 -j ACCEPT'
+    firstmatch: true
+  notify: reload ufw
+
+- name: Allow Calico tunnel traffic in UFW before rules
+  ansible.builtin.lineinfile:
+    path: /etc/ufw/before.rules
+    insertbefore: '^COMMIT'
+    line: '-A ufw-before-input -i tunl0 -j ACCEPT'
+    firstmatch: true
+  notify: reload ufw
+
+- name: Allow Calico pod traffic in UFW before rules
+  ansible.builtin.lineinfile:
+    path: /etc/ufw/before.rules
+    insertbefore: '^COMMIT'
+    line: '-A ufw-before-input -i cali+ -j ACCEPT'
+    firstmatch: true
+  notify: reload ufw
+
+- name: Enable forwarding for pod traffic
+  ansible.builtin.lineinfile:
+    path: /etc/default/ufw
+    regexp: '^DEFAULT_FORWARD_POLICY='
+    line: 'DEFAULT_FORWARD_POLICY="ACCEPT"'
+  notify: reload ufw
+
 - name: Enable UFW
   community.general.ufw:
     state: enabled
