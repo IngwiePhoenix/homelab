@@ -25,3 +25,24 @@
     - postmarketos
   roles:
     - postmarketos_baseline
+
+- name: Bootstrap Python on smallsupportboi
+  hosts: smallsupportboi
+  gather_facts: false
+  tags:
+    - bootstrap
+    - incus
+  tasks:
+    - name: Install python3 with apk via raw
+      ansible.builtin.raw: "sh -c 'apk info -e python3 >/dev/null 2>&1 || apk add --no-cache python3'"
+      register: bootstrap_python
+      changed_when: bootstrap_python.stdout is defined and ('Installing python3' in bootstrap_python.stdout or 'Upgrading python3' in bootstrap_python.stdout)
+      failed_when: bootstrap_python.rc is defined and bootstrap_python.rc != 0
+
+- name: Install standalone Incus on smallsupportboi
+  hosts: smallsupportboi
+  gather_facts: true
+  tags:
+    - incus
+  roles:
+    - incus

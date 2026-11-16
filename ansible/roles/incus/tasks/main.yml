@@ -1,0 +1,3 @@
+---
+- name: Install Incus packages and configure its systemd service
+  ansible.builtin.import_tasks: install.yml
