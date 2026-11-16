@@ -52,6 +52,25 @@
   changed_when: false
   check_mode: false
 
+- name: Check whether the native nftables systemd unit is installed
+  ansible.builtin.command:
+    argv:
+      - systemctl
+      - cat
+      - nftables.service
+  register: pmos_nftables_unit
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Require the postmarketOS native nftables systemd service
+  ansible.builtin.assert:
+    that:
+      - pmos_nftables_unit.rc == 0
+    fail_msg: >-
+      nftables.service is not installed. Refusing to proceed because
+      postmarketOS owns the native firewall lifecycle.
+
 - name: Check whether the old UFW systemd unit is installed
   ansible.builtin.command:
     argv:
@@ -74,25 +93,6 @@
   changed_when: pmos_ufw_disable.rc == 0
   failed_when: false
   when: pmos_ufw_unit.rc == 0
-
-- name: Check whether the native nftables systemd unit is installed
-  ansible.builtin.command:
-    argv:
-      - systemctl
-      - cat
-      - nftables.service
-  register: pmos_nftables_unit
-  changed_when: false
-  failed_when: false
-  check_mode: false
-
-- name: Require the postmarketOS native nftables systemd service
-  ansible.builtin.assert:
-    that:
-      - pmos_nftables_unit.rc == 0
-    fail_msg: >-
-      nftables.service is not installed. Refusing to proceed because
-      postmarketOS owns the native firewall lifecycle.
 
 - name: Restore and enable the postmarketOS native nftables firewall
   ansible.builtin.systemd_service:
