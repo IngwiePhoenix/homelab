@@ -52,6 +52,17 @@
   changed_when: false
   check_mode: false
 
+- name: Unmask the native nftables unit disabled by the previous UFW rollout
+  ansible.builtin.command:
+    argv:
+      - systemctl
+      - unmask
+      - nftables.service
+  register: pmos_nftables_unmask
+  changed_when: "'Removed' in (pmos_nftables_unmask.stdout | default(''))"
+  failed_when: false
+  check_mode: false
+
 - name: Check whether the native nftables systemd unit is installed
   ansible.builtin.command:
     argv:
@@ -108,7 +119,6 @@
   ansible.builtin.file:
     path: /etc/systemd/system/ufw.service
     state: absent
-  register: pmos_ufw_unit_removed
 
 - name: Remove UFW from postmarketOS nodes
   community.general.apk:
