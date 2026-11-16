@@ -83,7 +83,7 @@ spec:
       podSelector: ""
       skipWaitForDeleteTimeout: 0s
     concurrency:
-      limit: 30
+      limit: 1
       workerDisruptionPercent: 10
       uploads: 5
     evictTaint:

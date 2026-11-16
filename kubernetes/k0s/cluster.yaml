@@ -7,10 +7,9 @@ spec:
   api:
     k0sApiPort: 9443
     port: 6443
-    # Point this to your OPNSense HAProxy/Keepalived VIP or Public DNS
-    externalAddress: 10.1.0.1
+    externalAddress: 10.1.1.100
     sans:
-      - 10.1.0.1
+      - 10.1.1.100
       - k8s.birb.it
   installConfig:
     users:
