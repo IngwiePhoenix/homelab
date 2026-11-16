@@ -1,7 +1,8 @@
 name: Kubernetes
 
 include:
-  - k0s/updatecli.yaml
+  # Special case: when using k0sctl -c k0s, this file fails.
+  - k0s-updatecli.yaml
   - cert-manager/updatecli.yaml
   - local-path-provisioner/updatecli.yaml
   - rclone-csi/updatecli.yaml
