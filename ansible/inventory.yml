@@ -3,43 +3,39 @@ all:
     ansible_user: root
 
   hosts:
+    # External
     drachennetz:
       ansible_host: 10.0.0.1
     birb:
       ansible_host: 10.0.0.2
-    #ultradiskboi:
-    #  ansible_host: 10.1.0.2
     superdiskboi:
-      ansible_host: 10.1.0.2
-    #senseboi:
-    #  ansible_host: 10.1.0.3
-    #smolriscboi:
-    #  ansible_host: 10.1.0.4
-    #bigriscboi:
-    #  ansible_host: 10.1.0.5
-    #spaceboi:
-    #  ansible_host: 10.1.0.6
-    piboi:
-      ansible_host: 10.1.0.7
+      ansible_host: 10.1.1.2
+    smallsupportboi:
+      ansible_host: 10.1.1.3
     bigsupportboi:
-      ansible_host: 10.1.0.119
-    smolsupportboi:
-      ansible_host: 10.1.0.118
+      ansible_host: 10.1.1.4
+    piboi:
+      ansible_host: 10.1.1.5
+    #littleriscboi:
+    #  ansible_host: 10.1.1.6
+    #bigriscboi:
+    #  ansible_host: 10.1.1.7
+    #spaceboi:
+    #  ansible_host: 10.1.1.8
+    #bulkboi:
+    #  ansible_host: 10.1.1.9
     #kaguya:
     #  ansible_host: 10.1.0.10
     workboi-1:
-      ansible_host: 10.1.0.11
+      ansible_host: 10.1.1.11
     workboi-2:
-      ansible_host: 10.1.0.12
+      ansible_host: 10.1.1.12
     workboi-3:
-      ansible_host: 10.1.0.13
-    #bulkboi:
-    #  ansible_host: 10.1.0.15
+      ansible_host: 10.1.1.13
     #bulkboi-kvm:
-    #  ansible_host: 10.1.0.16
+    #senseboi:
 
   children:
-    # --- Hardware / Role Groups ---
     orion-o6:
       hosts:
         workboi-1:
@@ -48,10 +44,10 @@ all:
 
     dragon-q6a:
       hosts:
-        smolsupportboi:
+        smallsupportboi:
         bigsupportboi:
 
-    external-vpn:
+    external:
       hosts:
         drachennetz:
         birb:
@@ -77,7 +73,3 @@ all:
       #  birb:
       children:
         orion-o6:
-
-    incus:
-      children:
-        dragon-q6a:
