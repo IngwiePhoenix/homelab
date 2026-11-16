@@ -30,7 +30,8 @@ baseline_kernel_modules:
   - br_netfilter
   - overlay
 
-# Common UFW rules. SSH must remain reachable on every managed node.
+# Common firewall ports. UFW manages Alpine; postmarketOS uses native nftables.
+# SSH must remain reachable on every managed node.
 ufw_ports_allowed:
   - "22/tcp"
 
