@@ -84,6 +84,10 @@ spec:
               readOnly: true
             - name: tmp
               mountPath: /tmp
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
       volumes:
         - name: ui-assets
           emptyDir: {}
@@ -97,4 +101,8 @@ spec:
               - key: {{ .Values.incus.caSecretKey }}
                 path: {{ .Values.incus.caSecretKey }}
         - name: tmp
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
           emptyDir: {}
