@@ -4,8 +4,8 @@
 description="{{ item.description }}"
 
 depend() {
-    after bootmisc localmount networking
-    need net
+    after bootmisc localmount
+    need networking network-online
 }
 
 start() {
@@ -19,8 +19,9 @@ start() {
     if timeout 20 mount -t {{ item.fstype }} -o {{ item.opts }} {{ item.src }} {{ item.path }}; then
         eend 0
     else
-        ewarn "Optional mount failed: {{ item.path }}"
-        eend 0
+        ewarn "NFS mount failed: {{ item.path }}"
+        eend 1
+        return 1
     fi
 }
 
