@@ -61,7 +61,7 @@
     mode: "0755"
   when: item.rc == 1
 
-- name: Install OpenRC service scripts for NFS mounts
+- name: Install OpenRC service scripts for optional mounts
   loop: "{{ optional_nfs_mounts }}"
   ansible.builtin.template:
     src: openrc-optional-mount.j2
@@ -80,7 +80,7 @@
     group: root
     mode: "0644"
 
-- name: Enable and start NFS mount services
+- name: Enable and start optional mount services
   loop: "{{ optional_nfs_mounts }}"
   ansible.builtin.service:
     name: "{{ item.service_name }}"
