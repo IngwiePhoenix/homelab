@@ -1,0 +1,7 @@
+- name: Configure OpenRC net-online
+  ansible.builtin.template:
+    src: net-online.conf.j2
+    dest: /etc/conf.d/net-online
+    owner: root
+    group: root
+    mode: "0644"

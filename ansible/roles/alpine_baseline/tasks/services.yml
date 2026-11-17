@@ -1,3 +1,13 @@
+- name: Ensure networking starts in the boot runlevel
+  ansible.builtin.command:
+    cmd: rc-update add networking boot
+    creates: /etc/runlevels/boot/networking
+
+- name: Keep networking out of the default runlevel
+  ansible.builtin.command:
+    cmd: rc-update del networking default
+    removes: /etc/runlevels/default/networking
+
 - name: Enable required OpenRC services
   loop: "{{ baseline_services }}"
   ansible.builtin.service:

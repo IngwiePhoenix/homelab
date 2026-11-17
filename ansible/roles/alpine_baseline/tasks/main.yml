@@ -10,6 +10,9 @@
 - name: Configure sysctl
   ansible.builtin.import_tasks: sysctl.yml
 
+- name: Configure OpenRC network-online check
+  ansible.builtin.import_tasks: net_online.yml
+
 - name: Enable OpenRC services
   ansible.builtin.import_tasks: services.yml
 
