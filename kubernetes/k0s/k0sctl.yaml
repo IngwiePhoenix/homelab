@@ -11,6 +11,8 @@ spec:
       user: root
       port: 22
     role: controller+worker
+    privateInterface: bond0
+    #privateAddress: 10.1.1.11
     noTaints: true
     uploadBinary: true
     installFlags:
@@ -36,6 +38,8 @@ spec:
       user: root
       port: 22
     role: controller+worker
+    privateInterface: bond0
+    #privateAddress: 10.1.1.12
     noTaints: true
     uploadBinary: true
     installFlags:
@@ -47,6 +51,8 @@ spec:
       user: root
       port: 22
     role: controller+worker
+    privateInterface: bond0
+    #privateAddress: 10.1.1.13
     noTaints: true
     uploadBinary: true
     installFlags:
@@ -83,7 +89,7 @@ spec:
       podSelector: ""
       skipWaitForDeleteTimeout: 0s
     concurrency:
-      limit: 1
+      limit: 5
       workerDisruptionPercent: 10
       uploads: 5
     evictTaint:

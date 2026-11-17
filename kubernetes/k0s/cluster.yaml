@@ -25,19 +25,16 @@ spec:
     provider: calico
     podCIDR: 10.100.0.0/16
     serviceCIDR: 10.200.0.0/16
-    #podCIDR: 172.30.0.0/16
-    #serviceCIDR: 172.31.0.0/16
     dualStack:
       enabled: true
       IPv6podCIDR: fd00:10:100::/108
       IPv6serviceCIDR: fd00:10:200::/108
     calico:
       mode: bird
-      #overlay: Always
-      #vxlanPort: 4789
       ipAutodetectionMethod: kubernetes-internal-ip
-      #envVars:
-      #  FELIX_NFTABLESMODE: "Enabled"
+      envVars:
+        CALICO_IPV6POOL_VXLAN: "Always"
+        IP6_AUTODETECTION_METHOD: "can-reach=fd42:42:42::1"
     kubeProxy:
       disabled: false
       mode: nftables
