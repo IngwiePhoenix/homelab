@@ -70,20 +70,28 @@
     group: root
     mode: "0755"
 
-- name: Require both NFS mounts before starting k0scontroller
+- name: Require configured NFS mounts before starting k0scontroller
   ansible.builtin.lineinfile:
     path: /etc/conf.d/k0scontroller
     regexp: '^rc_need='
-    line: 'rc_need="mount-bunker mount-stash"'
+    line: >-
+      rc_need="{{ optional_nfs_mounts | map(attribute='service_name') | join(' ') }}"
     create: true
     owner: root
     group: root
     mode: "0644"
+  when: optional_nfs_mounts | length > 0
 
-- name: Enable and start optional mount services
+- name: Remove stale NFS dependencies when no mounts are configured
+  ansible.builtin.lineinfile:
+    path: /etc/conf.d/k0scontroller
+    regexp: '^rc_need='
+    state: absent
+  when: optional_nfs_mounts | length == 0
+
+- name: Keep optional NFS mount services out of the default runlevel
   loop: "{{ optional_nfs_mounts }}"
   ansible.builtin.service:
     name: "{{ item.service_name }}"
-    state: started
-    enabled: true
+    enabled: false
     use: openrc
