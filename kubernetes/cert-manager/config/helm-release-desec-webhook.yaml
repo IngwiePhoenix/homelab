@@ -1,11 +1,11 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: cert-manager-desec
+  name: cm-desec
   namespace: flux-system
 spec:
   interval: 1h
-  targetNamespace: cert-manager-desec
+  targetNamespace: cm-desec
   releaseName: cm-desec
   chart:
     kind: OCIRepository
