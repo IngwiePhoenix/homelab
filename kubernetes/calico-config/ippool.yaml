@@ -1,0 +1,14 @@
+apiVersion: projectcalico.org/v3
+kind: IPPool
+metadata:
+  name: kubernetes-loadbalancer-pool
+spec:
+  cidr: 10.10.10.0/24
+
+  disabled: false
+  natOutgoing: false
+
+  assignmentMode: Manual
+
+  allowedUses:
+    - LoadBalancer

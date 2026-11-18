@@ -1,0 +1,8 @@
+apiVersion: projectcalico.org/v3
+kind: KubeControllersConfiguration
+metadata:
+  name: default
+spec:
+  controllers:
+    loadBalancer:
+      assignIPs: RequestedServicesOnly

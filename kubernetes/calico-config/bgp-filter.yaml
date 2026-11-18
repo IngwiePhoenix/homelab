@@ -1,0 +1,14 @@
+apiVersion: projectcalico.org/v3
+kind: BGPFilter
+metadata:
+  name: opnsense-services-only
+spec:
+  exportV4:
+    - action: Accept
+      matchOperator: In
+      cidr: 10.10.10.0/24
+
+    - action: Reject
+
+  importV4:
+    - action: Reject

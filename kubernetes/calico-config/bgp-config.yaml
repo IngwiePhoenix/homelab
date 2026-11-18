@@ -1,0 +1,11 @@
+apiVersion: projectcalico.org/v3
+kind: BGPConfiguration
+metadata:
+  name: default
+spec:
+  asNumber: 64512
+
+  serviceLoadBalancerIPs:
+    - cidr: 10.10.10.0/24
+
+  serviceLoadBalancerAggregation: Disabled
