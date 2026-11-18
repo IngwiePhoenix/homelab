@@ -7,8 +7,6 @@ spec:
   interval: 30m
   releaseName: traefik-internal
   targetNamespace: traefik-internal
-  dependsOn:
-    - name: metallb-helmrelease
   chart:
     spec:
       chart: traefik
@@ -63,8 +61,7 @@ spec:
       enabled: true
       annotations:
         # TODO: Migrate to new CIDR
-        metallb.io/address-pool: home-lb-pool
-        metallb.io/loadBalancerIPs: "10.1.0.15"
+        projectcalico.org/loadBalancerIPs: '["10.10.10.10"]'
       spec:
         type: LoadBalancer
         externalTrafficPolicy: Local

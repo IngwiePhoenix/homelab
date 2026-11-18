@@ -4,6 +4,7 @@ resources:
   # Let Flux take ownership of the dynamic config from day 2 onwards
   - k0s/cluster.yaml
   - k0s/extensions-helm/flux-cd.yaml
+  - calico-config/flux.yaml
 
   # Core
   - local-path-provisioner/flux.yaml
@@ -12,7 +13,6 @@ resources:
   # Base:
   - updatecli/flux.yaml
   - cert-manager/flux.yaml
-  - metallb/flux.yaml
   - reflector/flux.yaml
   - reloader/flux.yaml
   - traefik/flux.yaml

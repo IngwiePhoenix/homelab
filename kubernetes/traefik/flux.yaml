@@ -35,8 +35,7 @@ spec:
       namespace: flux-system
   dependsOn:
     - name: traefik-common
-    - name: metallb-install
-    - name: metallb-config
+    - name: calico-config
     # CrowdSec Bouncer secret is here:
     - name: common-secrets
     - name: reflector

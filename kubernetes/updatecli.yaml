@@ -6,7 +6,6 @@ include:
   - cert-manager/updatecli.yaml
   - local-path-provisioner/updatecli.yaml
   - rclone-csi/updatecli.yaml
-  - metallb/updatecli.yaml
   - postgres/cloudnative-pg/updatecli.yaml
   - postgres/postgres-operator/updatecli.yaml
   - reflector/updatecli.yaml
