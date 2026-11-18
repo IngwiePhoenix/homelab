@@ -35,7 +35,7 @@ spec:
 
           containers:
             - name: updatecli
-              image: ghcr.io/updatecli/updatecli:v0.123.0
+              image: ghcr.io/updatecli/updatecli:v0.124.0
               imagePullPolicy: IfNotPresent
               workingDir: /workspace
               args:
