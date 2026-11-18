@@ -7,6 +7,8 @@ spec:
   interval: 1h
   targetNamespace: cm-desec
   releaseName: cm-desec
+  dependsOn:
+    - cert-manager-helmrelease
   chart:
     kind: OCIRepository
     spec:
