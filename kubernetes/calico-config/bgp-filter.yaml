@@ -4,6 +4,10 @@ metadata:
   name: opnsense-services-only
 spec:
   exportV4:
+    # Don't re-advertise routes learned from other BGP peers.
+    - action: Reject
+      source: RemotePeers
+
     - action: Accept
       matchOperator: In
       cidr: 10.10.10.0/24
