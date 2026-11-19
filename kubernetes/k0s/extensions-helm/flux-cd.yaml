@@ -9,6 +9,7 @@ spec:
   namespace: flux-system
   releaseName: flux-system
   timeout: 5m
+  #forceUpgrade: false
   values: |
     # Enable CRD migrations for the future. Could be useful.
     crds:
@@ -24,3 +25,9 @@ spec:
       container:
         additionalArgs:
           - --requeue-dependency=2s
+
+    imageAutomationController:
+      create: false
+
+    imageReflectionController:
+      create: false
