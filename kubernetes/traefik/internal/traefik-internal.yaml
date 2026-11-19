@@ -57,6 +57,10 @@ spec:
       websecure:
         expose:
           default: true
+      # Special usecase: Forgejo
+      ssh:
+        expose:
+          default: true
     service:
       enabled: true
       annotations:

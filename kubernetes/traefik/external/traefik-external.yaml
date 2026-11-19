@@ -51,5 +51,8 @@ spec:
       edge:
         hostPort: 443
         # hostIP: <public IP>   # optional: don't serve edge on the WG interface
+      # Special usecase: Forgejo
+      ssh:
+        hostPort: 22 # And this is why I need a new port lol.
     service:
       enabled: false

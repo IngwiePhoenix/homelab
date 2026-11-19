@@ -3,10 +3,8 @@ kind: Service
 metadata:
   name: forgejo-svc
   namespace: forgejo
-  annotations:
-    projectcalico.org/loadBalancerIPs: '["10.10.10.20"]'
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - name: http
       port: 3000

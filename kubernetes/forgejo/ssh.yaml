@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: TCPRoute
+metadata:
+  name: forgejo-ssh-tcproute
+  namespace: forgejo
+spec:
+  entryPoints:
+    - ssh
+  rules:
+    - match: HostSNI(`*`)
+  services:
+    - name: forgejo-svc
+      port: 2222

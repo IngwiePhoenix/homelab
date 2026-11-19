@@ -90,6 +90,13 @@ ports:
       middlewares:
         - traefik-ingress-external-chain-tm@kubernetescrd
 
+  # Special usecase: Forgejo
+  ssh:
+    port: 8222
+    exposedPort: 22
+    expose:
+      default: false
+
 # Optional hardening, requires Traefik >= 3.7.11 (GHSA-g55h-rg46-x9c5):
 core:
   strictTLSOptions: true
