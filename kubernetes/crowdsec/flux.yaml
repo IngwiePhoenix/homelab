@@ -27,7 +27,7 @@ spec:
       namespace: crowdsec
     - apiVersion: apps/v1
       kind: Deployment
-      name: crowdsec-web-ui
+      name: crowdsec-webui
       namespace: crowdsec
   dependsOn:
     - name: traefik-ingress
