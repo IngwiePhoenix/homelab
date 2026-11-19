@@ -5,6 +5,8 @@ metadata:
   namespace: flux-system
 spec:
   interval: 30m
+  releaseName: piped
+  targetNamespace: piped
   chart:
     spec:
       chart: piped
@@ -14,6 +16,9 @@ spec:
         name: piped-helmrepo
         namespace: flux-system
       interval: 12h
+
+  install:
+    createNamespace: true
 
   values:
     frontend:
@@ -31,6 +36,7 @@ spec:
             name: piped-db-creds
             username: LOGIN
             password: PASSWORD
+            namespace: piped
 
     ingress:
       backend:
