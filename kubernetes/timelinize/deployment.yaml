@@ -17,7 +17,14 @@ spec:
         # Ensures mounted volumes are writable by the container's default user (UID 1000)
         fsGroup: 1000
       nodeSelector:
-        kubernetes.io/arch: arm64
+        homelab/location: internal
+      initContainers:
+        - name: fix-permissions
+          image: alpine:3.24
+          command: ['sh', '-c', 'chown -R 1000:1000 /data']
+          volumeMounts:
+            - name: data
+              mountPath: /data
       containers:
         - name: main
           # Pinned version for Renovate to manage. Verified arm64 support.
