@@ -20,9 +20,10 @@
 
   packageRules: [
     {
-      description: 'control plane is k0sctl/autopilot territory',
+      description: 'k0s releases use a numeric build suffix',
+      matchDatasources: ['github-releases'],
       matchPackageNames: ['k0sproject/k0s'],
-      enabled: false
+      versioning: 'regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\+k0s\\.(?<build>\\d+)$',
     },
     {
       description: 'wait4x floats on :latest',
