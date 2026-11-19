@@ -1,0 +1,19 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: timelinize
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/timelinize
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+  dependsOn:
+    - name: traefik-ingress
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: timelinize-app
+      namespace: timelinize

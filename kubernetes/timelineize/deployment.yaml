@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timelinize-app
+  namespace: timelinize
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: timelinize
+  template:
+    metadata:
+      labels:
+        app: timelinize
+    spec:
+      securityContext:
+        # Ensures mounted volumes are writable by the container's default user (UID 1000)
+        fsGroup: 1000
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      containers:
+        - name: main
+          # Pinned version for Renovate to manage. Verified arm64 support.
+          image: ghcr.io/timelinize/timelinize:v0.0.28
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 12002
+              name: http
+          volumeMounts:
+            # Using subPaths on a single PVC to keep storage management simple while 
+            # respecting the app's recommended directory structure.
+            - name: data
+              mountPath: /repo
+              subPath: repo
+            - name: data
+              mountPath: /app/.config/timelinize
+              subPath: config
+            - name: data
+              mountPath: /app/.cache
+              subPath: cache
+            - name: data
+              mountPath: /app/.local
+              subPath: local
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: timelinize-data-pvc

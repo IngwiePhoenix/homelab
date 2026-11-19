@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: timelinize-data-pvc
+  namespace: timelinize
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-bunker
+  resources:
+    requests:
+      # Timelinize recommends 10+ GB for semantic/AI features and thumbnail generation
+      storage: 20Gi

@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: timelinize-ir
+  namespace: timelinize
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`time.birb.it`)
+      kind: Rule
+      services:
+        - name: timelinize-srv
+          port: 12002
