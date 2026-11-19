@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: renovate-oidc
+    namespace: renovate-operator
+    labels:
+        renovate-operator.mogenius.com/allow-ref: "true"
+stringData:
+    client-secret: ENC[AES256_GCM,data:+8qWWcNskZY9xpk5zeNqMlWbN9IKuX7dQg3TT5NylXU=,iv:eLL+Ckd+VVfcDBrvhPqNoDnCyXL5Ua8bi6b9uw0DtjY=,tag:+DhfTpnjDaPDgxzbwDR2zA==,type:str]
+    session-secret: ENC[AES256_GCM,data:CESd06WpOt43Ipoo0AlVwWgc4G1YfIHiqrdsWEYX5qaktNIifj7Q5Yx1mMoEkMDX2MfA1pChEqLptxt/Q2nKTg==,iv:e4tVWocuJn2N3nLjaW9XIO17IwnNSQZkwHdcwkeih/0=,tag:d82GPuydhaBzorlSGjCLRA==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBKL0hENWFLdUkveERXdzl0
+            R2VjQUZHKzlVbDA3UTVCSk5jMVd6bnFwb0VJCjBuK3NCQ1h1SW1NQkw3T1llQy9C
+            WEJDdkF3VTc5KzV4VTVjbUp1ZlVKbEUKLS0tIHdTM1dIeHhYRFJyRGNFYnovYWRW
+            ZjFqSUh0WEVCTjdnVWt0aVZUcngxbEUKEy2LFTWZ09lJOZlu8Hwb5OZf1VdhOPcE
+            6YIuDIDhL72XUYLaeQ8GaCzr5xitKiHPdwgvJtJZDiV5B2AOcT4QFg==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-19T13:38:59Z"
+    mac: ENC[AES256_GCM,data:1pEYCbV3FJXVtLBe+zSlH5YMDow33OZlWdHOBBSKIK89ZbZ8EM9ylJUfdccEI0O87uYM77Uxn+APr5uovfY5fXMcRnmgG4lfJkf2QP31gR32KTmZ9e8Fhn5NscS6oOkI8Z0WWN3fDkgrtGtzs7AsWLyZlW7gbyR9NpwKF/7qLZk=,iv:BrmHinBUYOwhdC1biaCVyKHDkYukMtiGau97Jms9jeM=,tag:Ic4iBh+hrOA82fRlhIY4Nw==,type:str]
+    version: 3.13.3

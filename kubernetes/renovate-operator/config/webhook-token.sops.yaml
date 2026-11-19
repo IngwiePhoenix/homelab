@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: renovate-webhook-token
+    namespace: renovate-operator
+    labels:
+        renovate-operator.mogenius.com/allow-ref: "true"
+stringData:
+    token: ENC[AES256_GCM,data:lvriZNsA0IJab1CFaECx8QVvJLlOJNBWrCNIiL5vvHUqHqo/l4vmPm3ldjZdJfQ5tQHau8upJVMHUZdHaL238A==,iv:7tPyQpkkpmBxYttRpbbAg7zahaYbxkKcG9HjyBwz/dg=,tag:p9Gl5DyDtD9vt+rrkeDpDg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBpenhNRGs3Z2RPd3IxdjdK
+            NVZjeWdjSzlzekdwZ3BsUng4Wjg5Z3UwYXlFClRhbGJLcVBjejk5ZUp2a0xhby81
+            WnVIeE90eVRGd3dRQUV0ZnlnYW5CZGsKLS0tIEZzLzh4NnRCbUNoSmR5TEJHaE9p
+            c0lZeGZndm5PMVhLdUtjM1ViNHJWcGsKtD4V7jnMZ2G3fQOiWKcpgPOtaFdJkAUW
+            0ihdmAQPWXOaoFznFNNWfL8ccJ9R/eJ+6GfaGU+OoAhX3hmaOnMwDA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-19T14:03:36Z"
+    mac: ENC[AES256_GCM,data:4wRpy77yyRgMbsA9AdhM4EEmu3vx2kVF2+ukiG4UK6sWSKOMKs/XjdkKoiTR97rR7mVsPOoN3P6u9oAb0BR0/CmEJKe3H1yzUMIyKyJNXeM3bFijghN92LHjj1jC8rTNbYVZmJ/lTCMAfYgYWlOUnb/ZQ0Y8IJ3NOp5O6bOAN8Y=,iv:h9tLP4OkS2OJCOC6JrIlPt7agyGe5wlsg4CTsOBxCOE=,tag:WBXdJkLjbymLUZ97rm91Rw==,type:str]
+    version: 3.13.3

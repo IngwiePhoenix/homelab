@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: renovate-github-app
+    namespace: renovate-operator
+    labels:
+        renovate-operator.mogenius.com/allow-ref: "true"
+stringData:
+    APP_ID: ENC[AES256_GCM,data:gbtNRugFuA==,iv:g2ptyJKVQhhByiSvyw0hAQQX14XvynqPXOH0JPXC22E=,tag:0uSkVSF+K1uLR9Kiee/0/A==,type:str]
+    INSTALL_ID: ENC[AES256_GCM,data:O1DxxlanpdKf,iv:2yza+LfC/dCfJuAjS6Gefaz6snncg3DEGaL//bQgthk=,tag:UU5qeFVGjbG6tp520DTCfA==,type:str]
+    PEM: ENC[AES256_GCM,data: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,iv:p9XzichegkmJ4yoTwHsrJqj71Uurm2t60LJ3NgTFqNY=,tag:Q8pIVXCcYl+ncX4gOzrgyA==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAzZGFqZWtzUk1vSldQbnFw
+            RSs4c2I3MVMwTkFyUUFmTzhSM0FOOFVjdWhvCnJ4bHhLWW5WWG9kekZRTVo3Z1lM
+            U3dqeThZM1NsN3piZW5LQ1BXWHVyekkKLS0tIHZHSWc0akV6cEVtOVVoZU90dStF
+            L3BOcW14eHR0ZklPZmU3bDNjc0ZybDQKz0b86Uz4yZom6SMwnYGvw4HT+bVZnJXU
+            b7+MYWrF/6BSFpX0nrAsWxXkXdKAsm4sA/Egl2mxmqzGoU4+DOgxCQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-19T14:03:11Z"
+    mac: ENC[AES256_GCM,data:o7Nn3rX9HxVjD1Hip1Oz2XjRHAAlrOyBQY/0yLnU1xwirnLzE5VyoZqpbMdcDL5Yq3fH7sdmfN7fnoTNRDV1DlJsSPkvQby43ePBM0AarwlljxCxfblpFdjV3to7WGRac7fmC8JlVceIz0dM7hktJ3zvifdF3p1eEZZpVRnZ1Jw=,iv:W/6j6T1wS62JZedS4+/7iTBuib5mRzv5r95qHXlFJiQ=,tag:SacvWRKR20d/eXFpdRUdrw==,type:str]
+    version: 3.13.3
