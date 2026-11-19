@@ -14,3 +14,13 @@ spec:
     crds:
       migration:
         enabled: true
+
+    kustomizeController:
+      container:
+        additionalArgs:
+          - --requeue-dependency=2s
+
+    helmController:
+      container:
+        additionalArgs:
+          - --requeue-dependency=2s
