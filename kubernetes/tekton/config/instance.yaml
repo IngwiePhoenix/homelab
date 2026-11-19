@@ -1,0 +1,26 @@
+apiVersion: operator.tekton.dev/v1alpha1
+kind: TektonConfig
+metadata:
+  name: config
+spec:
+  targetNamespace: tekton
+  profile: all
+
+  pipeline:
+    enable-api-fields: beta
+
+  trigger:
+    disabled: false
+
+  dashboard:
+    readonly: true
+
+  # Optional supply-chain signing.
+  # Enable after configuring signing keys
+  # and artifact/provenance storage.
+  chain:
+    disabled: true
+
+  # Disable the Results database initially.
+  result:
+    disabled: true

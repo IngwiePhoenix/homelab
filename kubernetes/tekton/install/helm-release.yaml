@@ -1,0 +1,42 @@
+
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tekton-operator
+  namespace: flux-system
+spec:
+  interval: 15m
+  releaseName: tekton-operator
+  targetNamespace: tekton-operator
+
+  chart:
+    spec:
+      chart: tekton-operator
+      version: "0.82.0"
+      sourceRef:
+        kind: HelmRepository
+        name: tekton-operator
+        namespace: flux-system
+      interval: 1h
+
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+
+  upgrade:
+    remediation:
+      retries: 3
+
+  values:
+    openshift:
+      enabled: false
+
+    # Required for a fresh installation unless
+    # Operator CRDs are managed separately.
+    installCRDs: true
+
+    operator:
+      replicas: 1
+      autoInstallComponents: false
+      defaultTargetNamespace: tekton
