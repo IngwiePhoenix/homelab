@@ -74,7 +74,6 @@ spec:
   #    apply:
   #      - homelab/location=external
   k0s:
-    # Pick latest
     # renovate: datasource=github-releases depName=k0sproject/k0s
     version: v1.37.2+k0s.1
     dynamicConfig: true
