@@ -1,0 +1,26 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: vaultwarden
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+  path: ./kubernetes/vaultwarden
+  prune: true
+  dependsOn:
+    - name: traefik-ingress
+    - name: reflector
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: vaultwarden-app
+      namespace: vaultwarden
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

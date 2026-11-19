@@ -21,6 +21,7 @@ resources:
   - common-secrets/flux.yaml
 
   # Apps
+  - vaultwarden/flux.yaml
   - voidauth/flux.yaml
   - tekton/flux.yaml
   - piped/flux.yaml

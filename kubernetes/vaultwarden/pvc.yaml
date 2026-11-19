@@ -5,6 +5,9 @@ metadata:
   namespace: vaultwarden
   labels:
     app: vaultwarden
+  annotations:
+    local-path-provisioner/uid: "1000"
+    local-path-provisioner/gid: "1000"
 spec:
   accessModes:
     - ReadWriteOnce
