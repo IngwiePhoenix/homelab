@@ -24,7 +24,7 @@ metadata:
   name: renovate-operator-config
   namespace: flux-system
 spec:
-  interval: 10m       # short: this is where renovate.config.js lands
+  interval: 10m
   retryInterval: 1m
   timeout: 5m
   sourceRef:
