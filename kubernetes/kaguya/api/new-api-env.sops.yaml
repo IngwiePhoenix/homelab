@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: new-api-env
+    namespace: new-api
+type: Opaque
+stringData:
+    SESSION_SECRET: ENC[AES256_GCM,data:1hU/XCl1eSzOKuG/2fy8HuPZJBT/GFGMglgEDBzZMJcDPbiuNwDVitz2MUB4aRS+OB9g58fycc3itZSYxnpVzQ==,iv:yHD2li99wy8ZlG+EAThW1qpR1fRPahNWtCSYpEi1ews=,tag:TLEFUaPg8fOVIbWriP1/kg==,type:str]
+    CRYPTO_SECRET: ENC[AES256_GCM,data:lBrdMEUi7BPSt30XH1lB9Six0/o4V7w6whW2FXGRhWr+p75isZ5zGG1iJahcSnncd0NcASjD5U1XnQzmYV9DVQ==,iv:BF/IkxYW54vbLaMjC0gAZyUgFLM5kQRWeRkMzHp4fW0=,tag:LkAVj4c9JEEhYw2W1iyKAg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAwUndHaWh4anp3UkR1WHZu
+            blpsdFZFQno3dmxTT1NGYzNsSGhia3ZPcjNNCjhRdjJJWWRTSnJEZVpFK0x1OFI4
+            VStvU2R4SVQ1OGVxWSt6dFpwcVM1RHMKLS0tIFdFcnVVb3VjWjl2OW9hWkIwSWl5
+            UDU1cDVBUWRPbzNOWXBETUhNRUJ6M2cKcW6jz/C4nLRmm9H+5XAF+NWZu8V3C1nD
+            lU7LcH1guv70w/wBoDAGOFEvhpOTZ0/seVmc36qUtGumkhx73CzpRA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-19T19:15:47Z"
+    mac: ENC[AES256_GCM,data:BhU+DprTgp6VGqIEjTyU0XkmJv/L5Cohtrxhz6G50s+tMr8YkJBjFciEQqGcnhnu+dPGMz1P6hRCAb5mMBgYMcyrUL3CCOEHqFnBcDZ597bvwJr6PaSYHcgHPIaZlg033K+J1ZSR8WhktA1lUr7e5oFmAfIj3f+RVxEeSN84tws=,iv:8ipUSm/reOACDopIEllBS9/xDZh23z+bYAqN0ZOu+aA=,tag:M9Kue/zCvwqMNkKg7y3Alg==,type:str]
+    version: 3.13.3

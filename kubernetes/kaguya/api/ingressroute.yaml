@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: new-api-ir
+  namespace: new-api
+spec:
+  entryPoints:
+    - websecure
+    #- edge
+  routes:
+    - match: Host(`api.kaguya.im`)
+      kind: Rule
+      services:
+        - name: new-api-svc
+          port: http

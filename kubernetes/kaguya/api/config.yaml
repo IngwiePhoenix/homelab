@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: new-api-cm
+  namespace: new-api
+data:
+  PORT: "3000"
+  TZ: "Europe/Berlin"
+  SESSION_COOKIE_SECURE: "true"
+  SESSION_COOKIE_TRUSTED_URL: "https://api.kaguya.im"
+  TRUSTED_PROXIES: "10.200.0.0/16"

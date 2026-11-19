@@ -1,0 +1,27 @@
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlDatabase
+metadata:
+  name: new-api-db
+  namespace: new-api
+spec:
+  engineConfiguration:
+    name: default-cluster-instance
+    namespace: postgres
+  database: new-api
+  masterRole: new-api-role
+  dropOnDelete: true
+  waitLinkedResourcesDeletion: true
+---
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlUserRole
+metadata:
+  name: new-api-db-user
+  namespace: new-api
+spec:
+  mode: MANAGED
+  rolePrefix: new-api
+  privileges:
+    - privilege: OWNER
+      database:
+        name: new-api-db
+      generatedSecretName: new-api-db-creds
