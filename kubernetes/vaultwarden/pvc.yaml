@@ -9,6 +9,7 @@ metadata:
     local-path-provisioner/uid: "1000"
     local-path-provisioner/gid: "1000"
 spec:
+  storageClassName: local-bunker
   accessModes:
     - ReadWriteOnce
   resources:
