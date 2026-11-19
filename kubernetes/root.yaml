@@ -10,9 +10,9 @@ spec:
   ref:
     branch: master
   ignore: |
-    # Ignore everything except the kubernetes directory
     /*
     !/kubernetes/
+    !/renovate.config.js
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

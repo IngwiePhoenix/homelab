@@ -1,0 +1,39 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: renovate-operator-install
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 1m
+  timeout: 10m
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+  path: ./kubernetes/renovate-operator/install
+  prune: true
+  wait: true          # CRDs must be established before config applies
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: renovate-operator-config
+  namespace: flux-system
+spec:
+  interval: 10m       # short: this is where renovate.config.js lands
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+  path: ./kubernetes/renovate-operator/config
+  prune: true
+  wait: false
+  dependsOn:
+    - name: renovate-operator-install
+    - name: cert-manager-issuers
+    - name: traefik-ingress
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

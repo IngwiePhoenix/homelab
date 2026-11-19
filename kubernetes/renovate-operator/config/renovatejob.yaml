@@ -1,0 +1,49 @@
+apiVersion: renovate-operator.mogenius.com/v1alpha1
+kind: RenovateJob
+metadata:
+  name: homelab
+  namespace: renovate-operator
+spec:
+  schedule: "CRON_TZ=Europe/Berlin 17 */6 * * *"
+  image: renovate/renovate:44.252.8   # multi-arch incl. arm64; slim, not -full
+  parallelism: 1
+
+  provider:
+    name: github
+
+  discoveryFilters:
+    - IngwiePhoenix/homelab
+    # later: - IngwiePhoenix/*   (picks up every repo the App is installed on)
+
+  githubAppReference:
+    secretName: renovate-github-app
+    appIdSecretKey: APP_ID
+    installationIdSecretKey: INSTALL_ID
+    pemSecretKey: PEM
+
+  renovateConfig:
+    configMapRef:
+      name: renovate-config
+      key: renovate.config.js
+
+  webhook:
+    enabled: true
+    authentication:
+      enabled: true
+      secretRef:
+        name: renovate-webhook-token
+        key: token
+
+  resources:
+    requests: { cpu: 100m, memory: 512Mi }
+    limits: { memory: 2Gi }
+
+  extraEnv:
+    - name: RENOVATE_LOG_LEVEL
+      value: info
+    # Optional but recommended: a read-only PAT used ONLY for fetching changelogs
+    # from github.com. The App token is scoped to your installation, so release
+    # notes for upstream repos can otherwise be missing or rate-limited.
+    # - name: RENOVATE_GITHUB_COM_TOKEN
+    #   valueFrom:
+    #     secretKeyRef: { name: renovate-github-app, key: CHANGELOG_TOKEN }

@@ -1,0 +1,24 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: renovate-operator
+  namespace: renovate-operator
+spec:
+  entryPoints:
+    - websecure
+    #- edge
+  routes:
+    # GitHub calls this — it must NOT go through forwardAuth. The operator
+    # authenticates it with the bearer token from renovate-webhook-token.
+    - match: Host(`renovate.birb.it`) && PathPrefix(`/webhook`)
+      kind: Rule
+      priority: 20
+      services:
+        - name: renovate-operator
+          port: 8082
+    - match: Host(`renovate.birb.it`)
+      kind: Rule
+      priority: 10
+      services:
+        - name: renovate-operator
+          port: 8081

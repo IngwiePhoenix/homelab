@@ -1,0 +1,80 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: renovate-operator
+  namespace: flux-system
+spec:
+  interval: 30m
+  releaseName: renovate-operator
+  targetNamespace: renovate-operator
+  chart:
+    spec:
+      chart: renovate-operator
+      version: 6.9.0
+      interval: 1h
+      sourceRef:
+        kind: HelmRepository
+        name: renovate-operator-helmrepo
+        namespace: flux-system
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace
+  values:
+    fullnameOverride: renovate-operator
+    replicaCount: 1
+
+    crd:
+      install: true
+      # "template" renders CRDs as ordinary release resources instead of a
+      # pre-install hook Job. No kubectl image pull, no hook lifecycle quirks,
+      # and they show up in flate/Helm diffs like everything else.
+      mode: template
+
+    resources:
+      requests: { cpu: 50m, memory: 128Mi }
+      limits: { memory: 512Mi }
+
+    config:
+      logStorage:
+        # TODO: Install Valkey operator.
+        mode: memory
+      deleteSuccessfulJobs: false
+      jobTTLSecondsAfterFinished: 86400
+
+    logging:
+      level: info
+
+    # UI is served by our own IngressRoute (see config/), so leave the chart's
+    # ingress/route disabled and give the operator explicit URLs instead.
+    ingress:
+      enabled: false
+    route:
+      enabled: false
+
+    webhook:
+      enabled: true
+      port: 8082
+      # NOTE: Needed because built-in ingress is disabled.
+      baseUrl: https://renovate.birb.it
+
+    auth:
+      sessionDuration: 168h
+      oidc:
+        enabled: true
+        issuerUrl: https://auth.birb.it
+        clientId: renovate-operator
+        existingSecret: renovate-oidc
+        secretKey: client-secret
+        sessionSecretKey: session-secret
+        redirectUrl: https://renovate.birb.it/auth/callback
+
+    authorization:
+      # Single-operator homelab: anyone who can log in is admin. This also avoids
+      # the fail-closed trap where group rules match nothing and every job is hidden.
+      enabled: false
+      suspendFromUI: false
+
+    valkey:
+      enabled: false

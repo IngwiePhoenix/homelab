@@ -20,7 +20,7 @@ experimental:
   plugins:
     bouncer:
       moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
-      # TODO: Need to find out how to pick this up in updatecli...
+      # renovate: datasource=github-releases depName=maxlerebourg/crowdsec-bouncer-traefik-plugin
       version: v1.8.1
 
 providers:
