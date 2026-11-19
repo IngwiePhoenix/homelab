@@ -20,6 +20,10 @@
 
   packageRules: [
     {
+      description: 'k0s releases use a numeric build suffix',
+      matchDatasources: ['github-releases'],
+      matchPackageNames: ['k0sproject/k0s'],
+      versioning: 'regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\+k0s\\.(?<build>\\d+)    {
       description: 'wait4x floats on :latest',
       matchPackageNames: ['wait4x/wait4x'],
       pinDigests: true
@@ -29,15 +33,34 @@
   customManagers: [
     {
       customType: 'regex',
-      description: 'k0sctl k0s version',
-      managerFilePatterns: ['kubernetes/k0s/k0sctl.yaml'],
+      description: 'k0s Helm extensions (helm.k0sproject.io/v1beta1 Chart)',
+      managerFilePatterns: ['/^kubernetes/k0s/extensions-helm/.+\\.ya?ml$/'],
       matchStrings: [
-        '(?:^|\\n)[ \\t]*version:[ \\t]*(?<currentValue>v\\S+)',
+        'chartName:\\s*oci://(?<depName>\\S+)\\s+version:\\s*"?(?<currentValue>[^"\\s]+)"?',
       ],
-      datasourceTemplate: 'github-releases',
-      depNameTemplate: 'k0sproject/k0s',
-      versioningTemplate: 'regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\+k0s\\.(?<build>\\d+)$',
+      datasourceTemplate: 'docker',
+      versioningTemplate: 'semver',
     },
+    {
+      customType: 'regex',
+      description: 'annotated one-offs',
+      managerFilePatterns: ['/^kubernetes/.+\\.ya?ml$/', '/^docker/.+\\.ya?ml$/'],
+      matchStrings: [
+        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)\\s+version:\\s*"?(?<currentValue>[^"\\s]+)"?',
+      ],
+    },
+  ],
+}
+,
+    },
+    {
+      description: 'wait4x floats on :latest',
+      matchPackageNames: ['wait4x/wait4x'],
+      pinDigests: true
+    },
+  ],
+
+  customManagers: [
     {
       customType: 'regex',
       description: 'k0s Helm extensions (helm.k0sproject.io/v1beta1 Chart)',
