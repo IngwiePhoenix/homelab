@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: crowdsec-webui-oidc
+    namespace: crowdsec
+stringData:
+    client-secret: ENC[AES256_GCM,data:D9h0YONVWhhdLLourVMscmvjrLqvekThXzkuGlyiLf8=,iv:H9w5eJuMG9JYsEdENNbFeFARpc0bJ0Sn/6v0w3fLv4E=,tag:na/ATTMfVQFc8r1pLN2S/w==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA2WENoYnEwNS9kSm9iWnRP
+            VnM2VTBBN1hLeXdEdGJpQXphRnN1dk1KVVM0ClJQQ1c3WHdtQ21VcHl3U1d4TkNN
+            a0VwSUNjUEFEbDlTMHUvODRWMHBHMnMKLS0tIEdNN094cmJEWGp4WXcxRTNhbXNt
+            OStqbmNDMWRGRUY4Nm1KeFRic0FTdEkKnZU6rXLWsje3kvIk3N6Q9XFO5ga88dHA
+            i0Tx/qPv6d/wjGyl7r18El6pDVX2rQf9MMXuuwq4E/AsI3CMSfvcpw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-19T17:52:25Z"
+    mac: ENC[AES256_GCM,data:TXS5hMJiKIPh3h02z86Q9wCZJm8PJjLhcYPPJxU2ebYkFE74hrkLI715mVWCJBeTM8lrv9nOJlkJg5pxWlAUT8jO8L6k2khJmKC8wAUPAAvabsZvkCQIQIdNeoKzg7t6dgCeN63JKv7tKddL0klej+Iv26IS8piHjOVv5YpkrPk=,iv:GjTVQ5Ta9uEc2JhDTIyvioJ2E9tXJW0rokzMmUX4aNc=,tag:stifGdrVJqC/7YpxenmMSw==,type:str]
+    version: 3.13.3

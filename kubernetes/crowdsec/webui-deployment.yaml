@@ -44,7 +44,7 @@ spec:
             - name: CONFIG_AUTH_ENABLED
               value: "true"
             - name: CONFIG_AUTH_OIDC_ISSUER_URL
-              value: "https://auth.birb.it"
+              value: "https://auth.birb.it/oidc"
             - name: CONFIG_AUTH_OIDC_CLIENT_ID
               value: "crowdsec-webui"
             - name: CONFIG_AUTH_OIDC_CLIENT_SECRET
@@ -57,9 +57,9 @@ spec:
             - name: CONFIG_AUTH_OIDC_GROUPS_CLAIM
               value: "groups"
             - name: CONFIG_AUTH_OIDC_ADMIN_GROUPS
-              value: "crowdsec-admins"
+              value: "kubernetes-admins"
             - name: CONFIG_AUTH_OIDC_READ_ONLY_GROUPS
-              value: "crowdsec-viewers"
+              value: "deny"
             - name: CONFIG_AUTH_OIDC_UNMATCHED_ROLE
               value: "deny"
           volumeMounts:
