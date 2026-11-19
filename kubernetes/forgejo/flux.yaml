@@ -1,0 +1,19 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: forgejo
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/forgejo
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+  dependsOn:
+    - name: traefik-ingress
+    - name: postgres-instance

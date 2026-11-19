@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: forgejo-ir
+  namespace: forgejo
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`forgejo.birb.it`)
+      kind: Rule
+      services:
+        - name: forgejo-svc
+          port: 3000

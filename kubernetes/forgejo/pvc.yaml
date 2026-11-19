@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: forgejo-pvc
+  namespace: forgejo
+  annotations:
+    local-path-provisioner/uid: "1000"
+    local-path-provisioner/gid: "1000"
+    local-path-provisioner/perm: "0700"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-bunker
+  resources:
+    requests:
+      storage: 10Gi

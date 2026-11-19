@@ -1,0 +1,29 @@
+# forgejo-db.yaml
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlDatabase
+metadata:
+  name: forgejo-db
+  namespace: forgejo
+spec:
+  engineConfiguration:
+    name: default-cluster-instance
+    namespace: postgres
+  database: forgejo
+  masterRole: forgejo-role
+  dropOnDelete: true
+  waitLinkedResourcesDeletion: true
+---
+# forgejo-db-user.yaml
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlUserRole
+metadata:
+  name: forgejo-db-user
+  namespace: forgejo
+spec:
+  mode: MANAGED
+  rolePrefix: forgejo
+  privileges:
+    - privilege: OWNER
+      database:
+        name: forgejo-db
+      generatedSecretName: forgejo-db-creds

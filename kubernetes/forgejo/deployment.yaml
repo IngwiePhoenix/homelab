@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forgejo-app
+  namespace: forgejo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forgejo
+  template:
+    metadata:
+      labels:
+        app: forgejo
+    spec:
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+        #- name: wait4x-db
+        #  image: wait4x/wait4x:latest
+        #  command:
+        #    - wait4x
+        #    - postgresql
+        - name: configure-oidc
+          image: codeberg.org/forgejo/forgejo:17.0.0-alpine
+          command:
+            - sh
+            - -c
+            - |
+              echo "Checking for existing VoidAuth OIDC source..."
+              if forgejo admin auth list 2>/dev/null | grep -q "VoidAuth"; then
+                echo "VoidAuth OIDC source already configured."
+                exit 0
+              fi
+              echo "Configuring VoidAuth OIDC source..."
+              exec forgejo admin auth add-oauth \
+                --name "VoidAuth" \
+                --provider "openidConnect" \
+                --key "${OIDC_CLIENT_ID}" \
+                --secret "${OIDC_CLIENT_SECRET}" \
+                --auto-discover-url "${OIDC_DISCOVERY_URL}" \
+                --scopes "openid,profile,email" \
+                --active
+          env:
+            - name: OIDC_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-oidc-creds
+                  key: client-id
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-oidc-creds
+                  key: client-secret
+            - name: OIDC_DISCOVERY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-oidc-creds
+                  key: discovery-url
+      containers:
+        - name: app
+          image: codeberg.org/forgejo/forgejo:17.0.0-alpine
+          ports:
+            - containerPort: 3000
+              name: http
+            - containerPort: 2222
+              name: ssh
+          envFrom:
+            - secretRef:
+                name: forgejo-env
+          env:
+            - name: FORGEJO__database__DB_TYPE
+              value: "postgres"
+            - name: FORGEJO__database__HOST
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: host
+            - name: FORGEJO__database__PORT
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: port
+            - name: FORGEJO__database__NAME
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: dbname
+            - name: FORGEJO__database__USER
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: username
+            - name: FORGEJO__database__PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: password
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: forgejo-pvc

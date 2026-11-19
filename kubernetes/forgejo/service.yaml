@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: forgejo-svc
+  namespace: forgejo
+  annotations:
+    projectcalico.org/loadBalancerIPs: '["10.10.10.20"]'
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+    - name: ssh
+      port: 2222
+      targetPort: 2222
+  selector:
+    app: forgejo
