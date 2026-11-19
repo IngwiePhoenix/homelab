@@ -1,0 +1,54 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+
+  // Where the manifests live in THIS repo.
+  flux: {
+    managerFilePatterns: [
+      '/^kubernetes/.+\\.ya?ml$/'
+    ]
+  },
+  kubernetes: {
+    managerFilePatterns: [
+      '/^kubernetes/.+\\.ya?ml$/'
+    ]
+  },
+  'helm-values': {
+    managerFilePatterns: [
+      '/^kubernetes/.*values\\.ya?ml$/'
+    ]
+  },
+
+  packageRules: [
+    {
+      description: 'control plane is k0sctl/autopilot territory',
+      matchPackageNames: ['k0sproject/k0s'],
+      enabled: false
+    },
+    {
+      description: 'wait4x floats on :latest',
+      matchPackageNames: ['wait4x/wait4x'],
+      pinDigests: true
+    },
+  ],
+
+  customManagers: [
+    {
+      customType: 'regex',
+      description: 'k0s Helm extensions (helm.k0sproject.io/v1beta1 Chart)',
+      managerFilePatterns: ['/^kubernetes/k0s/extensions-helm/.+\\.ya?ml$/'],
+      matchStrings: [
+        'chartName:\\s*oci://(?<depName>\\S+)\\s+version:\\s*"?(?<currentValue>[^"\\s]+)"?',
+      ],
+      datasourceTemplate: 'docker',
+      versioningTemplate: 'semver',
+    },
+    {
+      customType: 'regex',
+      description: 'annotated one-offs',
+      managerFilePatterns: ['/^kubernetes/.+\\.ya?ml$/', '/^docker/.+\\.ya?ml$/'],
+      matchStrings: [
+        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)\\s+version:\\s*"?(?<currentValue>[^"\\s]+)"?',
+      ],
+    },
+  ],
+}
