@@ -3,6 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: timelinize-data-pvc
   namespace: timelinize
+  annotations:
+    local-path-provisioner/uid: "1000"
+    local-path-provisioner/gid: "1000"
 spec:
   accessModes:
     - ReadWriteOnce
