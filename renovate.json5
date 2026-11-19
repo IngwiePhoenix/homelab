@@ -32,7 +32,7 @@
       description: 'k0sctl k0s version',
       managerFilePatterns: ['kubernetes/k0s/k0sctl.yaml'],
       matchStrings: [
-        '(?m)^[ \\t]*version:[ \\t]*(?<currentValue>v\\S+)',
+        '(?:^|\\n)[ \\t]*version:[ \\t]*(?<currentValue>v\\S+)',
       ],
       datasourceTemplate: 'github-releases',
       depNameTemplate: 'k0sproject/k0s',
