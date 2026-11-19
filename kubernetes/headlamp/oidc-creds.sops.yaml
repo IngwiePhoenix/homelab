@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: headlamp-oidc-creds
+    namespace: headlamp
+type: Opaque
+stringData:
+    clientID: ENC[AES256_GCM,data:a+5jSpXX+ZM=,iv:46jyAWYq1Qg9e6j3APThIel8fcbDx315/qzr+JH44wQ=,tag:24ESX2BfynU+qu1+wOP/qQ==,type:str]
+    clientSecret: ENC[AES256_GCM,data:6vCnSh/sOGFKGym+sYwlj8PARvr7Tdg1uk7jdCpPkQI=,iv:6LMy/3iK596qRdmbqGxZhKFNw+RZXwYkm5eyjwPCSuc=,tag:Pa+srgi3XEJCO7htSRZrHg==,type:str]
+    issuerURL: ENC[AES256_GCM,data:z4tt+bm4DGjp3TdtOccR3GQPxQaKJVnLVA==,iv:vFEaOBYN1GWOUlv4+wqhIPbeXoMdIdHeMK4rySdEQfs=,tag:e3XTK5ElGuypdTHbuLlWtg==,type:str]
+    scopes: ENC[AES256_GCM,data:ulH3cAB+/rWhgTs9xNIpaYDJy5s=,iv:01T01uqDhrpHt6ZbnrZV43mR5OKIbXfdO+KxqvyBCEs=,tag:N7xgWjyhQFcO+IUZivEQtQ==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBGLzc1VW5tSG1lZm96aDBT
+            UUdabjFZT3dTOG45d3RrTmhzck41anFqcERJCmM3RkZCRy84ZHZKZldLS1lGUHcw
+            aTJGbnp4ZnphRHY0TGluamZMejlBZXMKLS0tIFhpRkN5NjdLWkhEQmlwK2piSENQ
+            T21mNFZaRHBraWZwU0ZrbnFrRTJuRjQKJqYXz5XPTt/kKRx7LQm3Iug2qBFzHXBf
+            8ugmhk+5WU0dFC0eWLc66lv7jgFrefdeOhBQ530UzrpgWB0RpIUHGw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-19T18:38:55Z"
+    mac: ENC[AES256_GCM,data:y/1eCIoTyXw5PcY84wf1eOqup6/ZcCXt8CRPrmMPYJ5lN8u8uXeVuBXeZmkGu2ZOgJQxZGEVUkKuC+lZCF+dveg4YvXsvNWJTrqNDpp7chm1ODavHa3vgn7sxGUSaIw9cTBhABhh6M55/wc4VNA4ZYxp1n9tMA0vHq1ia8ixqM0=,iv:Vz24bpj2aX/atpDklMHYltwzb40vnPrHjGpHJi9IGWI=,tag:FqktRB/gxrQEdQ65JbhnkQ==,type:str]
+    version: 3.13.3

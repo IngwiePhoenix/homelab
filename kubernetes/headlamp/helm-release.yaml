@@ -1,0 +1,61 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: headlamp-helmrelease
+  namespace: headlamp
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: headlamp
+      version: "0.46.0"
+      sourceRef:
+        kind: HelmRepository
+        name: headlamp-helmrepo
+        namespace: headlamp
+  targetNamespace: headlamp
+  releaseName: headlamp
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    replicaCount: 1
+    #image:
+    #  registry: ghcr.io
+    #  repository: headlamp-k8s/headlamp
+    #  tag: "v0.28.0" # renovate: datasource=docker depName=ghcr.io/headlamp-k8s/headlamp
+    config:
+      inCluster: true
+      inClusterContextName: "main"
+      oidc:
+        secret:
+          create: false
+        externalSecret:
+          enabled: true
+          name: headlamp-oidc-creds
+      watchPlugins: true
+    pluginsManager:
+      enabled: true
+      baseImage: node:lts-alpine
+      version: "0.4.0" # renovate: datasource=npm depName=@headlamp/plugin
+      configContent: |
+        plugins:
+          - name: headlamp_flux
+            source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_flux
+            version: "0.1.0"
+          - name: headlamp_cert-manager
+            source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_cert-manager
+            version: "0.1.0"
+          - name: cnpg-headlamp-plugin
+            source: https://artifacthub.io/packages/headlamp/cnpg-headlamp-plugin/cnpg-headlamp-plugin
+            version: "0.1.6"
+          - name: headlamp_app-catalog
+            source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_app-catalog
+            version: "0.1.0"
+    clusterRoleBinding:
+      create: true
+      clusterRoleName: cluster-admin
+    service:
+      type: ClusterIP
+      port: 80
