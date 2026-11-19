@@ -21,4 +21,4 @@ resources:
 
   # Apps
   - voidauth/flux.yaml
-  #- tekton/flux.yaml
+  - tekton/flux.yaml
