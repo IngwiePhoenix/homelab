@@ -24,3 +24,4 @@ resources:
   - voidauth/flux.yaml
   - tekton/flux.yaml
   - piped/flux.yaml
+  - timelineize/flux.yaml
