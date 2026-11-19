@@ -26,5 +26,3 @@ spec:
     name: homelab-repo
   path: ./kubernetes
   prune: true
-  wait: true
-  timeout: 40m

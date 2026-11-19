@@ -75,7 +75,7 @@ spec:
   #      - homelab/location=external
   k0s:
     # Pick latest
-    #version: v1.37.2+k0s.0
+    version: v1.37.2+k0s.1
     dynamicConfig: true
   options:
     wait:
