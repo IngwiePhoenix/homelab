@@ -3,22 +3,15 @@ kind: Kustomization
 namespace: renovate-operator    # also applies to the generated ConfigMap
 
 resources:
-  - certificate.yaml
   - ingressroute.yaml
   - renovatejob.yaml
   - github-app.sops.yaml
-  - oidc.sops.yaml
   - webhook-token.sops.yaml
 
 configMapGenerator:
   - name: renovate-config
     files:
-      # Three levels up = repo root. Flux's kustomize-controller runs with
-      # --load-restrictor=LoadRestrictionsNone, so this is allowed.
-      - renovate.config.js=../../../renovate.config.js
+      - renovate.config.js=renovate.config.js
 
 generatorOptions:
-  # Stable name: spec.renovateConfig.configMapRef.name is a CRD field Kustomize
-  # doesn't know how to rewrite, so a hash suffix would break the reference.
-  # Renovate pods are created fresh per run and always read the current ConfigMap.
   disableNameSuffixHash: true

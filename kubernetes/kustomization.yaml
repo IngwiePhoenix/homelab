@@ -11,6 +11,7 @@ resources:
   - rclone-csi/flux.yaml
 
   # Base:
+  - renovate-operator/flux.yaml
   - cert-manager/flux.yaml
   - reflector/flux.yaml
   - reloader/flux.yaml
@@ -20,3 +21,4 @@ resources:
 
   # Apps
   - voidauth/flux.yaml
+  #- tekton/flux.yaml

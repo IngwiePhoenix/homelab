@@ -63,8 +63,8 @@ spec:
       sessionDuration: 168h
       oidc:
         enabled: true
-        issuerUrl: https://auth.birb.it
-        clientId: renovate-operator
+        issuerUrl: https://auth.birb.it/oidc
+        clientId: renovate
         existingSecret: renovate-oidc
         secretKey: client-secret
         sessionSecretKey: session-secret

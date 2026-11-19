@@ -26,7 +26,10 @@ module.exports = {
   prHourlyLimit: 10,
   prConcurrentLimit: 20,
   branchConcurrentLimit: 20,
-  ignorePaths: ['**/*.sops.yaml', '**/node_modules/**'],
+  ignorePaths: [
+    '**/*.sops.yaml',
+    '**/node_modules/**'
+  ],
 
   separateMajorMinor: false,
   separateMinorPatch: false,
