@@ -53,11 +53,11 @@ spec:
                   name: crowdsec-webui-oidc
                   key: client-secret
             - name: CONFIG_AUTH_OIDC_SCOPE
-              value: "openid profile email"
+              value: "openid profile email groups"
             - name: CONFIG_AUTH_OIDC_GROUPS_CLAIM
               value: "groups"
             - name: CONFIG_AUTH_OIDC_ADMIN_GROUPS
-              value: "[kubernetes-admins]"
+              value: "[kubernetes-admin]"
             - name: CONFIG_AUTH_OIDC_READ_ONLY_GROUPS
               value: "[]"
             - name: CONFIG_AUTH_OIDC_UNMATCHED_ROLE
