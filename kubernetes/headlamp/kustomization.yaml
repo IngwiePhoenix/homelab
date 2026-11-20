@@ -4,6 +4,5 @@ resources:
   - namespace.yaml
   - oidc-creds.sops.yaml
   - helm-repo.yaml
-  - oidc-creds.sops.yaml
   - helm-release.yaml
   - ingressroute.yaml
