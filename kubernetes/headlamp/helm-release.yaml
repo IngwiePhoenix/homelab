@@ -17,7 +17,6 @@ spec:
   releaseName: headlamp
   install:
     crds: CreateReplace
-    createNamespace: true
   upgrade:
     crds: CreateReplace
   values:
