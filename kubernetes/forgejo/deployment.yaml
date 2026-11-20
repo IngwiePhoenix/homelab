@@ -60,27 +60,27 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: forgejo-db-creds
-                  key: host
+                  key: HOST
             - name: FORGEJO__database__PORT
               valueFrom:
                 secretKeyRef:
                   name: forgejo-db-creds
-                  key: port
+                  key: PORT
             - name: FORGEJO__database__NAME
               valueFrom:
                 secretKeyRef:
                   name: forgejo-db-creds
-                  key: dbname
+                  key: DATABASE
             - name: FORGEJO__database__USER
               valueFrom:
                 secretKeyRef:
                   name: forgejo-db-creds
-                  key: username
+                  key: LOGIN
             - name: FORGEJO__database__PASSWD
               valueFrom:
                 secretKeyRef:
                   name: forgejo-db-creds
-                  key: password
+                  key: PASSWORD
             # Needed only for the init container:
             - name: OIDC_CLIENT_ID
               valueFrom:
@@ -115,27 +115,27 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: forgejo-db-creds
-                  key: host
+                  key: HOST
             - name: FORGEJO__database__PORT
               valueFrom:
                 secretKeyRef:
                   name: forgejo-db-creds
-                  key: port
+                  key: PORT
             - name: FORGEJO__database__NAME
               valueFrom:
                 secretKeyRef:
                   name: forgejo-db-creds
-                  key: dbname
+                  key: DATABASE
             - name: FORGEJO__database__USER
               valueFrom:
                 secretKeyRef:
                   name: forgejo-db-creds
-                  key: username
+                  key: LOGIN
             - name: FORGEJO__database__PASSWD
               valueFrom:
                 secretKeyRef:
                   name: forgejo-db-creds
-                  key: password
+                  key: PASSWORD
           volumeMounts:
             - name: data
               mountPath: /data
