@@ -22,6 +22,10 @@ spec:
         #    - wait4x
         #    - postgresql
         - name: configure-oidc
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
           image: codeberg.org/forgejo/forgejo:17.0.2
           command:
             - sh
