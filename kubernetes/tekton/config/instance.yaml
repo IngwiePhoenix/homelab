@@ -29,6 +29,7 @@ spec:
     is_external_db: true
     db_host: default-cluster-rw.postgres.svc.cluster.local
     db_port: 5432
+    db_name: tekton_results
     db_sslmode: disable
     db_enable_auto_migration: true
 
