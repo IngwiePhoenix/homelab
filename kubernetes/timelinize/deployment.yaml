@@ -33,8 +33,11 @@ spec:
           ports:
             - containerPort: 12002
               name: http
+          env:
+            - name: TLZ_ORIGIN
+              value: "https://time.birb.it"
           volumeMounts:
-            # Using subPaths on a single PVC to keep storage management simple while 
+            # Using subPaths on a single PVC to keep storage management simple while
             # respecting the app's recommended directory structure.
             - name: data
               mountPath: /repo
