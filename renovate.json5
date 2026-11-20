@@ -56,10 +56,10 @@
   customDatasources: {
     'artifacthub-headlamp': {
       defaultRegistryUrlTemplate:
-        'https://artifacthub.io/api/v1/packages/headlamp/{{packageName}}',
+        'https://artifacthub.io/api/v1/packages/headlamp/{{{packageName}}}',
 
       transformTemplates: [
-        '{ "releases": $map(available_versions, function($v) { { "version": $v.version } }) }'
+        '{ "releases": $map(available_versions ? available_versions : [{"version": version}], function($v) { {"version": $v.version} }) }'
       ],
     },
   },
