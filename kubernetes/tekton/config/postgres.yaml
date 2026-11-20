@@ -7,7 +7,7 @@ spec:
   database: tekton_results
 
   engineConfiguration:
-    name: default-cluster
+    name: default-cluster-instance
     namespace: postgres
 
   # Preserve the database if Flux removes this CR.
@@ -21,7 +21,7 @@ metadata:
 spec:
   mode: MANAGED
   rolePrefix: tektonresults
-
+  userPasswordRotationDuration: 720h
   privileges:
     - privilege: OWNER
       connectionType: PRIMARY
