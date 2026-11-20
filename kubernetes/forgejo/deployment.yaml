@@ -47,7 +47,41 @@ spec:
                 --group-claim-name "groups" \
                 --admin-group "forgejo-admin" \
                 --skip-local-2fa
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          envFrom:
+            - secretRef:
+                name: forgejo-env
           env:
+            - name: FORGEJO__database__DB_TYPE
+              value: "postgres"
+            - name: FORGEJO__database__HOST
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: host
+            - name: FORGEJO__database__PORT
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: port
+            - name: FORGEJO__database__NAME
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: dbname
+            - name: FORGEJO__database__USER
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: username
+            - name: FORGEJO__database__PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: password
+            # Needed only for the init container:
             - name: OIDC_CLIENT_ID
               valueFrom:
                 secretKeyRef:
