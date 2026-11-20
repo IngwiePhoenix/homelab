@@ -27,3 +27,4 @@ resources:
   - tekton/flux.yaml
   - piped/flux.yaml
   - timelinize/flux.yaml
+  - forgejo/flux.yaml
