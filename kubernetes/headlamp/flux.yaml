@@ -9,11 +9,10 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: homelab
+    name: homelab-repo
   dependsOn:
     - name: traefik-ingress
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: headlamp-helmrelease
-      namespace: headlamp

@@ -32,6 +32,24 @@
     },
   ],
 
+  customDatasources: {
+    'artifacthub-headlamp': {
+      defaultRegistryUrlTemplate:
+        'https://artifacthub.io/api/v1/packages/headlamp/{{packageName}}',
+
+      transformTemplates: [
+        `{
+          "releases": $map(available_versions, function($v) {
+            {
+              "version": $v.version,
+              "releaseTimestamp": $fromMillis($v.ts * 1000)
+            }
+          })
+        }`
+      ],
+    },
+  },
+
   customManagers: [
     {
       customType: 'regex',
@@ -50,6 +68,20 @@
       matchStrings: [
         '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)\\s+version:\\s*"?(?<currentValue>[^"\\s]+)"?',
       ],
+    },
+    {
+      customType: 'regex',
+      description: 'Headlamp plugins from Artifact Hub',
+      managerFilePatterns: [
+        'kubernetes/headlamp/helm-release.yaml'
+      ],
+      matchStrings: [
+        'name:\\s*(?<depName>[^\\s]+)\\s+' +
+        'source:\\s*https://artifacthub\\.io/packages/headlamp/(?<packageName>[^/\\s]+/[^/\\s]+)\\s+' +
+        'version:\\s*"?(?<currentValue>[^"\\s]+)"?'
+      ],
+      datasourceTemplate: 'custom.artifacthub-headlamp',
+      versioningTemplate: 'semver',
     },
   ],
 }

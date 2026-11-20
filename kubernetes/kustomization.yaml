@@ -28,3 +28,4 @@ resources:
   - piped/flux.yaml
   - timelinize/flux.yaml
   - forgejo/flux.yaml
+  - headlamp/flux.yaml
