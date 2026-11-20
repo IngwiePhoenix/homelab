@@ -18,9 +18,9 @@ spec:
         - metadata:
             name: data-volume
             annotations:
-              local-path-provisioner/uid: "999"
-              local-path-provisioner/gid: "999"
-              local-path-provisioner/perm: "0755"
+              local-path-provisioner/uid: "2000"
+              local-path-provisioner/gid: "2000"
+              local-path-provisioner/perm: "0770"
           spec:
             storageClassName: local-bunker
             accessModes:
@@ -28,6 +28,19 @@ spec:
             resources:
               requests:
                 storage: 10Gi
+        - metadata:
+            name: logs-volume
+            annotations:
+              local-path-provisioner/uid: "2000"
+              local-path-provisioner/gid: "2000"
+              local-path-provisioner/perm: "0770"
+          spec:
+            storageClassName: local-bunker
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 2Gi
       podTemplate:
         spec:
           affinity:
