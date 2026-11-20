@@ -8,6 +8,7 @@ spec:
   type: ReplicaSet
   # renovate: datasource=docker depName=mongo
   version: "7.0.14"
+  featureCompatibilityVersion: "7.0"
   security:
     authentication:
       modes: ["SCRAM"]
