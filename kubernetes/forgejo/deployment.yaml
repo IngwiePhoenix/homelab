@@ -7,6 +7,7 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+  rollingUpdate: null # HOW does this bug exist?!
   selector:
     matchLabels:
       app: forgejo
