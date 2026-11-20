@@ -21,16 +21,19 @@ spec:
         #  command:
         #    - wait4x
         #    - postgresql
-        - name: configure-oidc
+        - name: boot
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
             runAsGroup: 1000
           image: codeberg.org/forgejo/forgejo:17.0.2
-          command:
-            - sh
-            - -c
+          args:
+            - /bin/sh
+            - -ec
             - |
+              echo "Migrating Forgejo database..."
+              forgejo migrate
+
               echo "Checking for existing VoidAuth OIDC source..."
               if forgejo admin auth list 2>/dev/null | grep -q "VoidAuth"; then
                 echo "VoidAuth OIDC source already configured."
