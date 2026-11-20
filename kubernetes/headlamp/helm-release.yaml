@@ -28,14 +28,9 @@ spec:
     config:
       inCluster: true
       inClusterContextName: "main"
-      oidc:
-        autoLogin: true
-        secret:
-          create: false
-        externalSecret:
-          enabled: true
-          hasScopes: true
-          name: headlamp-oidc-creds
+      unsafeUseServiceAccountToken: true
+      extraArgs:
+        - "-proxy-auth=true"
       watchPlugins: true
     pluginsManager:
       enabled: true
