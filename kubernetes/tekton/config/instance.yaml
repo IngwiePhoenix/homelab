@@ -23,4 +23,31 @@ spec:
 
   # Disable the Results database initially.
   result:
+    disabled: false
+    targetNamespace: tekton
+
+    # Existing PostgreSQL instance
+    is_external_db: true
+    db_host: postgres.database.svc.cluster.local
+    db_port: 5432
+    db_sslmode: require
+    db_enable_auto_migration: true
+
+    # Reuse EasyMile's generated Secret directly
+    db_secret_name: tekton-results-db
+    db_secret_user_key: LOGIN
+    db_secret_password_key: PASSWORD
+
+    # Persistent logs
+    logs_api: true
+    logs_type: File
+    logging_pvc_name: tekton-logs
+
+    watcher:
+      logs_api: true
+      disable_storing_incomplete_runs: true
+      completed_run_grace_period: 24h
+
+  # Let the Results Watcher handle run cleanup.
+  pruner:
     disabled: true

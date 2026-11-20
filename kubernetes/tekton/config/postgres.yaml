@@ -1,0 +1,30 @@
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlDatabase
+metadata:
+  name: tekton-results
+  namespace: tekton
+spec:
+  database: tekton_results
+
+  engineConfiguration:
+    name: default-cluster
+    namespace: postgres
+
+  # Preserve the database if Flux removes this CR.
+  dropOnDelete: false
+---
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlUserRole
+metadata:
+  name: tekton-results
+  namespace: tekton
+spec:
+  mode: MANAGED
+  rolePrefix: tektonresults
+
+  privileges:
+    - privilege: OWNER
+      connectionType: PRIMARY
+      database:
+        name: tekton-results
+      generatedSecretName: tekton-results-db

@@ -1,0 +1,39 @@
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: default-cluster
+  namespace: mongodb
+spec:
+  members: 3
+  type: ReplicaSet
+  # renovate: datasource=docker depName=mongo
+  version: "7.0.14"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users: [] # Users are now declared via MongoDBUser CRDs elsewhere
+  statefulSet:
+    spec:
+      volumeClaimTemplates:
+        - metadata:
+            name: data-volume
+            annotations:
+              local-path-provisioner/uid: "999"
+              local-path-provisioner/gid: "999"
+              local-path-provisioner/perm: "0755"
+          spec:
+            storageClassName: local-bunker
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 10Gi
+      podTemplate:
+        spec:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: shared-mongo-svc
+                  topologyKey: kubernetes.io/hostname

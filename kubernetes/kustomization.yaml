@@ -18,6 +18,7 @@ resources:
   - traefik/flux.yaml
   - crowdsec/flux.yaml
   - postgres/flux.yaml
+  - mongodb/flux.yaml
   - common-secrets/flux.yaml
 
   # Apps
