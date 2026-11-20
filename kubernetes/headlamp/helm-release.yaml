@@ -29,10 +29,12 @@ spec:
       inCluster: true
       inClusterContextName: "main"
       oidc:
+        autoLogin: true
         secret:
           create: false
         externalSecret:
           enabled: true
+          hasScopes: true
           name: headlamp-oidc-creds
       watchPlugins: true
     pluginsManager:
