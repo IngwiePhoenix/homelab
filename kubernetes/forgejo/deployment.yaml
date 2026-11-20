@@ -30,6 +30,14 @@ spec:
               echo "Preparing Forgejo configuration..."
               /etc/s6/gitea/setup
 
+              echo "Fixing Git SSH directory ownership..."
+              chown -R git:git /data/git/.ssh
+              chmod 700 /data/git/.ssh
+
+              if [ -f /data/git/.ssh/authorized_keys ]; then
+                  chmod 600 /data/git/.ssh/authorized_keys
+              fi
+
               CONFIG=/data/gitea/conf/app.ini
 
               if [ ! -s "$CONFIG" ]; then
