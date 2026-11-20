@@ -22,3 +22,5 @@ spec:
   values:
     database:
       namespace: mongodb
+    operator:
+      watchNamespace: "*"
