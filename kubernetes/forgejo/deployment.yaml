@@ -59,7 +59,7 @@ spec:
                   key: discovery-url
       containers:
         - name: app
-          image: codeberg.org/forgejo/forgejo:17.0.0-alpine
+          image: codeberg.org/forgejo/forgejo:17.0.2
           ports:
             - containerPort: 3000
               name: http
