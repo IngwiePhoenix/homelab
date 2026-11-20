@@ -5,3 +5,4 @@ resources:
   - oidc-creds.sops.yaml
   - helm-release.yaml
   - ingressroute.yaml
+  - oidc-creds.sops.yaml
