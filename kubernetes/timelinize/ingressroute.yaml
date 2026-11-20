@@ -9,6 +9,9 @@ spec:
   routes:
     - match: Host(`time.birb.it`)
       kind: Rule
+      middlewares:
+        - name: voidauth-tm
+          namespace: voidauth
       services:
         - name: timelinize-svc
           port: 12002
