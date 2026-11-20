@@ -59,7 +59,7 @@
         'https://artifacthub.io/api/v1/packages/headlamp/{{{packageName}}}',
 
       transformTemplates: [
-        '{ "releases": $map(available_versions ? available_versions : [{"version": version}], function($v) { {"version": $v.version} }) }'
+        '{ "releases": available_versions.{"version": version}[] }'
       ],
     },
   },
