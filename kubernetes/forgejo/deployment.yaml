@@ -22,25 +22,32 @@ spec:
         #    - wait4x
         #    - postgresql
         - name: boot
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1000
-            runAsGroup: 1000
           image: codeberg.org/forgejo/forgejo:17.0.2
           args:
             - /bin/sh
             - -ec
             - |
+              echo "Preparing Forgejo configuration..."
+              /etc/s6/gitea/setup
+
+              CONFIG=/data/gitea/conf/app.ini
+
+              if [ ! -s "$CONFIG" ]; then
+                echo "ERROR: Forgejo configuration was not generated!"
+                exit 1
+              fi
+
               echo "Migrating Forgejo database..."
-              forgejo migrate
+              su-exec git forgejo --config "$CONFIG" migrate
 
               echo "Checking for existing VoidAuth OIDC source..."
-              if forgejo admin auth list 2>/dev/null | grep -q "VoidAuth"; then
+              if su-exec git forgejo --config "$CONFIG" admin auth list 2>/dev/null | grep -Fq "VoidAuth"; then
                 echo "VoidAuth OIDC source already configured."
                 exit 0
               fi
+
               echo "Configuring VoidAuth OIDC source..."
-              exec forgejo admin auth add-oauth \
+              exec su-exec git forgejo --config "$CONFIG" admin auth add-oauth \
                 --name "VoidAuth" \
                 --provider "openidConnect" \
                 --key "${OIDC_CLIENT_ID}" \
