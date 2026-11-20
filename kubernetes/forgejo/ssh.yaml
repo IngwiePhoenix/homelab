@@ -1,16 +1,15 @@
 apiVersion: traefik.io/v1alpha1
-kind: TCPRoute
+kind: IngressRouteTCP
 metadata:
-  name: forgejo-ssh-tcproute
+  name: forgejo-ssh-irtcp
   namespace: forgejo
 spec:
   entryPoints:
     # internal: on service
     # external: on node
     - ssh
-  rules:
-    # catch-all; raw TCP
+  routes:
     - match: HostSNI(`*`)
-  services:
-    - name: forgejo-svc
-      port: 2222
+      services:
+        - name: forgejo-svc
+          port: 2222
