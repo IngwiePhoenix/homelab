@@ -36,5 +36,5 @@ spec:
 
     args:
       - --leader-elect
-      - --reconcile-timeout=20s
-      - --resync-period=60s
+      - --reconcile-timeout=60s
+      - --resync-period=120s
