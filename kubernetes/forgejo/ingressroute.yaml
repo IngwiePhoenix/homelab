@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`forgejo.birb.it`)
+    - match: Host(`git.birb.it`)
       kind: Rule
       services:
         - name: forgejo-svc

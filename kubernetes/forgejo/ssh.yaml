@@ -5,8 +5,11 @@ metadata:
   namespace: forgejo
 spec:
   entryPoints:
+    # internal: on service
+    # external: on node
     - ssh
   rules:
+    # catch-all; raw TCP
     - match: HostSNI(`*`)
   services:
     - name: forgejo-svc
