@@ -1,20 +1,21 @@
+
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
 
   // Where the manifests live in THIS repo.
   flux: {
     managerFilePatterns: [
-      '/^kubernetes/.+\\.ya?ml$/'
+      '/^kubernetes\\/.+\\.ya?ml$/'
     ]
   },
   kubernetes: {
     managerFilePatterns: [
-      '/^kubernetes/.+\\.ya?ml$/'
+      '/^kubernetes\\/.+\\.ya?ml$/'
     ]
   },
   'helm-values': {
     managerFilePatterns: [
-      '/^kubernetes/.*values\\.ya?ml$/'
+      '/^kubernetes\\/.*values\\.ya?ml$/'
     ]
   },
 
@@ -30,6 +31,26 @@
       matchPackageNames: ['wait4x/wait4x'],
       pinDigests: true
     },
+    {
+      description: 'Headlamp Artifact Hub plugins have no datasource release timestamps',
+      matchDatasources: ['custom'],
+      matchFileNames: [
+        'kubernetes/headlamp/helm-release.yaml'
+      ],
+      minimumReleaseAgeBehaviour: 'timestamp-optional',
+    },
+    {
+      description: 'Always automerge Renovate runner image updates',
+      matchDatasources: ['docker'],
+      matchPackageNames: ['renovate/renovate'],
+
+      automerge: true,
+      automergeType: 'pr',
+      platformAutomerge: true,
+      ignoreTests: true,
+
+      minimumReleaseAge: null,
+    },
   ],
 
   customDatasources: {
@@ -38,14 +59,7 @@
         'https://artifacthub.io/api/v1/packages/headlamp/{{packageName}}',
 
       transformTemplates: [
-        `{
-          "releases": $map(available_versions, function($v) {
-            {
-              "version": $v.version,
-              "releaseTimestamp": $fromMillis($v.ts * 1000)
-            }
-          })
-        }`
+        '{ "releases": $map(available_versions, function($v) { { "version": $v.version } }) }'
       ],
     },
   },
@@ -54,7 +68,9 @@
     {
       customType: 'regex',
       description: 'k0s Helm extensions (helm.k0sproject.io/v1beta1 Chart)',
-      managerFilePatterns: ['/^kubernetes/k0s/extensions-helm/.+\\.ya?ml$/'],
+      managerFilePatterns: [
+        '/^kubernetes\\/k0s\\/extensions-helm\\/.+\\.ya?ml$/'
+      ],
       matchStrings: [
         'chartName:\\s*oci://(?<depName>\\S+)\\s+version:\\s*"?(?<currentValue>[^"\\s]+)"?',
       ],
@@ -64,7 +80,10 @@
     {
       customType: 'regex',
       description: 'annotated one-offs',
-      managerFilePatterns: ['/^kubernetes/.+\\.ya?ml$/', '/^docker/.+\\.ya?ml$/'],
+      managerFilePatterns: [
+        '/^kubernetes\\/.+\\.ya?ml$/',
+        '/^docker\\/.+\\.ya?ml$/'
+      ],
       matchStrings: [
         '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)\\s+version:\\s*"?(?<currentValue>[^"\\s]+)"?',
       ],
@@ -76,9 +95,7 @@
         'kubernetes/headlamp/helm-release.yaml'
       ],
       matchStrings: [
-        'name:\\s*(?<depName>[^\\s]+)\\s+' +
-        'source:\\s*https://artifacthub\\.io/packages/headlamp/(?<packageName>[^/\\s]+/[^/\\s]+)\\s+' +
-        'version:\\s*"?(?<currentValue>[^"\\s]+)"?'
+        'name:\\s*(?<depName>[^\\s]+)\\s+source:\\s*https://artifacthub\\.io/packages/headlamp/(?<packageName>[^/\\s]+/[^/\\s]+)\\s+version:\\s*"?(?<currentValue>[^"\\s]+)"?'
       ],
       datasourceTemplate: 'custom.artifacthub-headlamp',
       versioningTemplate: 'semver',
