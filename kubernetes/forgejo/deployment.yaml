@@ -39,8 +39,10 @@ spec:
                 --key "${OIDC_CLIENT_ID}" \
                 --secret "${OIDC_CLIENT_SECRET}" \
                 --auto-discover-url "${OIDC_DISCOVERY_URL}" \
-                --scopes "openid,profile,email" \
-                --active
+                --scopes "openid,profile,email,groups" \
+                --group-claim-name "groups" \
+                --admin-group "forgejo-admin" \
+                --skip-local-2fa
           env:
             - name: OIDC_CLIENT_ID
               valueFrom:
