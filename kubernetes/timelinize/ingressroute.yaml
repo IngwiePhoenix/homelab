@@ -10,5 +10,5 @@ spec:
     - match: Host(`time.birb.it`)
       kind: Rule
       services:
-        - name: timelinize-srv
+        - name: timelinize-svc
           port: 12002
