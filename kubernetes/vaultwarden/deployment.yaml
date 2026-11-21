@@ -40,6 +40,8 @@ spec:
                 ssh-agent,
                 ssh-key-vault-item,
                 export-attachments
+            - name: ENABLE_DB_WAL
+              value: "false"
             - name: "WEBSOCKET_ENABLED"
               value: "true"
             - name: "EVENTS_DAYS_RETAIN"
