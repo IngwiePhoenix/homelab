@@ -32,10 +32,3 @@ spec:
 
       # Your database is in another namespace.
       watchNamespace: "*"
-
-    community:
-      mongodb:
-        # Preserve the old chart's MongoDB image registry.
-        repo: docker.io/mongodb
-        name: mongodb-community-server
-        imageType: ubi9-slim

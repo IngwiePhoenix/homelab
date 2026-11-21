@@ -40,6 +40,12 @@
       minimumReleaseAgeBehaviour: 'timestamp-optional',
     },
     {
+      matchDatasources: ["docker"],
+      matchDepNames: ["quay.io/mongodb/mongodb-community-server"],
+      extractVersion: "^(?<version>\\d+\\.\\d+\\.\\d+)-ubi9-slim$",
+      versioning: "semver"
+    },
+    {
       description: 'Always automerge Renovate runner image updates',
       matchDatasources: ['docker'],
       matchPackageNames: ['renovate/renovate'],

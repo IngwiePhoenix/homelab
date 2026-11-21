@@ -6,9 +6,9 @@ metadata:
 spec:
   members: 3
   type: ReplicaSet
-  # renovate: datasource=docker depName=mongo
+  # renovate: datasource=docker depName=quay.io/mongodb/mongodb-community-server
   version: "9.0.8"
-  featureCompatibilityVersion: "8.0"
+  featureCompatibilityVersion: "9.0"
   security:
     authentication:
       modes: ["SCRAM"]
