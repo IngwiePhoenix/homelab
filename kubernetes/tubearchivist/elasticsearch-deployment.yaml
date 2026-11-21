@@ -20,7 +20,7 @@ spec:
             claimName: elasticsearch-data-pvc
       containers:
         - name: app
-          image: "elasticsearch:8.14.3"
+          image: "elasticsearch:9.5.5"
           env:
             # TODO: Turn into Secret to share between deployments
             - name: ELASTIC_PASSWORD
