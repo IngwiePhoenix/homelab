@@ -38,4 +38,4 @@ spec:
         # Preserve the old chart's MongoDB image registry.
         repo: docker.io/mongodb
         name: mongodb-community-server
-        imageType: ubi8
+        imageType: ubi9-slim
