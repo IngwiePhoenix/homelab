@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pinchflat-svc
+  namespace: pinchflat
+spec:
+  type: ClusterIP
+  selector:
+    app: pinchflat
+  ports:
+    - targetPort: http
+      name: http
+      port: 8080

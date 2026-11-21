@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pinchflat-app
+  namespace: pinchflat
+  labels:
+    app: pinchflat
+spec:
+  selector:
+    matchLabels:
+      app: pinchflat
+  template:
+    metadata:
+      labels:
+        app: pinchflat
+    spec:
+      volumes:
+        - name: direct-vol
+          hostPath:
+            path: /mnt/stash/Pinchflat
+            type: Directory
+        - name: config-vol
+          persistentVolumeClaim:
+            claimName: config-pvc
+      containers:
+        - name: app
+          image: "keglin/pinchflat:dev" # v2025.9.26
+          imagePullPolicy: Always
+          env:
+            - name: TZ
+              value: Europe/Berlin
+            - name: JOURNAL_MODE
+              value: delete
+          ports:
+            - containerPort: 8945
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: config-vol
+            - mountPath: /downloads
+              name: direct-vol
