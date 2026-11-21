@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ta-app
+  namespace: tubearchivist
+  labels:
+    app: tubearchivist
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tubearchivist
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: tubearchivist
+    spec:
+      volumes:
+        - name: ta-cache-vol
+          persistentVolumeClaim:
+            claimName: ta-cache-pvc-v2
+        - name: ta-direct-vol
+          persistentVolumeClaim:
+            claimName: ta-direct-pvc
+      initContainers:
+        - name: wait-for-redis
+          image: cgr.dev/chainguard/wait-for-it:latest
+          args: ["-h", "redis-stack-svc", "-p", "6379", "-t", "60"]
+        - name: wait-for-es
+          image: cgr.dev/chainguard/wait-for-it:latest
+          args: ["-h", "elasticsearch-svc", "-p", "9200", "-t", "60"]
+      containers:
+        - name: app
+          image: "bbilly1/tubearchivist:latest"
+          imagePullPolicy: Always
+          env:
+            - name: ES_URL
+              value:
+            - name: REDIS_HOST
+              value:
+            - name: REDIS_PORT
+              value:
+            - name: HOST_UID
+              value: "1000"
+            - name: HOST_GID
+              value: "1000"
+            - name: TA_HOST
+              value:
+            - name: TA_USERNAME
+              value:
+            - name: TA_PASSWORD
+              value:
+            - name: ELASTIC_PASSWORD
+              value:
+            - name: TZ
+              value: "Europe/Berlin"
+          ports:
+            - containerPort: 8000
+              name: webui
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /cache
+              name: ta-cache-vol
+            - mountPath: /youtube
+              name: ta-direct-vol

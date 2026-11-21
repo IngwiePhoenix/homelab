@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-app
+  namespace: tubearchivist
+  labels:
+    app: elasticsearch
+spec:
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      volumes:
+        - name: elasticsearch-data-vol
+          persistentVolumeClaim:
+            claimName: elasticsearch-data-pvc
+      containers:
+        - name: app
+          image: "elasticsearch:8.14.3"
+          env:
+            # TODO: Turn into Secret to share between deployments
+            - name: ELASTIC_PASSWORD
+              value: "gHYXPeZAW4P5hW3hCPfkZiQdtfHhuCkM"
+            - name: ES_JAVA_OPTS
+              value: "-Xms512m -Xmx1024m"
+            - name: xpack.security.enabled
+              value: "true"
+            - name: discovery.type
+              value: "single-node"
+            - name: path.repo
+              value: "/usr/share/elasticsearch/data/snapshot"
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+          ports:
+            - containerPort: 9200
+              name: es
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /usr/share/elasticsearch/data
+              name: elasticsearch-data-vol
