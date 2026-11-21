@@ -26,6 +26,7 @@ experimental:
 providers:
   kubernetesCRD:
     enabled: true
+    allowExternalNameServices: true
     ingressClass: ""
     allowCrossNamespace: true
     # Requires Traefik >= 3.7.11 (check `helm show chart traefik/traefik --version 42.3.2`).
@@ -34,6 +35,7 @@ providers:
   kubernetesIngress:
     # plain Ingress = internal-only; enabled on internal below
     enabled: false
+    allowExternalNameServices: true
 
 # Bouncer API key, reflected into both traefik namespaces by reflector.
 # NOTE: pods stay ContainerCreating until this Secret exists (see README bootstrap order).
