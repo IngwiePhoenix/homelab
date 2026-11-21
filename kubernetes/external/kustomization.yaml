@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - servertransport.yaml
+  - bulkboi-ingressroute.yaml
+  - bulkboi-service.yaml
+  - coinboi-ingressroute.yaml
+  - coinboi-service.yaml
+  - superdiskboi-ingressroute.yaml
+  - superdiskboi-service.yaml

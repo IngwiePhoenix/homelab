@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: bulkboi-tr
+  namespace: external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`kasm.birb.it`)
+      kind: Rule
+      services:
+        - name: bulkboi-svc
+          port: kasm-https
+          passHostHeader: true
+          scheme: https
+          serversTransport: ignore-cert-st

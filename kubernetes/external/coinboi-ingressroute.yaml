@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: coinboi-tr
+  namespace: external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`zaps.birb.it`) || Host(`cln.birb.it`)
+      kind: Rule
+      services:
+        - name: coinboi-svc
+          port: http
+          scheme: http
+          passHostHeader: true

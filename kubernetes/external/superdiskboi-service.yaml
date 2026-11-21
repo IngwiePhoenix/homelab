@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: superdiskboi-svc
+  namespace: external
+spec:
+  type: ExternalName
+  externalName: 10.1.1.2
+  ports:
+    # Jellyfin, Wizarr
+    - port: 8096
+      name: jellyfin-webui
+    - port: 5690
+      name: wizarr-webui
+    # Home Assistant
+    - port: 8123
+      name: hass-web

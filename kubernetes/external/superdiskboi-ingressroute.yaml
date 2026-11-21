@@ -1,0 +1,28 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: superdiskboi-tr
+  namespace: external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`video.birb.it`)
+      kind: Rule
+      services:
+        - name: superdiskboi-svc
+          port: jellyfin-webui
+          scheme: http
+          passHostHeader: true
+    - match: Host(`video-users.birb.it`)
+      kind: Rule
+      services:
+        - name: superdiskboi-svc
+          port: wizarr-webui
+          passHostHeader: true
+    - match: Host(`hass.birb.it`)
+      kind: Rule
+      services:
+        - name: superdiskboi-svc
+          port: hass-web
+          passHostHeader: true

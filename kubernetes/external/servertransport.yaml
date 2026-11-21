@@ -1,0 +1,7 @@
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: ignore-cert-st
+  namespace: external
+spec:
+  insecureSkipVerify: true                  # [2]

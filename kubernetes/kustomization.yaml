@@ -16,6 +16,7 @@ resources:
   - reflector/flux.yaml
   - reloader/flux.yaml
   - traefik/flux.yaml
+  - external/flux.yaml
   - crowdsec/flux.yaml
   - postgres/flux.yaml
   - mongodb/flux.yaml
