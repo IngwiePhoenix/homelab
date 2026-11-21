@@ -21,7 +21,7 @@ spec:
       initContainers:
         - name: fix-permissions
           image: alpine:3.24
-          command: ['sh', '-c', 'chown -R 1000:1000 /data']
+          command: ['sh', '-c', 'chown -v 1000:1000 /data']
           volumeMounts:
             - name: data
               mountPath: /data
