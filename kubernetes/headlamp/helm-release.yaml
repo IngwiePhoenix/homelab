@@ -47,7 +47,7 @@ spec:
             version: "0.1.1"
           - name: cnpg-headlamp-plugin
             source: https://artifacthub.io/packages/headlamp/cnpg-headlamp-plugin/cnpg-headlamp-plugin
-            version: "0.1.6"
+            version: "0.1.7"
     clusterRoleBinding:
       create: true
       clusterRoleName: cluster-admin
