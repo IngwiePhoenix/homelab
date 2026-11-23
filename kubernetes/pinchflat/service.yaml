@@ -10,4 +10,4 @@ spec:
   ports:
     - targetPort: http
       name: http
-      port: 8080
+      port: 8945

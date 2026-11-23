@@ -24,8 +24,11 @@ spec:
             claimName: config-pvc
       containers:
         - name: app
-          image: "keglin/pinchflat:dev" # v2025.9.26
+          image: "ghcr.io/thebadfella/pinchflat-ngx:2026.11.2"
           imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: oidc-creds
           env:
             - name: TZ
               value: Europe/Berlin
