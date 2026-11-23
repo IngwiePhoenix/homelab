@@ -1,0 +1,12 @@
+services:
+  traefik-kop:
+    extra_hosts:
+      # Allows resolving k0s in-cluster DNS names
+      - "valkey-traefik-valkey-node-0.valkey-traefik-valkey-headless.traefik-ingress.svc.cluster.local=10.10.10.21"
+      - "valkey-traefik-valkey-node-1.valkey-traefik-valkey-headless.traefik-ingress.svc.cluster.local=10.10.10.22"
+      - "valkey-traefik-valkey-node-2.valkey-traefik-valkey-headless.traefik-ingress.svc.cluster.local=10.10.10.23"
+    environment:
+      REDIS_SENTINEL_ADDRS: "10.10.10.21:26379,10.10.10.22:26379,10.10.10.23:26379"
+      REDIS_SENTINEL_MASTER: "myprimary"
+      REDIS_USER: "default"
+      REDIS_PASS: "${VALKEY_PASSWORD}"
