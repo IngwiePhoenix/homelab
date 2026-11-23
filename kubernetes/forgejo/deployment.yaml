@@ -117,6 +117,102 @@ spec:
                 secretKeyRef:
                   name: forgejo-oidc-creds
                   key: discovery-url
+        - name: install-themes
+          image: alpine:3.24.4
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              set -eu
+              umask 022
+
+              CUSTOM=/data/gitea
+              CSS_DIR="$CUSTOM/public/assets/css"
+              STATE_DIR="$CUSTOM/.theme-revisions"
+              MARKER="$STATE_DIR/rose-pine-forgejo"
+
+              THEME_REV=1c4a8f009d756e8b7b3b6cbf2bf061dcf25e9f3d
+              ARCHIVE_URL="https://git.orangc.net/c/rose-pine-forgejo/archive/${THEME_REV}.tar.gz"
+
+              mkdir -p "$CSS_DIR" "$STATE_DIR" /run/theme-env
+
+              # Check whether the pinned revision is already installed.
+              set -- "$CSS_DIR"/theme-rose-pine-*.css
+
+              if [ -f "$1" ]; then
+                INSTALLED_COUNT=$#
+              else
+                INSTALLED_COUNT=0
+              fi
+
+              INSTALLED_REV="$(cat "$MARKER" 2>/dev/null || true)"
+              if [ "$INSTALLED_REV" != "$THEME_REV" ] || [ "$INSTALLED_COUNT" -ne 24 ]; then
+                echo "Installing Rosé Pine for Forgejo..."
+                WORK="$(mktemp -d)"
+                trap 'rm -rvf "$WORK"' EXIT
+                mkdir -p "$WORK/src"
+                echo "Downloading pinned repository revision..."
+                wget -q -O "$WORK/theme.tar.gz" "$ARCHIVE_URL"
+                echo "Extracting theme..."
+                tar -xvzf "$WORK/theme.tar.gz" -C "$WORK/src" --strip-components=1
+                # Validate the expected generated CSS files.
+                set -- "$WORK"/src/dist/theme-rose-pine-*.css
+                if [ ! -f "$1" ] || [ "$#" -ne 24 ]; then
+                  echo "ERROR: Expected 24 Rosé Pine theme files."
+                  echo "       Found $# instead."
+                  exit 1
+                fi
+
+                for file in "$@"; do
+                  if [ ! -s "$file" ]; then
+                    echo "ERROR: Empty theme file: $file"
+                    exit 1
+                  fi
+                done
+
+                # Remove the old revision's files, then install the new ones.
+                rm -vf "$MARKER" "$CSS_DIR"/theme-rose-pine-*.css
+                cp -v "$@" "$CSS_DIR/"
+                # Record the revision only after successful installation.
+                printf '%s\n' "$THEME_REV" > "$MARKER.tmp"
+                mv "$MARKER.tmp" "$MARKER"
+                echo "Rosé Pine installed successfully."
+              else
+                echo "Rosé Pine revision $THEME_REV already installed."
+              fi
+
+              # Discover all installed custom themes.
+              # ...why is this list so long? I could shellhack that into readability but.... x.x
+              BUILTIN_THEMES='forgejo-auto,forgejo-light,forgejo-dark,gitea-auto,gitea-light,gitea-dark,forgejo-auto-deuteranopia-protanopia,forgejo-light-deuteranopia-protanopia,forgejo-dark-deuteranopia-protanopia,forgejo-auto-tritanopia,forgejo-light-tritanopia,forgejo-dark-tritanopia'
+              THEMES="$BUILTIN_THEMES"
+              for file in "$CSS_DIR"/theme-*.css; do
+                [ -f "$file" ] || continue
+                name="${file##*/}"
+                name="${name#theme-}"
+                name="${name%.css}"
+                case ",$THEMES," in
+                  *,"$name",*)
+                    ;;
+                  *)
+                    THEMES="${THEMES},${name}"
+                    ;;
+                esac
+              done
+
+              # Generate the Kubernetes EnvFiles file.
+              printf 'FORGEJO__ui__THEMES=%s\n' "$THEMES" > /run/theme-env/themes.env.tmp
+              mv -v /run/theme-env/themes.env.tmp /run/theme-env/themes.env
+              echo "Available themes: $THEMES"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: theme-env
+              mountPath: /run/theme-env
+
       containers:
         - name: app
           image: codeberg.org/forgejo/forgejo:17.0.2
@@ -129,6 +225,15 @@ spec:
             - secretRef:
                 name: forgejo-env
           env:
+            - name: FORGEJO__ui__THEMES
+              valueFrom:
+                fileKeyRef:
+                  volumeName: theme-env
+                  path: themes.env
+                  key: FORGEJO__ui__THEMES
+                  optional: false
+            - name: FORGEJO__ui__DEFAULT_THEME
+              value: "rose-pine-auto-rose"
             - name: FORGEJO__database__DB_TYPE
               value: "postgres"
             - name: FORGEJO__database__HOST
@@ -163,3 +268,5 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: forgejo-pvc
+        - name: theme-env
+          emptyDir: {}
