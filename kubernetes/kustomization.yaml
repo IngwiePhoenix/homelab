@@ -15,12 +15,13 @@ resources:
   - cert-manager/flux.yaml
   - reflector/flux.yaml
   - reloader/flux.yaml
-  - traefik/flux.yaml
-  - external/flux.yaml
-  - crowdsec/flux.yaml
+  - valkey/flux.yaml
   - postgres/flux.yaml
   - mongodb/flux.yaml
   - common-secrets/flux.yaml
+  - traefik/flux.yaml
+  - crowdsec/flux.yaml
+  - external/flux.yaml
 
   # Apps
   - vaultwarden/flux.yaml
