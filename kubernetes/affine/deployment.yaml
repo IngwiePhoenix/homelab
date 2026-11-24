@@ -24,9 +24,11 @@ spec:
         kubernetes.io/arch: arm64
         homelab/location: internal
       securityContext:
-        fsGroup: 0
-        runAsUser: 0
-        runAsGroup: 0
+        runAsNonRoot: true
+        runAsUser: 1010
+        runAsGroup: 1010
+        fsGroup: 1010
+        fsGroupChangePolicy: OnRootMismatch
       initContainers:
         - name: wait-for-dependencies
           image: wait4x/wait4x:latest
@@ -118,9 +120,11 @@ spec:
               value: selfhosted
           volumeMounts:
             - name: config
-              mountPath: /root/.affine/config
+              mountPath: /home/affine/.affine/config
             - name: storage
-              mountPath: /root/.affine/storage
+              mountPath: /home/affine/.affine/storage
+            - name: app-src
+              mountPath: /app/src
           resources:
             requests:
               cpu: 250m
@@ -188,9 +192,11 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: config
-              mountPath: /root/.affine/config
+              mountPath: /home/affine/.affine/config
             - name: storage
-              mountPath: /root/.affine/storage
+              mountPath: /home/affine/.affine/storage
+            - name: app-src
+              mountPath: /app/src
           startupProbe:
             tcpSocket:
               port: web
@@ -223,3 +229,5 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: affine-storage-pvc
+        - name: app-src
+          emptyDir: {}
