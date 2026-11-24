@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memos-app
+  namespace: memos
+  labels:
+    app: memos
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: memos
+  template:
+    metadata:
+      labels:
+        app: memos
+    spec:
+      securityContext:
+        fsGroup: 10001
+        runAsUser: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: memos-pvc
+      containers:
+        - name: app
+          image: neosmemo/memos:26.11.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MEMOS_PORT
+              value: "5230"
+            - name: MEMOS_DATA
+              value: /var/opt/memos
+            - name: MEMOS_DRIVER
+              value: sqlite
+            - name: MEMOS_INSTANCE_URL
+              value: https://memos.birb.it
+          ports:
+            - name: web
+              containerPort: 5230
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /var/opt/memos
+          startupProbe:
+            tcpSocket:
+              port: web
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            tcpSocket:
+              port: web
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: web
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+        - name: mortis-api-compat
+          image: ghcr.io/mudkipme/mortis:26.11.2
+          imagePullPolicy: IfNotPresent
+          command:
+            - /app/mortis
+          args:
+            - -grpc-addr=127.0.0.1:5230
+          ports:
+            - name: compat
+              containerPort: 5231
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: compat
+            periodSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: compat
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: compat
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
