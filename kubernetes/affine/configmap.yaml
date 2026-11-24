@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  HOME: /home/affine
   name: affine-config-cm
   namespace: affine
 data:
+  HOME: /home/affine
   AFFINE_SERVER_HOST: affine.birb.it
   AFFINE_SERVER_EXTERNAL_URL: https://affine.birb.it
   AFFINE_SERVER_HTTPS: "true"
