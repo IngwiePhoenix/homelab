@@ -21,7 +21,6 @@ spec:
         app: affine
     spec:
       nodeSelector:
-        kubernetes.io/arch: arm64
         homelab/location: internal
       securityContext:
         runAsNonRoot: true
