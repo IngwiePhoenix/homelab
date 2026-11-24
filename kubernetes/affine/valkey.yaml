@@ -13,3 +13,5 @@ spec:
     size: 1Gi
   nodeSelector:
     homelab/location: internal
+  binding:
+    secretName: valkey-affine-binding
