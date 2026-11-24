@@ -26,7 +26,7 @@ The Git repository reference in Flux is:
 ```
   sourceRef:
     kind: GitRepository
-    name: homelab
+    name: homelab-repo
 ```
 
 Each component may contain any of:
@@ -42,7 +42,7 @@ When writing plain Kubernetes objects, follow the following naming convention
   * A service may only use a LoadBalancer IP (Calico annotations; pool is `10.10.10.0/24`) when it has sufficiently complex requirements.
 - Persistent Volume Claims end in `-pvc`
   * use `local-bunker` as the Storage Class (via local-path-provisioner).
-  * use `local-path-provisioner/...` annotations for permission management
+  * use `local-path-provisioner/...` annotations for permission management. You might also want to set a pod/podTemplate's `securityContext` to equal values - or derive the values from the deployed container itself (i.e. by reading the source's Dockerfile)
     * `local-path-provisioner/uid: "<int>"`: Set UID
     * `local-path-provisioner/gid: "<int>"`: Set GID
     * `local-path-provisioner/perm: "<int>"`: Set permissions (i.e.: "0700")
@@ -51,6 +51,7 @@ When writing plain Kubernetes objects, follow the following naming convention
   * Depend on the Flux kustomization `traefik-ingress`
   * Use Traefik IngressRoute CRDs
     * Endpoint `websecure` is only usable at home, `edge` is also accessible from the public internet.
+    * The `tls:` section defaults to `*.birb.it` SNIs. Only set it if you intend to derive or use sub-sub-domains.
   * Names end in `-ir`
 - Secrets used to store environment variables end in `-env`
 - Secrets used to store credentials end in `-creds`
@@ -62,12 +63,26 @@ When writing plain Kubernetes objects, follow the following naming convention
 - When you need a PostgresQL database and account, use the EasyMile Postgres CRDs
   * `PostgresDatabase` object names end in `-db`. The database itself has no suffix.
   * `PostgresqlUserRole` end in `-db-user`
+- When you need a Valkey or Redis-compatible database, use SAP's Valkey Operator CRD.
+- When you need a MongoDB, use the MongoDBCommunity operator's CRDs for users and passwords and databases.
+  * The default instance is in namespace `mongodb` and called `default-cluster`.
+- Should you introduce additional or special stanzas that describe remote versions, you should integrate that with Renovate.
+  * You can find the repository config in `(repo)/renovate.json5`
+  * You can find the global config in `kubernetes/renovate-operator/config/renovate.config.js` (it is injected via the operator)
+  * Try to re-use existing parsers and matchers wherever possible!
+  * If you must make a new one, keep your RegEx as simple as possible. I do not want to review a kilometer long pattern-matching snake!
 
 When using HelmRepo and HelmRelease:
 - Helm Release names end in `-helmrelease`
   * Target namespace follows the name of the chart. I.e. Chart "Traefik" becomes target namespace "traefik"
   * The `releaseName` follows the same schema. This keeps naming equalized and simple. I do have to type those out by hand after all.
 - Helm Repo names end in `-helmrepo`
+
+When creating the component's `flux.yaml`:
+- Use dependencies where possible - this creates neat chains of execution and installation.
+- Use directed health checks rather than `wait: true` - they are often faster.
+- Each component, even ones that split across folders, only has one `flux.yaml`. This means, that all Flux Kustomizations land in one, potentially multi-part, document.
+  * An example is `kubernetes/traefik/flux.yaml`.
 
 Example Postgres objects:
 ```
