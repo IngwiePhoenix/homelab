@@ -28,15 +28,17 @@ spec:
         runAsUser: 0
         runAsGroup: 0
       initContainers:
-        - name: wait-for-postgres
+        - name: wait-for-dependencies
           image: wait4x/wait4x:latest
           imagePullPolicy: IfNotPresent
           command:
             - wait4x
           args:
-            - postgresql
-            - "postgresql://$(DB_LOGIN):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable"
-            - --timeout=10m
+            - tcp
+            - "$(DB_HOST):$(DB_PORT)"
+            - "$(VALKEY_HOST):$(VALKEY_PORT)"
+            - --timeout
+            - 10m
           env:
             - name: DB_HOST
               valueFrom:
@@ -48,33 +50,6 @@ spec:
                 secretKeyRef:
                   name: affine-db-creds
                   key: PORT
-            - name: DB_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: affine-db-creds
-                  key: DATABASE
-            - name: DB_LOGIN
-              valueFrom:
-                secretKeyRef:
-                  name: affine-db-creds
-                  key: LOGIN
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: affine-db-creds
-                  key: PASSWORD
-            - name: DATABASE_URL
-              value: "postgresql://$(DB_LOGIN):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable"
-        - name: wait-for-valkey
-          image: wait4x/wait4x:latest
-          imagePullPolicy: IfNotPresent
-          command:
-            - wait4x
-          args:
-            - tcp
-            - "$(VALKEY_HOST):$(VALKEY_PORT)"
-            - --timeout=10m
-          env:
             - name: VALKEY_HOST
               valueFrom:
                 secretKeyRef:
@@ -93,6 +68,9 @@ spec:
             - -c
           args:
             - node ./scripts/self-host-predeploy.js
+          envFrom:
+            - configMapRef:
+                name: affine-config-cm
           env:
             - name: DB_HOST
               valueFrom:
@@ -138,37 +116,25 @@ spec:
                   key: password
             - name: DEPLOYMENT_TYPE
               value: selfhosted
-            - name: AFFINE_INDEXER_ENABLED
-              value: "false"
           volumeMounts:
             - name: config
               mountPath: /root/.affine/config
             - name: storage
               mountPath: /root/.affine/storage
-            - name: config-file
-              mountPath: /root/.affine/config/config.json
-              subPath: config.json
-              readOnly: true
           resources:
             requests:
-              cpu: 500m
-              memory: 2Gi
+              cpu: 250m
+              memory: 512Mi
             limits:
-              cpu: "2"
-              memory: 4Gi
-        - name: wait-for-postgres-and-valkey-before-migrate
-          image: wait4x/wait4x:latest
-          imagePullPolicy: IfNotPresent
-          command:
-            - wait4x
-          args:
-            - tcp
-            - default-cluster-rw.postgres.svc.cluster.local:5432
-            - --timeout=10m
+              cpu: "1"
+              memory: 2Gi
       containers:
         - name: app
           image: ghcr.io/toeverything/affine:0.27.4
           imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: affine-config-cm
           env:
             - name: DB_HOST
               valueFrom:
@@ -214,8 +180,6 @@ spec:
                   key: password
             - name: DEPLOYMENT_TYPE
               value: selfhosted
-            - name: AFFINE_INDEXER_ENABLED
-              value: "false"
             - name: NODE_OPTIONS
               value: --max-old-space-size=3072
           ports:
@@ -227,27 +191,20 @@ spec:
               mountPath: /root/.affine/config
             - name: storage
               mountPath: /root/.affine/storage
-            - name: config-file
-              mountPath: /root/.affine/config/config.json
-              subPath: config.json
-              readOnly: true
           startupProbe:
-            httpGet:
-              path: /info
+            tcpSocket:
               port: web
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 60
           readinessProbe:
-            httpGet:
-              path: /info
+            tcpSocket:
               port: web
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
           livenessProbe:
-            httpGet:
-              path: /info
+            tcpSocket:
               port: web
             periodSeconds: 20
             timeoutSeconds: 5
@@ -266,9 +223,3 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: affine-storage-pvc
-        - name: config-file
-          configMap:
-            name: affine-config-cm
-            items:
-              - key: config.json
-                path: config.json
