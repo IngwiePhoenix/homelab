@@ -17,6 +17,7 @@ spec:
     - name: postgres-instance
     - name: valkey-operator
     - name: traefik-ingress
+    - name: reloader
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
