@@ -21,7 +21,7 @@ The PVC is mounted at the same path as the Compose deployment:
 1. Stop the Compose stack cleanly before copying the data, so SQLite can
    checkpoint its WAL and no process is writing to the database.
 2. Copy the **contents** of the old `./data` directory into the root of
-   `memos-pvc`. Preserve the database and the complete `assets/` directory.
+   `memos-pvc`. Preserve the database and every other file and subdirectory.
 3. Ensure the copied files are owned by UID/GID `10001:10001`. The Memos
    container runs as that non-root user; the PVC annotations set the initial
    directory ownership, but a copy performed as root can change ownership
