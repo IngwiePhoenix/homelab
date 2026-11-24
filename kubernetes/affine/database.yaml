@@ -1,0 +1,30 @@
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlDatabase
+metadata:
+  name: affine-db
+  namespace: affine
+spec:
+  engineConfiguration:
+    name: default-cluster-instance
+    namespace: postgres
+  database: affine
+  masterRole: affine-role
+  dropOnDelete: true
+  waitLinkedResourcesDeletion: true
+  extensions:
+    list:
+      - vector
+---
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlUserRole
+metadata:
+  name: affine-db-user
+  namespace: affine
+spec:
+  mode: MANAGED
+  rolePrefix: affine
+  privileges:
+    - privilege: OWNER
+      database:
+        name: affine-db
+      generatedSecretName: affine-db-creds

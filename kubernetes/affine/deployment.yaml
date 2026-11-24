@@ -1,0 +1,233 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: affine-app
+  namespace: affine
+  labels:
+    app: affine
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: affine
+  template:
+    metadata:
+      labels:
+        app: affine
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+        homelab/location: internal
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1010
+        runAsGroup: 1010
+        fsGroup: 1010
+        fsGroupChangePolicy: OnRootMismatch
+      initContainers:
+        - name: wait-for-dependencies
+          image: wait4x/wait4x:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - wait4x
+          args:
+            - tcp
+            - "$(DB_HOST):$(DB_PORT)"
+            - "$(VALKEY_HOST):$(VALKEY_PORT)"
+            - --timeout
+            - 10m
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PORT
+            - name: VALKEY_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryHost
+            - name: VALKEY_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryPort
+        - name: migrate
+          image: ghcr.io/toeverything/affine:0.27.4
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+          args:
+            - node ./scripts/self-host-predeploy.js
+          envFrom:
+            - configMapRef:
+                name: affine-config-cm
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PORT
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: DATABASE
+            - name: DB_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: LOGIN
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://$(DB_LOGIN):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable"
+            - name: REDIS_SERVER_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryHost
+            - name: REDIS_SERVER_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryPort
+            - name: REDIS_SERVER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: password
+            - name: DEPLOYMENT_TYPE
+              value: selfhosted
+          volumeMounts:
+            - name: config
+              mountPath: /home/affine/.affine/config
+            - name: storage
+              mountPath: /home/affine/.affine/storage
+            - name: app-src
+              mountPath: /app/src
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+      containers:
+        - name: app
+          image: ghcr.io/toeverything/affine:0.27.4
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: affine-config-cm
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PORT
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: DATABASE
+            - name: DB_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: LOGIN
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://$(DB_LOGIN):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable"
+            - name: REDIS_SERVER_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryHost
+            - name: REDIS_SERVER_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryPort
+            - name: REDIS_SERVER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: password
+            - name: DEPLOYMENT_TYPE
+              value: selfhosted
+            - name: NODE_OPTIONS
+              value: --max-old-space-size=3072
+          ports:
+            - name: web
+              containerPort: 3010
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /home/affine/.affine/config
+            - name: storage
+              mountPath: /home/affine/.affine/storage
+            - name: app-src
+              mountPath: /app/src
+          startupProbe:
+            tcpSocket:
+              port: web
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            tcpSocket:
+              port: web
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: web
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: affine-config-pvc
+        - name: storage
+          persistentVolumeClaim:
+            claimName: affine-storage-pvc
+        - name: app-src
+          emptyDir: {}
