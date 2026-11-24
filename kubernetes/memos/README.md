@@ -29,9 +29,9 @@ The PVC is mounted at the same path as the Compose deployment:
 4. Start the Kubernetes workload only after the copy is complete.
 
 SQLite remains the active database backend in the Deployment. The
-`MEMO_CONTENT_BYTES` variable from the old Compose file is not present in
-Memos 26.11.2's documented runtime configuration, so it is intentionally not
-carried over as a potentially ineffective setting.
+`MEMO_CONTENT_BYTES` variable from the old Compose file is not listed in
+Memos 26.11.2's documented runtime environment variables, so it is
+intentionally not carried over as a potentially ineffective setting.
 
 ## Later: migrate SQLite to PostgreSQL
 
