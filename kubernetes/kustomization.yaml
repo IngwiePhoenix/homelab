@@ -15,6 +15,7 @@ resources:
   - cert-manager/flux.yaml
   - reflector/flux.yaml
   - reloader/flux.yaml
+  - clustersecret-operator/flux.yaml
   - valkey/flux.yaml
   - postgres/flux.yaml
   - mongodb/flux.yaml
