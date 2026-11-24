@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: affine-config-pvc
+  namespace: affine
+  labels:
+    app: affine
+  annotations:
+    local-path-provisioner/uid: "0"
+    local-path-provisioner/gid: "0"
+    local-path-provisioner/perm: "0700"
+spec:
+  storageClassName: local-bunker
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: affine-storage-pvc
+  namespace: affine
+  labels:
+    app: affine
+  annotations:
+    local-path-provisioner/uid: "0"
+    local-path-provisioner/gid: "0"
+    local-path-provisioner/perm: "0700"
+spec:
+  storageClassName: local-bunker
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
