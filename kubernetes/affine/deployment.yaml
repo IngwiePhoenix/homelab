@@ -31,7 +31,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       initContainers:
         - name: wait-for-dependencies
-          image: wait4x/wait4x:latest
+          image: wait4x/wait4x:latest@sha256:aae91ea65a38117ac07c84c7e1122691ac91c3b60529edcb8fe62292d105d8ff
           imagePullPolicy: IfNotPresent
           command:
             - wait4x
