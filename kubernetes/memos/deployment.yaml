@@ -38,6 +38,8 @@ spec:
               value: /var/opt/memos
             - name: MEMOS_DRIVER
               value: sqlite
+            - name: MEMOS_INSTANCE_URL
+              value: https://memos.birb.it
           ports:
             - name: web
               containerPort: 5230
