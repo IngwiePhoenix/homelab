@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  HOME: /home/affine
   name: affine-config-cm
   namespace: affine
 data:
