@@ -39,7 +39,6 @@ spec:
     ingressClass:
       enabled: true
       isDefaultClass: false
-      allowExternalNameServices: true
       name: traefik-internal
     ingressRoute:
       dashboard:
