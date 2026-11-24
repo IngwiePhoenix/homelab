@@ -16,7 +16,7 @@ Both images are pinned to `26.11.2`. Mortis `26.11.2` requires the Memos
 
 The PVC is mounted at the same path as the Compose deployment:
 `/var/opt/memos`. Memos stores its default SQLite database there as
-`memos_prod.db`, along with the local `assets/` directory.
+`memos_prod.db`, plus any local attachment files and other persisted data.
 
 1. Stop the Compose stack cleanly before copying the data, so SQLite can
    checkpoint its WAL and no process is writing to the database.
@@ -86,7 +86,7 @@ application configuration.
 ### 2. Initialize the PostgreSQL schema
 
 Use the **same Memos version** for schema initialization and the data import.
-First, back up the SQLite database and assets. Upgrade the SQLite database to
+First, back up the SQLite database and the complete Memos data directory. Upgrade the SQLite database to
 the current Memos release before migrating; older databases may need the
 intermediate upgrade path documented in the
 [upgrade guide](https://usememos.com/docs/operations/upgrade).
