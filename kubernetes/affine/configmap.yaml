@@ -4,17 +4,6 @@ metadata:
   name: affine-config-cm
   namespace: affine
 data:
-  config.json: |
-    {
-      "$schema": "https://github.com/toeverything/affine/releases/latest/download/config.schema.json",
-      "server": {
-        "name": "AFFiNE",
-        "externalUrl": "https://affine.birb.it"
-      },
-      "copilot": {
-        "enabled": true,
-        "byok": {
-          "enabled": true
-        }
-      }
-    }
+  AFFINE_SERVER_HOST: affine.birb.it
+  AFFINE_SERVER_EXTERNAL_URL: https://affine.birb.it
+  AFFINE_SERVER_HTTPS: "true"
