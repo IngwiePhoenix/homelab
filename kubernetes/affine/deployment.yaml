@@ -1,0 +1,274 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: affine-app
+  namespace: affine
+  labels:
+    app: affine
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: affine
+  template:
+    metadata:
+      labels:
+        app: affine
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+        homelab/location: internal
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
+      initContainers:
+        - name: wait-for-postgres
+          image: wait4x/wait4x:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - wait4x
+          args:
+            - postgresql
+            - "postgresql://$(DB_LOGIN):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable"
+            - --timeout=10m
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PORT
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: DATABASE
+            - name: DB_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: LOGIN
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://$(DB_LOGIN):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable"
+        - name: wait-for-valkey
+          image: wait4x/wait4x:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - wait4x
+          args:
+            - tcp
+            - "$(VALKEY_HOST):$(VALKEY_PORT)"
+            - --timeout=10m
+          env:
+            - name: VALKEY_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryHost
+            - name: VALKEY_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryPort
+        - name: migrate
+          image: ghcr.io/toeverything/affine:0.27.4
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+          args:
+            - node ./scripts/self-host-predeploy.js
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PORT
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: DATABASE
+            - name: DB_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: LOGIN
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://$(DB_LOGIN):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable"
+            - name: REDIS_SERVER_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryHost
+            - name: REDIS_SERVER_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryPort
+            - name: REDIS_SERVER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: password
+            - name: DEPLOYMENT_TYPE
+              value: selfhosted
+            - name: AFFINE_INDEXER_ENABLED
+              value: "false"
+          volumeMounts:
+            - name: config
+              mountPath: /root/.affine/config
+            - name: storage
+              mountPath: /root/.affine/storage
+            - name: config-file
+              mountPath: /root/.affine/config/config.json
+              subPath: config.json
+              readOnly: true
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+        - name: wait-for-postgres-and-valkey-before-migrate
+          image: wait4x/wait4x:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - wait4x
+          args:
+            - tcp
+            - default-cluster-rw.postgres.svc.cluster.local:5432
+            - --timeout=10m
+      containers:
+        - name: app
+          image: ghcr.io/toeverything/affine:0.27.4
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PORT
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: DATABASE
+            - name: DB_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: LOGIN
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: affine-db-creds
+                  key: PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://$(DB_LOGIN):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable"
+            - name: REDIS_SERVER_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryHost
+            - name: REDIS_SERVER_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: primaryPort
+            - name: REDIS_SERVER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-affine-binding
+                  key: password
+            - name: DEPLOYMENT_TYPE
+              value: selfhosted
+            - name: AFFINE_INDEXER_ENABLED
+              value: "false"
+            - name: NODE_OPTIONS
+              value: --max-old-space-size=3072
+          ports:
+            - name: web
+              containerPort: 3010
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /root/.affine/config
+            - name: storage
+              mountPath: /root/.affine/storage
+            - name: config-file
+              mountPath: /root/.affine/config/config.json
+              subPath: config.json
+              readOnly: true
+          startupProbe:
+            httpGet:
+              path: /info
+              port: web
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /info
+              port: web
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /info
+              port: web
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: affine-config-pvc
+        - name: storage
+          persistentVolumeClaim:
+            claimName: affine-storage-pvc
+        - name: config-file
+          configMap:
+            name: affine-config-cm
+            items:
+              - key: config.json
+                path: config.json
