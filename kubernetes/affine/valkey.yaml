@@ -1,0 +1,15 @@
+apiVersion: cache.cs.sap.com/v1alpha1
+kind: Valkey
+metadata:
+  name: affine
+  namespace: affine
+spec:
+  replicas: 1
+  sentinel:
+    enabled: false
+  persistence:
+    enabled: true
+    storageClass: local-bunker
+    size: 1Gi
+  nodeSelector:
+    homelab/location: internal
