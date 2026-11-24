@@ -1,0 +1,10 @@
+# Access attachments to items
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: vaultwarden-attachments
+spec:
+  provider:
+    webhook:
+      url: 'http://127.0.0.1:8087/object/attachment/{{ .remoteRef.property }}?itemid={{ .remoteRef.key }}'
+      result: {}

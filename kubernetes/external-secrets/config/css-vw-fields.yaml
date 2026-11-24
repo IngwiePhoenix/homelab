@@ -1,0 +1,13 @@
+# Access extra fields
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: vaultwarden-fields
+spec:
+  provider:
+    webhook:
+      url: 'http://127.0.0.1:8087/object/item/{{ .remoteRef.key }}'
+      headers:
+        Content-Type: application/json
+      result:
+        jsonPath: '$.data.fields[?@.name=="{{ .remoteRef.property }}"].value'
