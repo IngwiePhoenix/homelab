@@ -14,7 +14,6 @@ spec:
   extensions:
     list:
       - vector
-      - pgcrypto
 ---
 apiVersion: postgresql.easymile.com/v1alpha1
 kind: PostgresqlUserRole
