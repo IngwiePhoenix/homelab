@@ -6,8 +6,8 @@ metadata:
   labels:
     app: affine
   annotations:
-    local-path-provisioner/uid: "0"
-    local-path-provisioner/gid: "0"
+    local-path-provisioner/uid: "1010"
+    local-path-provisioner/gid: "1010"
     local-path-provisioner/perm: "0700"
 spec:
   storageClassName: local-bunker
@@ -25,8 +25,8 @@ metadata:
   labels:
     app: affine
   annotations:
-    local-path-provisioner/uid: "0"
-    local-path-provisioner/gid: "0"
+    local-path-provisioner/uid: "1010"
+    local-path-provisioner/gid: "1010"
     local-path-provisioner/perm: "0700"
 spec:
   storageClassName: local-bunker
