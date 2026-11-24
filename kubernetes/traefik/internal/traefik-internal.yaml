@@ -36,7 +36,6 @@ spec:
       kubernetesIngress:
         enabled: true
         ingressClass: traefik-internal
-        allowExternalNameServices: true
     ingressClass:
       enabled: true
       isDefaultClass: false
