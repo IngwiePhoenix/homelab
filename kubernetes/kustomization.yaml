@@ -32,4 +32,4 @@ resources:
   - timelinize/flux.yaml
   - forgejo/flux.yaml
   - headlamp/flux.yaml
-  #- affine/flux.yaml
+  - affine/flux.yaml
