@@ -153,7 +153,7 @@ spec:
               if [ "$INSTALLED_REV" != "$THEME_REV" ] || [ "$INSTALLED_COUNT" -ne 24 ]; then
                 echo "Installing Rosé Pine for Forgejo..."
                 WORK="$(mktemp -d)"
-                trap 'rm -rvf "$WORK"' EXIT
+                trap 'rm -rf "$WORK"' EXIT
                 mkdir -p "$WORK/src"
                 echo "Downloading pinned repository revision..."
                 wget -q -O "$WORK/theme.tar.gz" "$ARCHIVE_URL"
@@ -207,6 +207,10 @@ spec:
               printf 'FORGEJO__ui__THEMES=%s\n' "$THEMES" > /run/theme-env/themes.env.tmp
               mv -v /run/theme-env/themes.env.tmp /run/theme-env/themes.env
               echo "Available themes: $THEMES"
+              echo "---"
+              echo "# /run/theme-env/themes.env"
+              cat /run/theme-env/themes.env
+              echo
           volumeMounts:
             - name: data
               mountPath: /data
