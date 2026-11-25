@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: pkvault-ir
+  namespace: pkvault
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`pkvault.birb.it`)
+      kind: Rule
+      services:
+        - name: pkvault-svc
+          port: web
