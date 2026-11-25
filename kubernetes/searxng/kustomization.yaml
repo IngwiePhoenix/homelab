@@ -13,3 +13,4 @@ configMapGenerator:
   - name: searxng-settings
     files:
       - settings.yml
+      - limiter.toml
