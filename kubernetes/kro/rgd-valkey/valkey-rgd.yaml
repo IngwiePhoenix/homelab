@@ -138,13 +138,13 @@ spec:
           namespace: ${schema.metadata.namespace}
         data:
           host: ${schema.metadata.name}-valkey
-          port: ${string(schema.spec.?values.orValue({}).?service.orValue({}).?port.orValue(6379))}
+          port: ${string(schema.spec.values.?service.?port.orValue(6379))}
           username: default
           db: "0"
           # Sentinel configuration
-          sentinelEnabled: ${string(schema.spec.?values.orValue({}).?sentinel.orValue({}).?enabled.orValue(false))}
+          sentinelEnabled: ${string(schema.spec.values.?sentinel.?enabled.orValue(false))}
           sentinelHost: ${schema.metadata.name}-valkey-sentinel
-          sentinelPort: ${string(schema.spec.?values.orValue({}).?sentinel.orValue({}).?service.orValue({}).?port.orValue(26379))}
-          sentinelMasterSet: ${schema.spec.?values.orValue({}).?sentinel.orValue({}).?masterSet.orValue("mymaster")}
+          sentinelPort: ${string(schema.spec.values.?sentinel.?service.?port.orValue(26379))}
+          sentinelMasterSet: ${schema.spec.values.?sentinel.?masterSet.orValue("mymaster")}
           sentinelUsername: sentinel
-          sentinelServiceEnabled: ${string(schema.spec.?values.orValue({}).?sentinel.orValue({}).?service.orValue({}).?enabled.orValue(true))}
+          sentinelServiceEnabled: ${string(schema.spec.values.?sentinel.?service.?enabled.orValue(true))}
