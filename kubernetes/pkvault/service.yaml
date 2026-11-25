@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pkvault-svc
+  namespace: pkvault
+spec:
+  type: ClusterIP
+  selector:
+    app: pkvault
+  ports:
+    - name: web
+      port: 3000
+      targetPort: web
+      protocol: TCP
