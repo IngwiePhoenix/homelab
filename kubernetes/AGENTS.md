@@ -63,9 +63,12 @@ When writing plain Kubernetes objects, follow the following naming convention
 - When you need a PostgresQL database and account, use the EasyMile Postgres CRDs
   * `PostgresDatabase` object names end in `-db`. The database itself has no suffix.
   * `PostgresqlUserRole` end in `-db-user`
-- When you need a Valkey or Redis-compatible database, use SAP's Valkey Operator CRD.
+- When you need a Valkey or Redis-compatible database, there is a Kro-based Valkey CRD in this repo.
+  * The `.spec.values` are just Helm Chart values for the official Valkey chart. So you can use that to override it as you see fit.
+  * The definition is in `kubernetes/kro/rgd-valkey`.
 - When you need a MongoDB, use the MongoDBCommunity operator's CRDs for users and passwords and databases.
   * The default instance is in namespace `mongodb` and called `default-cluster`.
+- The External Secrets Operator can generate secrets for you, if you need any.
 - Should you introduce additional or special stanzas that describe remote versions, you should integrate that with Renovate.
   * You can find the repository config in `(repo)/renovate.json5`
   * You can find the global config in `kubernetes/renovate-operator/config/renovate.config.js` (it is injected via the operator)
