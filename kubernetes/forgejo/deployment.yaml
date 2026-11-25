@@ -204,7 +204,7 @@ spec:
               done
 
               # Generate the Kubernetes EnvFiles file.
-              printf 'FORGEJO__ui__THEMES=%s\n' "$THEMES" > /run/theme-env/themes.env.tmp
+              printf "FORGEJO__ui__THEMES='%s'\n" "$THEMES" > /run/theme-env/themes.env.tmp
               mv -v /run/theme-env/themes.env.tmp /run/theme-env/themes.env
               echo "Available themes: $THEMES"
               echo "---"
