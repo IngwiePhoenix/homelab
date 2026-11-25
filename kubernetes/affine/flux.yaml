@@ -15,7 +15,7 @@ spec:
   dependsOn:
     - name: local-path-provisioner
     - name: postgres-instance
-    - name: valkey-operator
+    - name: kro-rgd-valkey
     - name: traefik-ingress
     - name: reloader
   healthChecks:
