@@ -54,13 +54,13 @@ spec:
             - name: VALKEY_HOST
               valueFrom:
                 secretKeyRef:
-                  name: valkey-affine-binding
-                  key: primaryHost
+                  name: cache-connection
+                  key: host
             - name: VALKEY_PORT
               valueFrom:
                 secretKeyRef:
-                  name: valkey-affine-binding
-                  key: primaryPort
+                  name: cache-connection
+                  key: port
         - name: migrate
           image: ghcr.io/toeverything/affine:0.27.4
           imagePullPolicy: IfNotPresent
@@ -103,17 +103,22 @@ spec:
             - name: REDIS_SERVER_HOST
               valueFrom:
                 secretKeyRef:
-                  name: valkey-affine-binding
-                  key: primaryHost
+                  name: cache-connection
+                  key: host
             - name: REDIS_SERVER_PORT
               valueFrom:
                 secretKeyRef:
-                  name: valkey-affine-binding
-                  key: primaryPort
+                  name: cache-connection
+                  key: port
+            - name: REDIS_SERVER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cache-connection
+                  key: username
             - name: REDIS_SERVER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: valkey-affine-binding
+                  name: cache-auth
                   key: password
             - name: DEPLOYMENT_TYPE
               value: selfhosted
@@ -169,17 +174,22 @@ spec:
             - name: REDIS_SERVER_HOST
               valueFrom:
                 secretKeyRef:
-                  name: valkey-affine-binding
-                  key: primaryHost
+                  name: cache-connection
+                  key: host
             - name: REDIS_SERVER_PORT
               valueFrom:
                 secretKeyRef:
-                  name: valkey-affine-binding
-                  key: primaryPort
+                  name: cache-connection
+                  key: port
+            - name: REDIS_SERVER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cache-connection
+                  key: username
             - name: REDIS_SERVER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: valkey-affine-binding
+                  name: cache-auth
                   key: password
             - name: DEPLOYMENT_TYPE
               value: selfhosted
