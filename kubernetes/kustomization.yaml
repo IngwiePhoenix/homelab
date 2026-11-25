@@ -34,3 +34,4 @@ resources:
   - headlamp/flux.yaml
   - affine/flux.yaml
   - external-secrets/flux.yaml
+  - ladder/flux.yaml
