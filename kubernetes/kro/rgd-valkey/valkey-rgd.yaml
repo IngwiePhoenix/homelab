@@ -1,0 +1,150 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: valkey.kro.k8s.birb.it
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: Valkey
+    group: kro.k8s.birb.it
+    scope: Namespaced
+
+    spec:
+      values: object
+
+  resources:
+    - id: password
+      template:
+        apiVersion: generators.external-secrets.io/v1alpha1
+        kind: Password
+        metadata:
+          name: ${schema.metadata.name}-password
+          namespace: ${schema.metadata.namespace}
+        spec:
+          length: 48
+          digits: 12
+          symbols: 0
+          allowRepeat: true
+          secretKeys:
+            - password
+            - sentinel
+
+    - id: externalSecret
+      readyWhen:
+        - ${externalSecret.status.?conditions.orValue([]).exists(c, c.type == "Ready" && c.status == "True")}
+      template:
+        apiVersion: external-secrets.io/v1
+        kind: ExternalSecret
+        metadata:
+          name: ${schema.metadata.name}-auth
+          namespace: ${schema.metadata.namespace}
+        spec:
+          refreshPolicy: CreatedOnce
+          target:
+            name: ${schema.metadata.name}-auth
+            immutable: true
+          dataFrom:
+            - sourceRef:
+                generatorRef:
+                  apiVersion: generators.external-secrets.io/v1alpha1
+                  kind: Password
+                  name: ${password.metadata.name}
+
+    - id: valuesConfig
+      template:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: ${schema.metadata.name}-basevalues
+            namespace: ${schema.metadata.namespace}
+          data:
+            values.yaml: |
+              auth:
+                enabled: true
+                usersExistingSecret: ${externalSecret.metadata.name}
+                aclUsers:
+                  default:
+                    permissions: "~* &* +@all"
+                    passwordKey: password
+              replica:
+                enabled: false
+              sentinel:
+                enabled: false
+                existingSecret: ${externalSecret.metadata.name}
+                passwordKey: sentinel
+              persistence:
+                enabled: true
+                size: 1Gi
+                storageClass: local-path
+                annotations:
+                  local-path-provisioner/uid: "1000"
+                  local-path-provisioner/gid: "1000"
+                  local-path-provisioner/perm: "0770"
+              podSecurityContext:
+                runAsUser: 1000
+                runAsGroup: 1000
+                fsGroup: 1000
+                seccompProfile:
+                  type: RuntimeDefault
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 1000
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+              extraConfig: |
+                maxmemory 160mb
+
+    - id: valkeyRelease
+      template:
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: ${schema.metadata.name}-valkey-helmrelease
+          namespace: ${schema.metadata.namespace}
+        spec:
+          interval: 30m
+          releaseName: ${schema.metadata.name}-valkey
+          targetNamespace: ${schema.metadata.namespace}
+          chart:
+            spec:
+              chart: valkey
+              version: "1.0.0"
+              sourceRef:
+                kind: HelmRepository
+                name: valkey-helmrepo
+                namespace: flux-system
+              interval: 1h
+          valuesFrom:
+            - kind: ConfigMap
+              name: ${valuesConfig.metadata.name}
+          values: ${schema.spec.?values.orValue({})}
+
+    - id: connectionConfig
+      template:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: ${schema.metadata.name}-connection
+          namespace: ${schema.metadata.namespace}
+        data:
+          host: ${schema.metadata.name}-valkey
+          port: ${string(schema.spec.?values.orValue({}).?service.orValue({}).?port.orValue(6379))}
+          username: default
+          db: "0"
+          # Sentinel configuration
+          sentinelEnabled: ${string(schema.spec.?values.orValue({}).?sentinel.orValue({}).?enabled.orValue(false))}
+          sentinelHost: ${schema.metadata.name}-valkey-sentinel
+          sentinelPort: ${string(schema.spec.?values.orValue({}).?sentinel.orValue({}).?service.orValue({}).?port.orValue(26379))}
+          sentinelMasterSet: ${schema.spec.?values.orValue({}).?sentinel.orValue({}).?masterSet.orValue("mymaster")}
+          sentinelUsername: sentinel
+          sentinelServiceEnabled: ${string(schema.spec.?values.orValue({}).?sentinel.orValue({}).?service.orValue({}).?enabled.orValue(true))}

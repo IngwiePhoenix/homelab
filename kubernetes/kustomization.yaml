@@ -16,13 +16,13 @@ resources:
   - reflector/flux.yaml
   - reloader/flux.yaml
   - clustersecret-operator/flux.yaml
-  - valkey-operator/flux.yaml
   - postgres/flux.yaml
   - mongodb/flux.yaml
   - common-secrets/flux.yaml
   - traefik/flux.yaml
   - crowdsec/flux.yaml
   - external/flux.yaml
+  - kro/flux.yaml
 
   # Apps
   - vaultwarden/flux.yaml

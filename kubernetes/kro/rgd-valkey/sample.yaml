@@ -1,0 +1,16 @@
+apiVersion: kro.k8s.birb.it/v1alpha1
+kind: Valkey
+metadata:
+  name: cache
+  namespace: my-application
+spec:
+  values:
+    persistence:
+      size: 5Gi
+
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
