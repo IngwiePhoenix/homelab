@@ -33,118 +33,118 @@ spec:
       fsGroup: 1000
 
     # NOTE: Volume for the bw cli
-    extraVolumes:
-      - name: bw-home
-        emptyDir: {}
-      - name: vaultwarden-cli-auth
-        secret:
-          secretName: vaultwarden-api-creds
-          # This here allows polling. =)
-          optional: true
+    extraVolumes: []
+    #  - name: bw-home
+    #    emptyDir: {}
+    #  - name: vaultwarden-cli-auth
+    #    secret:
+    #      secretName: vaultwarden-api-creds
+    #      # This here allows polling. =)
+    #      optional: true
 
     # Kubernetes-native sidecars are restartable init containers.
     # The upstream chart renders extraContainers as regular containers.
-    extraInitContainers:
-      - name: vaultwarden-bw-serve
-        restartPolicy: Always
-        image: ghcr.io/charlesthomas/bitwarden-cli:2026.10.1
-        imagePullPolicy: IfNotPresent
-        command: ["/bin/bash", "-ec"]
-        args:
-          - |
-            set -eux
-
-            # Setup: Wait for secret
-
-            BW_AUTH_DIR="${BW_AUTH_DIR:-/var/run/vaultwarden-cli-auth}"
-            echo "Waiting for Vaultwarden CLI bootstrap Secret files..."
-
-            while true; do
-              if [ -s "${BW_AUTH_DIR}/BW_CLIENTID" ] &&
-                 [ -s "${BW_AUTH_DIR}/BW_CLIENTSECRET" ] &&
-                 [ -s "${BW_AUTH_DIR}/BW_USER" ] &&
-                 [ -s "${BW_AUTH_DIR}/BW_PASSWORD" ]; then
-                break
-              fi
-              echo "Secret vaultwarden-cli-auth is not ready yet; waiting..."
-              sleep 1
-            done
-
-            export BW_CLIENTID="$(cat "${BW_AUTH_DIR}/BW_CLIENTID")"
-            export BW_CLIENTSECRET="$(cat "${BW_AUTH_DIR}/BW_CLIENTSECRET")"
-            export BW_PASSWORD="$(cat "${BW_AUTH_DIR}/BW_PASSWORD")"
-
-            # Run: Actually serve the thing!
-            mkdir -p "${HOME}"
-
-            # Needed to avoid criss-crossing configs
-            bw logout >/dev/null 2>&1 || true
-            bw config server "${BW_HOST}"
-            bw login --apikey --raw >/dev/null
-            export BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw)"
-            bw unlock --check
-            bw sync
-            exec bw serve --hostname 127.0.0.1 --port 8087
-        env:
-          - name: HOME
-            value: /tmp/bw
-          - name: BW_HOST
-            value: "https://vault.birb.it"
-        ports:
-          - name: bw-http
-            containerPort: 8087
-            protocol: TCP
-        volumeMounts:
-          - name: bw-home
-            mountPath: /tmp
-          - name: vaultwarden-cli-auth
-            mountPath: /var/run/vaultwarden-cli-auth
-            readOnly: true
-        readinessProbe:
-          exec:
-            command:
-              - /bin/sh
-              - -ec
-              - |
-                wget -q -O - http://127.0.0.1:8087/status | grep -Eq '"status"[[:space:]]*:[[:space:]]*"unlocked"'
-          initialDelaySeconds: 10
-          periodSeconds: 15
-          failureThreshold: 5
-          timeoutSeconds: 10
-          successThreshold: 1
-        livenessProbe:
-          exec:
-            command:
-              - /bin/sh
-              - -ec
-              - |
-                # Actually automatically does a sync too.
-                if wget -q -O /dev/null --post-data= http://127.0.0.1:8087/sync?force=true; then
-                  exit 0
-                fi
-                # Waiting for secrets to pop up...
-                if [ ! -s /var/run/vaultwarden-cli-auth/BW_CLIENTID ] ||
-                    [ ! -s /var/run/vaultwarden-cli-auth/BW_CLIENTSECRET ] ||
-                    [ ! -s /var/run/vaultwarden-cli-auth/BW_USER ] ||
-                    [ ! -s /var/run/vaultwarden-cli-auth/BW_PASSWORD ]; then
-                  exit 0
-                fi
-                exit 1
-          initialDelaySeconds: 360
-          periodSeconds: 600
-          failureThreshold: 2
-          timeoutSeconds: 360
-        securityContext:
-          # We need to secure this SoB. _A lot._
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1000
-          runAsGroup: 1000
-          capabilities:
-            drop: ["ALL"]
-          seccompProfile:
-            type: RuntimeDefault
+    extraInitContainers: []
+    #  - name: vaultwarden-bw-serve
+    #    restartPolicy: Always
+    #    image: ghcr.io/charlesthomas/bitwarden-cli:2026.10.1
+    #    imagePullPolicy: IfNotPresent
+    #    command: ["/bin/bash", "-ec"]
+    #    args:
+    #      - |
+    #        set -eux
+    #
+    #        # Setup: Wait for secret
+    #
+    #        BW_AUTH_DIR="${BW_AUTH_DIR:-/var/run/vaultwarden-cli-auth}"
+    #        echo "Waiting for Vaultwarden CLI bootstrap Secret files..."
+    #
+    #        while true; do
+    #          if [ -s "${BW_AUTH_DIR}/BW_CLIENTID" ] &&
+    #             [ -s "${BW_AUTH_DIR}/BW_CLIENTSECRET" ] &&
+    #             [ -s "${BW_AUTH_DIR}/BW_USER" ] &&
+    #             [ -s "${BW_AUTH_DIR}/BW_PASSWORD" ]; then
+    #            break
+    #          fi
+    #          echo "Secret vaultwarden-cli-auth is not ready yet; waiting..."
+    #          sleep 1
+    #        done
+    #
+    #        export BW_CLIENTID="$(cat "${BW_AUTH_DIR}/BW_CLIENTID")"
+    #        export BW_CLIENTSECRET="$(cat "${BW_AUTH_DIR}/BW_CLIENTSECRET")"
+    #        export BW_PASSWORD="$(cat "${BW_AUTH_DIR}/BW_PASSWORD")"
+    #
+    #        # Run: Actually serve the thing!
+    #        mkdir -p "${HOME}"
+    #
+    #        # Needed to avoid criss-crossing configs
+    #        bw logout >/dev/null 2>&1 || true
+    #        bw config server "${BW_HOST}"
+    #        bw login --apikey --raw >/dev/null
+    #        export BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw)"
+    #        bw unlock --check
+    #        bw sync
+    #        exec bw serve --hostname 127.0.0.1 --port 8087
+    #    env:
+    #      - name: HOME
+    #        value: /tmp/bw
+    #      - name: BW_HOST
+    #        value: "https://vault.birb.it"
+    #    ports:
+    #      - name: bw-http
+    #        containerPort: 8087
+    #        protocol: TCP
+    #    volumeMounts:
+    #      - name: bw-home
+    #        mountPath: /tmp
+    #      - name: vaultwarden-cli-auth
+    #        mountPath: /var/run/vaultwarden-cli-auth
+    #        readOnly: true
+    #    readinessProbe:
+    #      exec:
+    #        command:
+    #          - /bin/sh
+    #          - -ec
+    #          - |
+    #            wget -q -O - http://127.0.0.1:8087/status | grep -Eq '"status"[[:space:]]*:[[:space:]]*"unlocked"'
+    #      initialDelaySeconds: 10
+    #      periodSeconds: 15
+    #      failureThreshold: 5
+    #      timeoutSeconds: 10
+    #      successThreshold: 1
+    #    livenessProbe:
+    #      exec:
+    #        command:
+    #          - /bin/sh
+    #          - -ec
+    #          - |
+    #            # Actually automatically does a sync too.
+    #            if wget -q -O /dev/null --post-data= http://127.0.0.1:8087/sync?force=true; then
+    #              exit 0
+    #            fi
+    #            # Waiting for secrets to pop up...
+    #            if [ ! -s /var/run/vaultwarden-cli-auth/BW_CLIENTID ] ||
+    #                [ ! -s /var/run/vaultwarden-cli-auth/BW_CLIENTSECRET ] ||
+    #                [ ! -s /var/run/vaultwarden-cli-auth/BW_USER ] ||
+    #                [ ! -s /var/run/vaultwarden-cli-auth/BW_PASSWORD ]; then
+    #              exit 0
+    #            fi
+    #            exit 1
+    #      initialDelaySeconds: 360
+    #      periodSeconds: 600
+    #      failureThreshold: 2
+    #      timeoutSeconds: 360
+    #    securityContext:
+    #      # We need to secure this SoB. _A lot._
+    #      allowPrivilegeEscalation: false
+    #      readOnlyRootFilesystem: true
+    #      runAsNonRoot: true
+    #      runAsUser: 1000
+    #      runAsGroup: 1000
+    #      capabilities:
+    #        drop: ["ALL"]
+    #      seccompProfile:
+    #        type: RuntimeDefault
     extraObjects: []
       # We hijack here, because its a great opportunity to sneak
       # a reflector-based secret in here.
