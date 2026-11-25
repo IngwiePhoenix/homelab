@@ -31,4 +31,4 @@ spec:
   wait: true
   dependsOn:
     - name: kro
-    - name: external-secrets
+    - name: external-secrets-install
