@@ -10,7 +10,7 @@ spec:
     scope: Namespaced
 
     spec:
-      values: object
+      values: object | required=true
 
   resources:
     - id: password
@@ -127,7 +127,7 @@ spec:
           valuesFrom:
             - kind: ConfigMap
               name: ${valuesConfig.metadata.name}
-          values: ${schema.spec.?values.orValue({})}
+          values: ${schema.spec.values}
 
     - id: connectionConfig
       template:
