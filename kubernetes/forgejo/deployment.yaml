@@ -18,11 +18,43 @@ spec:
       securityContext:
         fsGroup: 1000
       initContainers:
-        #- name: wait4x-db
-        #  image: wait4x/wait4x:latest
-        #  command:
-        #    - wait4x
-        #    - postgresql
+        - name: wait-for-db
+          image: wait4x/wait4x:latest
+          command:
+            - wait4x
+            - postgresql
+            - "postgres://$(FORGEJO__database__USER):$(FORGEJO__database__PASSWD)@$(FORGEJO__database__HOST):$(FORGEJO__database__PORT)/$(FORGEJO__database__NAME)"
+            - --timeout
+            - 2m
+            - --interval
+            - 2s
+          env:
+            - name: FORGEJO__database__HOST
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: HOST
+            - name: FORGEJO__database__PORT
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: PORT
+            - name: FORGEJO__database__NAME
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: DATABASE
+            - name: FORGEJO__database__USER
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: LOGIN
+            - name: FORGEJO__database__PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-creds
+                  key: PASSWORD
+
         - name: boot
           image: codeberg.org/forgejo/forgejo:17.0.2
           args:
@@ -117,6 +149,7 @@ spec:
                 secretKeyRef:
                   name: forgejo-oidc-creds
                   key: discovery-url
+
         - name: install-themes
           image: alpine:3.24.4
           securityContext:
