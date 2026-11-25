@@ -54,7 +54,7 @@ spec:
             - |
               : "${BRAVE_API_KEY:?Missing BRAVE_API_KEY}"
               : "${SEARXNG_SECRET:?Missing SEARXNG_SECRET}"
-              envsubst < /input/settings.yaml > /output/settings.yaml
+              envsubst < /input/settings.yml > /output/settings.yml
           envFrom:
             - secretRef:
                 name: searxng-config-creds
