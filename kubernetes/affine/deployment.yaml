@@ -53,12 +53,12 @@ spec:
                   key: PORT
             - name: VALKEY_HOST
               valueFrom:
-                secretKeyRef:
+                configMapKeyRef:
                   name: cache-connection
                   key: host
             - name: VALKEY_PORT
               valueFrom:
-                secretKeyRef:
+                configMapKeyRef:
                   name: cache-connection
                   key: port
         - name: migrate
@@ -102,17 +102,17 @@ spec:
               value: "postgresql://$(DB_LOGIN):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable"
             - name: REDIS_SERVER_HOST
               valueFrom:
-                secretKeyRef:
+                configMapKeyRef:
                   name: cache-connection
                   key: host
             - name: REDIS_SERVER_PORT
               valueFrom:
-                secretKeyRef:
+                configMapKeyRef:
                   name: cache-connection
                   key: port
             - name: REDIS_SERVER_USER
               valueFrom:
-                secretKeyRef:
+                configMapKeyRef:
                   name: cache-connection
                   key: username
             - name: REDIS_SERVER_PASSWORD
