@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ladder-ir
+  namespace: ladder
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`ladder.birb.it`)
+      middlewares:
+        - name: cors-inject-trm
+      services:
+        - name: ladder-svc
+          port: http

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ladder-app
+  namespace: ladder
+  labels:
+    app: ladder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ladder
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: ladder
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/everywall/ladder:v0.0.23
+          env:
+            - name: PREFORK
+              value: "false"
+            - name: X_FORWARDED_FOR
+              value: ""
+            - name: RULESET
+              value: https://raw.githubusercontent.com/everywall/ladder-rules/main/ruleset.yaml
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
