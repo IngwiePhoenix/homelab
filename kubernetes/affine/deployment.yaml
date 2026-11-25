@@ -38,6 +38,7 @@ spec:
             - tcp
             - "$(DB_HOST):$(DB_PORT)"
             - "$(VALKEY_HOST):$(VALKEY_PORT)"
+            - "manticore-svc:9308"
             - --timeout
             - 10m
           env:

@@ -7,6 +7,18 @@ spec:
   entryPoints:
     - websecure
   routes:
+    # Admin UI: require VoidAuth
+    - match: Host(`affine.birb.it`) && (Path(`/admin`) || PathPrefix(`/admin/`))
+      kind: Rule
+      priority: 100
+      middlewares:
+        - name: voidauth-tm
+          namespace: voidauth
+      services:
+        - name: affine-svc
+          port: web
+
+    # Regular AFFiNE application: unchanged
     - match: Host(`affine.birb.it`)
       kind: Rule
       services:
