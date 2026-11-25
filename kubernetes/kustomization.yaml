@@ -33,3 +33,4 @@ resources:
   - forgejo/flux.yaml
   - headlamp/flux.yaml
   - affine/flux.yaml
+  - external-secrets/flux.yaml
