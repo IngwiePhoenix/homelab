@@ -21,3 +21,7 @@ spec:
       kind: Deployment
       name: searxng-app
       namespace: searxng
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

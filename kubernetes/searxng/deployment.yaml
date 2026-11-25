@@ -5,6 +5,8 @@ metadata:
   namespace: searxng
   labels:
     app: searxng
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: 1
   revisionHistoryLimit: 3
@@ -26,17 +28,6 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
-      initContainers:
-        - name: wait-for-valkey
-          image: wait4x/wait4x:latest@sha256:aae91ea65a38117ac07c84c7e1122691ac91c3b60529edcb8fe62292d105d8ff
-          imagePullPolicy: IfNotPresent
-          command:
-            - wait4x
-          args:
-            - tcp
-            - cache-valkey:6379
-            - --timeout
-            - 10m
       volumes:
         - name: config
           persistentVolumeClaim:
@@ -44,6 +35,35 @@ spec:
         - name: cache
           emptyDir:
             sizeLimit: 512Mi
+        - name: template
+          configMap:
+            name: searxng-settings
+        - name: rendered
+          emptyDir: {}
+      initContainers:
+        - name: wait-for-valkey
+          image: wait4x/wait4x:latest@sha256:aae91ea65a38117ac07c84c7e1122691ac91c3b60529edcb8fe62292d105d8ff
+          imagePullPolicy: IfNotPresent
+          command: ["wait4x"]
+          args: ["tcp", "cache-valkey:6379", "--timeout", "10m"]
+        - name: render-settings
+          image: nimasystems/envsubst:1.0.1
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              : "${BRAVE_API_KEY:?Missing BRAVE_API_KEY}"
+              : "${SEARXNG_SECRET:?Missing SEARXNG_SECRET}"
+              envsubst < /input/settings.yml > /output/settings.yml
+          envFrom:
+            - secretRef:
+                name: searxng-config-creds
+          volumeMounts:
+            - name: template
+              mountPath: /input
+              readOnly: true
+            - name: rendered
+              mountPath: /output
       containers:
         - name: app
           image: docker.io/searxng/searxng:2026.11.23-a7163d091
@@ -51,10 +71,17 @@ spec:
           env:
             - name: SEARXNG_BASE_URL
               value: https://search.birb.it/
+            - name: SEARXNG_PUBLIC_INSTANCE
+              value: "false"
             - name: SEARXNG_LIMITER
               value: "true"
             - name: SEARXNG_IMAGE_PROXY
               value: "true"
+            - name: SEARXNG_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: searxng-config-creds
+                  key: SEARXNG_SECRET
             - name: VALKEY_HOST
               valueFrom:
                 configMapKeyRef:
@@ -110,7 +137,7 @@ spec:
               drop:
                 - ALL
           volumeMounts:
-            - name: config
+            - name: rendered
               mountPath: /etc/searxng
             - name: cache
               mountPath: /var/cache/searxng
