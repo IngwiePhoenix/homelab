@@ -4,6 +4,7 @@ resources:
   - namespace.yaml
   - database.yaml
   - valkey.yaml
+  - manticore-all.yaml
   - configmap.yaml
   - pvc.yaml
   - deployment.yaml

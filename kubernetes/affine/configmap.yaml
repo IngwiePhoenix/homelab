@@ -8,3 +8,5 @@ data:
   AFFINE_SERVER_HOST: affine.birb.it
   AFFINE_SERVER_EXTERNAL_URL: https://affine.birb.it
   AFFINE_SERVER_HTTPS: "true"
+  AFFINE_INDEXER_ENABLED: "true"
+  AFFINE_INDEXER_SEARCH_ENDPOINT: "http://manticore-svc:9308"

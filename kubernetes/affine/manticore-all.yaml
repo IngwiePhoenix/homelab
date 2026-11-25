@@ -1,0 +1,101 @@
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: manticore-pvc
+  namespace: affine
+  annotations:
+    local-path-provisioner/uid: "999"
+    local-path-provisioner/gid: "999"
+    local-path-provisioner/perm: "0770"
+spec:
+  storageClassName: local-bunker
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: manticore-app
+  namespace: affine
+  labels:
+    app: affine-manticore
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: affine-manticore
+  template:
+    metadata:
+      labels:
+        app: affine-manticore
+    spec:
+      nodeSelector:
+        homelab/location: internal
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: manticore
+          image: manticoresearch/manticore:10.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 9308
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/manticore
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: manticore-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: manticore-svc
+  namespace: affine
+  labels:
+    app: affine-manticore
+spec:
+  type: ClusterIP
+  selector:
+    app: affine-manticore
+  ports:
+    - name: http
+      port: 9308
+      targetPort: http
+      protocol: TCP
