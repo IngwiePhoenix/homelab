@@ -75,7 +75,7 @@ spec:
               persistence:
                 enabled: true
                 size: 1Gi
-                storageClass: local-path
+                storageClass: local-bunker
                 annotations:
                   local-path-provisioner/uid: "1000"
                   local-path-provisioner/gid: "1000"
