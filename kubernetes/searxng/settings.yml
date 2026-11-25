@@ -183,9 +183,9 @@ outgoing:
   # uncomment below section only if you have more than one network interface
   # which can be the source of outgoing search requests
   #
-  source_ips:
-    - 10.0.0.0/8
-    - fd42:42:42::/64
+  #source_ips:
+  #  - 10.0.0.0/8
+  #  - fd42:42:42::/64
 
 
 # Plugin configuration, for more details see
