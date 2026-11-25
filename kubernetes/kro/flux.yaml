@@ -23,7 +23,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./kubernetes/kro/install/rgd-valkey
+  path: ./kubernetes/kro/rgd-valkey
   prune: true
   sourceRef:
     kind: GitRepository
