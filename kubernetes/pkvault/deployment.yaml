@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pkvault-app
+  namespace: pkvault
+  labels:
+    app: pkvault
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: pkvault
+  template:
+    metadata:
+      labels:
+        app: pkvault
+    spec:
+      nodeSelector:
+        homelab/location: internal
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: pkvault-pvc
+        - name: saves
+          hostPath:
+            path: /mnt/bunker/Retro/Saves
+            type: Directory
+      containers:
+        - name: app
+          image: ghcr.io/chnapy/pkvault:2.5.3
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: web
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: LOG_FILE_COUNT_LIMIT
+              value: "10"
+            - name: BACKUP_FILE_COUNT_LIMIT
+              value: "30"
+          volumeMounts:
+            - name: data
+              mountPath: /pkvault
+            - name: saves
+              mountPath: /pkvault/saves
+          startupProbe:
+            httpGet:
+              path: /
+              port: web
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /
+              port: web
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: web
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
