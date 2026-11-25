@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: searxng-config-pvc
+  namespace: searxng
+  labels:
+    app: searxng
+  annotations:
+    local-path-provisioner/uid: "977"
+    local-path-provisioner/gid: "977"
+    local-path-provisioner/perm: "0750"
+spec:
+  storageClassName: local-bunker
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi

@@ -35,3 +35,4 @@ resources:
   - affine/flux.yaml
   - external-secrets/flux.yaml
   - ladder/flux.yaml
+  - searxng/flux.yaml
