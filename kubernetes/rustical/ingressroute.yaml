@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`calendar.birb.it`)
+    - match: Host(`dav.birb.it`)
       kind: Rule
       services:
         - name: rustical-svc
