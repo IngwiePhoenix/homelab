@@ -5,8 +5,8 @@ metadata:
   namespace: rustical
 data:
   # The cluster's OpenID Connect provider (VoidAuth).
-  RUSTICAL_OIDC__NAME: "BirbAuth"
-  RUSTICAL_OIDC__ISSUER: "https://auth.birb.it"
+  RUSTICAL_OIDC__NAME: "VoidAuth"
+  RUSTICAL_OIDC__ISSUER: "https://auth.birb.it/oidc"
   RUSTICAL_OIDC__CLAIM_USERID: "preferred_username"
   RUSTICAL_OIDC__SCOPES: '["openid", "profile", "groups"]'
   RUSTICAL_OIDC__ALLOW_SIGN_UP: "true"
