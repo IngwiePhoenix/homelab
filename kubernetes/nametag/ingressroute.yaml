@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`nametag.birb.it`)
+    - match: Host(`contacts.birb.it`)
       kind: Rule
       services:
         - name: nametag-svc
