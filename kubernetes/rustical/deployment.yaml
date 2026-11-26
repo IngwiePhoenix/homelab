@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rustical-app
+  namespace: rustical
+  labels:
+    app: rustical
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  # SQLite is a single-writer database; don't overlap old and new pods.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: rustical
+  template:
+    metadata:
+      labels:
+        app: rustical
+    spec:
+      # Prevent Kubernetes service-link variables (e.g. RUSTICAL_SERVICE_HOST)
+      # from being interpreted as RustiCal configuration.
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: rustical-pvc
+      containers:
+        - name: app
+          image: ghcr.io/lennart-k/rustical:0.20.1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: rustical-env
+            - secretRef:
+                name: rustical-oidc-creds
+          ports:
+            - name: http
+              containerPort: 4000
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/rustical
+          startupProbe:
+            exec:
+              command:
+                - /usr/local/bin/rustical
+                - health
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            exec:
+              command:
+                - /usr/local/bin/rustical
+                - health
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - /usr/local/bin/rustical
+                - health
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

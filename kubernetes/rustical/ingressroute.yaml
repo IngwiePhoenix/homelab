@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rustical-ir
+  namespace: rustical
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`calendar.birb.it`)
+      kind: Rule
+      services:
+        - name: rustical-svc
+          port: 4000
