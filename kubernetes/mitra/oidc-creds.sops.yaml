@@ -1,0 +1,12 @@
+# Intentionally blank bootstrap template.
+# Populate the client ID and (if used) client secret, then SOPS-encrypt this file
+# before activating this component through kubernetes/kustomization.yaml.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mitra-oidc-creds
+  namespace: mitra
+type: Opaque
+stringData:
+  MITRA_OIDC_CLIENT_ID: ""
+  MITRA_OIDC_CLIENT_SECRET: ""

@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mitra-app
+  namespace: mitra
+  labels:
+    app: mitra
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  # Mitra 0.8.0 uses SQLite and does not expose a journal-mode setting. Keep its
+  # normal journaling; disabling it removes transaction atomicity.
+  # NFS clients must provide working POSIX advisory locks; sync,hard does not replace them.
+  # Recreate avoids overlapping writers during rollouts.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mitra
+  template:
+    metadata:
+      labels:
+        app: mitra
+    spec:
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mitra-pvc
+      containers:
+        - name: app
+          image: ghcr.io/a11delavar/mitra:0.8.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: mitra-cm
+            - secretRef:
+                name: mitra-oidc-creds
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
