@@ -22,6 +22,10 @@ experimental:
       moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       # renovate: datasource=github-releases depName=maxlerebourg/crowdsec-bouncer-traefik-plugin
       version: v1.8.2
+    traefikoidc:
+      moduleName: github.com/lukaszraczylo/traefikoidc
+      # renovate: datasource=github-releases depName=lukaszraczylo/traefikoidc
+      version: v1.0.66
 
 providers:
   kubernetesCRD:
