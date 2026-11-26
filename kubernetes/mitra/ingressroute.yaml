@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: mitra-ir
+  namespace: mitra
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`mitra.birb.it`)
+      kind: Rule
+      services:
+        - name: mitra-svc
+          port: http
