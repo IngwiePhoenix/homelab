@@ -21,6 +21,8 @@ spec:
       labels:
         app: rustical
     spec:
+      nodeSelector:
+        homelab/location: internal
       # Prevent Kubernetes service-link variables (e.g. RUSTICAL_SERVICE_HOST)
       # from being interpreted as RustiCal configuration.
       enableServiceLinks: false
