@@ -1,3 +1,6 @@
+# WARNING: RustiCal 0.20.1 unconditionally enables SQLite WAL. This PVC is
+# backed by NFS, so do not deploy until using a patched RustiCal image that
+# switches the journal mode to DELETE (or until upstream exposes a setting).
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
