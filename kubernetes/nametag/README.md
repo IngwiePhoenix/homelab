@@ -1,13 +1,13 @@
 # Nametag
 
-Nametag is available at [https://nametag.birb.it](https://nametag.birb.it). It uses the shared PostgreSQL instance and stores uploaded photos in the `local-bunker` PVC.
+Nametag is available at [https://contacts.birb.it](https://contacts.birb.it). It uses the shared PostgreSQL instance and stores uploaded photos in the `local-bunker` PVC.
 
 ## VoidAuth OIDC setup
 
 Create a confidential OIDC application in VoidAuth with:
 
 - Issuer URL: `https://auth.birb.it/oidc` (confirm that this exactly matches the **OIDC Issuer Endpoint** shown under VoidAuth's OIDC Information)
-- Redirect URI: `https://nametag.birb.it/api/auth/callback/oidc`
+- Redirect URI: `https://contacts.birb.it/api/auth/callback/oidc`
 - Scopes: `openid email profile`
 - Authorization Code flow with PKCE
 
