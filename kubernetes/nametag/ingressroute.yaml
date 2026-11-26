@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nametag-ir
+  namespace: nametag
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`contacts.birb.it`)
+      kind: Rule
+      services:
+        - name: nametag-svc
+          port: http
