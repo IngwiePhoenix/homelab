@@ -38,3 +38,4 @@ resources:
   - searxng/flux.yaml
   - rustical/flux.yaml
   - nametag/flux.yaml
+  - mitra/flux.yaml

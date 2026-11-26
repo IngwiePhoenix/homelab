@@ -10,10 +10,6 @@ metadata:
 spec:
   replicas: 1
   revisionHistoryLimit: 3
-  # Mitra 0.8.0 uses SQLite and does not expose a journal-mode setting. Keep its
-  # normal journaling; disabling it removes transaction atomicity.
-  # NFS clients must provide working POSIX advisory locks; sync,hard does not replace them.
-  # Recreate avoids overlapping writers during rollouts.
   strategy:
     type: Recreate
   selector:

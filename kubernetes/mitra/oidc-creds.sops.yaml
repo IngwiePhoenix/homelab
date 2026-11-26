@@ -4,9 +4,24 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mitra-oidc-creds
-  namespace: mitra
+    name: mitra-oidc-creds
+    namespace: mitra
 type: Opaque
 stringData:
-  MITRA_OIDC_CLIENT_ID: ""
-  MITRA_OIDC_CLIENT_SECRET: ""
+    MITRA_OIDC_CLIENT_ID: ENC[AES256_GCM,data:MkR+Kto=,iv:Dr1yrHf1L0mpyxuIDAeYVfEMrdGjs+X9Kq38EtaeMH4=,tag:GNi5yO5QWC8cgj5cIYqXGg==,type:str]
+    MITRA_OIDC_CLIENT_SECRET: ENC[AES256_GCM,data:73+LkyhpE/7gdBHmUuIVfqourbVi+DyLh+AFrFM+6UM=,iv:+8nF6rPo6J2zBhZxCme3h9PEjVnY/7iBcA7XIA51rCM=,tag:9aGOK496icc+W5x2e7FU3w==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAzSFhvNk9pL2tBUWFvbHNj
+            Q3B6T2toazNtb0NSUjlrUnV0aHdhRnN2V2pVCmdRUVdXNHhRUzU3SEc3QXFEbmps
+            b053RVBPOVRrbmE5cUNJYWVCdDFZMzQKLS0tIEZuQktkZm9RN1k4Tm9ZNVUzY3Fk
+            dDArU28yc3RMd1hYSHlhTnZSbndzeVEKB+9N4cmAWHBk+LegfCLvvTJDk0HrxVyd
+            bzb7FtPHZCtRevg398VKH284qjjOpRY2Is4VQNafKd5Iky6bFNqzhg==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-26T21:02:35Z"
+    mac: ENC[AES256_GCM,data:IylAm7FXKmOzOIHnM++2k2nH/jNKNrLvN/na4Kp1S6GGXkPAjbEjSFF58bvDsqF1ok0Q29ldGwZrU1Zg/CgnamJ2d+MdTxmqqxghBd8EzObDJFqEZ9bkfDbiYVEDIxCXJP5XNabfG5eNK8a7OPgrBcEQBNjCYNHephMLzbJexdY=,iv:GDC/aL3IK/MMS1OFrGLoH/FsaWJQZ0I71h5WeTfOS90=,tag:j8N1NkRzwZg/EEyGOIWNaA==,type:str]
+    version: 3.13.3
