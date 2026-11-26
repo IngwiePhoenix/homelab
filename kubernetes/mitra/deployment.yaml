@@ -10,7 +10,9 @@ metadata:
 spec:
   replicas: 1
   revisionHistoryLimit: 3
-  # Mitra stores its SQLite database in the PVC; avoid overlapping writers on rollout.
+  # Mitra 0.8.0 uses SQLite and does not expose a journal-mode setting. Keep its
+  # default rollback journal; disabling it removes transaction atomicity.
+  # Recreate avoids overlapping writers during rollouts.
   strategy:
     type: Recreate
   selector:
