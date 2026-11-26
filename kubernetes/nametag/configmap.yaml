@@ -6,8 +6,8 @@ metadata:
 data:
   NODE_ENV: "production"
   SAAS_MODE: "false"
-  NEXTAUTH_URL: "https://nametag.birb.it"
-  NEXT_PUBLIC_APP_URL: "https://nametag.birb.it"
+  NEXTAUTH_URL: "https://contacts.birb.it"
+  NEXT_PUBLIC_APP_URL: "https://contacts.birb.it"
   OIDC_ISSUER_URL: "https://auth.birb.it/oidc"
   OIDC_DISPLAY_NAME: "VoidAuth"
   DISABLE_PASSWORD_LOGIN: "true"
