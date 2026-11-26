@@ -37,3 +37,4 @@ resources:
   - ladder/flux.yaml
   - searxng/flux.yaml
   - rustical/flux.yaml
+  - nametag/flux.yaml
