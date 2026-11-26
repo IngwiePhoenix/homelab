@@ -5,5 +5,5 @@ metadata:
   namespace: mitra
 data:
   MITRA_NAME: "Mitra"
-  MITRA_URL: "https://mitra.birb.it"
-  MITRA_OIDC_ISSUER: "https://auth.birb.it"
+  MITRA_URL: "https://calendar.birb.it"
+  MITRA_OIDC_ISSUER: "https://auth.birb.it/oidc"
