@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`mitra.birb.it`)
+    - match: Host(`calendar.birb.it`)
       kind: Rule
       services:
         - name: mitra-svc
