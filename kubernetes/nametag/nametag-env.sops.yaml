@@ -1,13 +1,26 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: nametag-env
-  namespace: nametag
+    name: nametag-env
+    namespace: nametag
 type: Opaque
-# Intentionally blank until the OIDC client and application secrets are created.
-# Populate stringData locally, then encrypt this file with the repository .sops.yaml rules.
 stringData:
-  NEXTAUTH_SECRET: ""
-  CRON_SECRET: ""
-  OIDC_CLIENT_ID: ""
-  OIDC_CLIENT_SECRET: ""
+    NEXTAUTH_SECRET: ENC[AES256_GCM,data:BGom3QrS5ZOiqAOaWoDOTcPgemQnhGAGcgogWHxut0Dsv7iLeoU+MtdfJdM8SpH7IuwIsuIl0X2up6My7ANaPQ==,iv:VG2NYAg4gbUOf0J7tcFOH2qu8FH+4tE+cobGYr3mcUc=,tag:a9NW6gatmRei0+vOxbrUAA==,type:str]
+    CRON_SECRET: ENC[AES256_GCM,data:ExNY47BhtDb4VqPT7WplNdX8crHPh6zs/yTCuXUqXSP/tdf8UIDtZG6JrenvAgDIF6+DsB4baeV73PNP8ERmLA==,iv:/6wJKomoaPtn5Qsmy0ubByiGzFmtGcCZ+Ev0rtxCAos=,tag:wzUwA9AtWKwl5UHIIH3XaA==,type:str]
+    OIDC_CLIENT_ID: ENC[AES256_GCM,data:vO/kz8Fp4g==,iv:9Oo3jRSa4DFC2GATKQxJZ0Ao7OEhl5TlMAiw8+aCthU=,tag:Oqd8ftHHPiTChVccFycHfA==,type:str]
+    OIDC_CLIENT_SECRET: ENC[AES256_GCM,data:sn/I5du7R/j8ibl0zOFiSj9FXxl1HWjrS+JcHjk2Aqc=,iv:ohe2fKZXO7UWHRodvJQzxBG6lqNJ73Tei2uMUBUEsZU=,tag:v5NTEzoFyRC3+zr5/MZCOg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBUZXUyUVhucjJIQWU5NFJ5
+            MDRwVnV3NFF5cnRnTWJPQTkxMUxOaGxnU2lnCjFXamJVOVNNUDlwcHQzU1d4THMr
+            MlB0VTZvWmVOcncvU2NKTjIvNUFvMWsKLS0tIEhNOHlhbUROcGp2NDZ2V0xtL29K
+            TkhTeXZMNEVvYk5JNU8rQVJsUzVVaVkKeeLmfUi5t2aLB5cyzGHGBC8s5T+fgYi6
+            dpnPp7e2hRQIGL7VXcoYtxSYPxjK82XXizA7mzaw8tXDmEYxy33muA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-26T20:32:49Z"
+    mac: ENC[AES256_GCM,data:6ZPjXfq01ucHWKnAlsqFl8PZ9R1HTJg/DD2CrT7kqyfqH5Hm+ljlR1OyEUdDxdE3XJfGtxdd1IHVnz+gMy3B5QnsJMlyWHEf5gn+yi4smyBJXfKQqixw7h2p+GbLe87f8KCutMo8pevwn8zSB79rx71AVARIDhM3JfVIFi7nABU=,iv:ZbPvURDHKY60EAkKc5xzoKmKGMPuJFxbgUm28/FIG6w=,tag:dhnKH0us/zEi9JrsEE+EDg==,type:str]
+    version: 3.13.3
