@@ -1,3 +1,1 @@
 .tmp/*
-# Plaintext counterpart of the Nametag SOPS secret.
-kubernetes/nametag/nametag-env.yaml
