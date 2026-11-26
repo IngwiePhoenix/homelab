@@ -36,3 +36,4 @@ resources:
   - external-secrets/flux.yaml
   - ladder/flux.yaml
   - searxng/flux.yaml
+  - rustical/flux.yaml
