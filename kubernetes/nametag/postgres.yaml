@@ -1,0 +1,27 @@
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlDatabase
+metadata:
+  name: nametag-db
+  namespace: nametag
+spec:
+  engineConfiguration:
+    name: default-cluster-instance
+    namespace: postgres
+  database: nametag
+  masterRole: nametag-role
+  dropOnDelete: true
+  waitLinkedResourcesDeletion: true
+---
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlUserRole
+metadata:
+  name: nametag-db-user
+  namespace: nametag
+spec:
+  mode: MANAGED
+  rolePrefix: nametag
+  privileges:
+    - privilege: OWNER
+      database:
+        name: nametag-db
+      generatedSecretName: nametag-db-creds
