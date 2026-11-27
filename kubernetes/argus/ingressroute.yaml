@@ -9,6 +9,9 @@ spec:
   routes:
     - match: Host(`argus.birb.it`)
       kind: Rule
+      middlewares:
+        - name: voidauth-tm
+          namespace: voidauth
       services:
         - name: argus-svc
           port: http
