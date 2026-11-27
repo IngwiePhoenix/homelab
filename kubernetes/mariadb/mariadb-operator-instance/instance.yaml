@@ -8,6 +8,10 @@ spec:
   imagePullPolicy: IfNotPresent
   replicas: 2
 
+  myCnf: |
+    [mariadb]
+    innodb_linux_aio=aio
+
   # Generate and retain the root credential in this namespace. DB Operator
   # consumes this Secret through its cluster-scoped DbInstance resource.
   rootPasswordSecretKeyRef:
