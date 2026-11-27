@@ -70,7 +70,7 @@ spec:
               fi
 
               echo "Restoring PhotoPrism database and album metadata from $dump"
-              /opt/photoprism/bin/photoprism restore --albums --database --force "$dump"
+              /opt/photoprism/bin/photoprism restore --albums --database --force --albums-path /photoprism/storage/backups/serial "$dump"
 
               touch "$marker"
               echo "PhotoPrism MariaDB restore completed."
