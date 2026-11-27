@@ -37,7 +37,7 @@ The first Pod startup restores this specific dump:
 The restore init container waits for the MariaDB primary Service, checks that the dump exists and is non-empty, then runs:
 
 ~~~sh
-photoprism restore --albums --database --force /photoprism/storage/backups/mysql/2024-06-14.sql
+photoprism restore --albums --database --force --albums-path /photoprism/storage/backups/serial /photoprism/storage/backups/mysql/2024-06-14.sql
 ~~~
 
 This restores the index database from the 2024-06-14 SQL dump and restores album metadata from the YAML backups in the configured serial-backup directory. PhotoPrism's restore command also runs the schema migrations shipped with the same PhotoPrism image. The application then runs any remaining schema migrations automatically during startup.
