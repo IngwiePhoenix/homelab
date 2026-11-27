@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: homepage-oidc-creds
+    namespace: homepage
+stringData:
+    HOMEPAGE_OIDC_ISSUER: ENC[AES256_GCM,data:s2FjVw9Gcqxv7d1yEl80xDXNRYWZapmORQ==,iv:h/jSVJ/4AISHT+1k5ZgvsPWbifZhQGYH7QON7MWP9qs=,tag:iZmdvtAIWwLsEn5d7iV1ng==,type:str]
+    HOMEPAGE_OIDC_CLIENT_ID: ENC[AES256_GCM,data:z0GC0v3MsLE=,iv:lHVcHxP5OQzHCWYQlVUkDM6R5A6jqW1nKXgB9g5+csI=,tag:EbMVGuYGvSmyRZSV7XwiTg==,type:str]
+    HOMEPAGE_OIDC_CLIENT_SECRET: ENC[AES256_GCM,data:zwRHWX93VQvFUOEbViz24zKMHtK6b/RVS+80XMzBlr4=,iv:XDPXofYN7W0w4mXD2/JM8ziggHvCsa5qAQeYswekHUs=,tag:VCjJ4b9pVWGKfqONEtSEeQ==,type:str]
+    HOMEPAGE_OIDC_NAME: ENC[AES256_GCM,data:rjadoKQFnPw=,iv:n5KsggKrz8sB58al8+drIZXA07AFis5bpaOI9+3h/G0=,tag:AwrxrZnylBx/NXjq7b09NA==,type:str]
+    HOMEPAGE_OIDC_AUTO_LOGIN: ENC[AES256_GCM,data:TQ81kA==,iv:c3UKJrfD4X1LIeXYRAN+Y6dR7GIIZnQ+bRWxkCNd0WI=,tag:ZFWqZhOhJh1OG6IXY44eYw==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBSdlpabU5hWTZSUmFhZXZ2
+            TG1sbnhnMXYrK045SmZlWDJZYUZOeHh4VkRzCmRYbXo4U2VoUzZOTW9YVnlPTWdp
+            eGVrK3h4ZEhTT1NCUyt3WTY2Yi9rbEUKLS0tIHFnT05TeTZBTHFLVkRWQTNKbzd3
+            b1d4SlNDL0k4QWV1cTdoeENSUHZBMUEKbSzDHi3p3BtfatnIfFbzkwfszMFCHYJU
+            FJQ6hg+EU/MBvg9zTcWtwt/BxBAD6TkZ/AmSdt0QruojYNs69a+OEQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-27T09:35:32Z"
+    mac: ENC[AES256_GCM,data:9Khvd31hbzrUqdzt1jjpeUX5+LDYMWLHTdt06lvgjfrt0imC7IwfK31dejP7HuJSXZNkcniHZIKdEsMSgzPvjwCyLGxdspMN5QSGs5kLfehqY6Cm+JxEMi3zOM5B5B9nJ6v1hgH00MnnbrPzN5EMKH0rzgK2GuzfsPERediCE9s=,iv:UTM2XyQQpKZoxgFRDv3I7qWqysOe75p5wsVYUBlTMrU=,tag:rchzxBXkJ3TYOHa/uOnyww==,type:str]
+    version: 3.13.3
