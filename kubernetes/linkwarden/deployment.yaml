@@ -131,13 +131,13 @@ spec:
             capabilities:
               drop:
                 - ALL
-          resources:
-            requests:
-              cpu: 100m
-              memory: 512Mi
-            limits:
-              cpu: "2"
-              memory: 2Gi
+          #resources:
+          #  requests:
+          #    cpu: 100m
+          #    memory: 512Mi
+          #  limits:
+          #    cpu: "2"
+          #    memory: 2Gi
       volumes:
         - name: data
           persistentVolumeClaim:
