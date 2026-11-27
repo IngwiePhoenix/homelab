@@ -24,7 +24,7 @@ spec:
             claimName: config-pvc
       containers:
         - name: app
-          image: "ghcr.io/thebadfella/pinchflat-ngx:2026.11.2"
+          image: "ghcr.io/thebadfella/pinchflat-ngx:2026.11.3"
           imagePullPolicy: Always
           envFrom:
             - secretRef:
