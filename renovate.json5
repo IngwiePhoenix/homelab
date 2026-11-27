@@ -30,7 +30,7 @@
       description: 'Firefly III tags use a version- prefix',
       matchDatasources: ['docker'],
       matchPackageNames: ['fireflyiii/core'],
-      versioning: 'regex:^version-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)
+      versioning: 'regex:^version-(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)
       matchPackageNames: ['wait4x/wait4x'],
       pinDigests: true
     },
