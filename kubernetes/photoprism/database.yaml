@@ -1,7 +1,7 @@
 apiVersion: kinda.rocks/v1beta1
 kind: Database
 metadata:
-  name: photoprism
+  name: photoprism-db
   namespace: photoprism
 spec:
   # DB Operator connects through the registered MariaDB instance and its
