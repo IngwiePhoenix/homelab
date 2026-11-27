@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: firefly-iii-ir
+  namespace: firefly
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`firefly.birb.it`)
+      kind: Rule
+      middlewares:
+        - name: voidauth-tm
+          namespace: voidauth
+      services:
+        - name: firefly-iii-svc
+          port: http

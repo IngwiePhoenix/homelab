@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: firefly-iii-cm
+  namespace: firefly
+data:
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_URL: https://firefly.birb.it
+  TZ: Europe/Berlin
+  TRUSTED_PROXIES: "10.100.0.0/16"
+  LOG_CHANNEL: stdout
+  APP_LOG_LEVEL: notice
+
+  DB_CONNECTION: pgsql
+
+  AUTHENTICATION_GUARD: remote_user_guard
+  AUTHENTICATION_GUARD_HEADER: HTTP_REMOTE_USER
+  AUTHENTICATION_GUARD_EMAIL: HTTP_REMOTE_EMAIL

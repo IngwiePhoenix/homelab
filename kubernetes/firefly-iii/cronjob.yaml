@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: firefly-iii-cron
+  namespace: firefly
+spec:
+  schedule: "0 3 * * *"
+  timeZone: Europe/Berlin
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: OnFailure
+          containers:
+            - name: cron
+              image: alpine:3.24.4
+              imagePullPolicy: IfNotPresent
+              envFrom:
+                - secretRef:
+                    name: firefly-iii-env
+              command:
+                - /bin/sh
+                - -c
+              args:
+                - >-
+                  wget -qO-
+                  "http://firefly-iii-svc.firefly.svc.cluster.local:8080/api/v1/cron/${STATIC_CRON_TOKEN}"
+                  >/dev/null
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 65534
+                runAsGroup: 65534
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi

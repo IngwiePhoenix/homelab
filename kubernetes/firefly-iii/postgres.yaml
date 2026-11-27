@@ -1,0 +1,27 @@
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlDatabase
+metadata:
+  name: firefly-iii-db
+  namespace: firefly
+spec:
+  engineConfiguration:
+    name: default-cluster-instance
+    namespace: postgres
+  database: firefly-iii
+  masterRole: firefly-iii-role
+  dropOnDelete: true
+  waitLinkedResourcesDeletion: true
+---
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlUserRole
+metadata:
+  name: firefly-iii-db-user
+  namespace: firefly
+spec:
+  mode: MANAGED
+  rolePrefix: firefly-iii
+  privileges:
+    - privilege: OWNER
+      database:
+        name: firefly-iii-db
+      generatedSecretName: firefly-iii-db-creds

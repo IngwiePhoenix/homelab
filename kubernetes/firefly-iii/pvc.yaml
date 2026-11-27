@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: firefly-iii-upload-pvc
+  namespace: firefly
+  labels:
+    app: firefly-iii
+  annotations:
+    local-path-provisioner/uid: "33"
+    local-path-provisioner/gid: "33"
+    local-path-provisioner/perm: "0700"
+spec:
+  storageClassName: local-bunker
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
