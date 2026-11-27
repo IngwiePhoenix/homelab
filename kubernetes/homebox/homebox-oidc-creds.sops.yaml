@@ -1,0 +1,10 @@
+# Bootstrap template. Add the VoidAuth client credentials and SOPS-encrypt this file before activation.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: homebox-oidc-creds
+  namespace: homebox
+type: Opaque
+stringData:
+  HBOX_OIDC_CLIENT_ID: ""
+  HBOX_OIDC_CLIENT_SECRET: ""

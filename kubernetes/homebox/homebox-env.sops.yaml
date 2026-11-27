@@ -1,0 +1,10 @@
+# Bootstrap template. Generate the API key pepper, then SOPS-encrypt this file before activation.
+# Generate with: openssl rand -base64 48
+apiVersion: v1
+kind: Secret
+metadata:
+  name: homebox-env
+  namespace: homebox
+type: Opaque
+stringData:
+  HBOX_AUTH_API_KEY_PEPPER: ""
