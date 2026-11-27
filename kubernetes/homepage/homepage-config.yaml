@@ -5,6 +5,7 @@ data:
       - Github:
         - abbr: GH
           href: https://github.com/
+  custom.css: "/* empty */\r\n"
   docker.yaml: |
     # empty
   kubernetes.yaml: |
@@ -12,6 +13,8 @@ data:
     ingress: true
     traefik: true
     gateway: false
+  proxmox.yaml: |
+    # empty
   services.yaml: "- My First Group:\n  - My First Service:\n    href: http://localhost/\n
     \   description: Homepage is awesome\n\n- My Second Group:\n  - My Second Service:\n
     \   href: http://localhost/\n    description: Homepage is the best\n\n- My Third
