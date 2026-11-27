@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: photoprism-oidc-creds
+    namespace: photoprism
+type: Opaque
+stringData:
+    PHOTOPRISM_OIDC_CLIENT: ENC[AES256_GCM,data:6Y39kyd2/DSVww==,iv:aS37CptCgsCE/6bhE2AVCDUtSST+shoQMSSF7UedjqE=,tag:rOQbB6uUw07zCRftyyfFQg==,type:str]
+    PHOTOPRISM_OIDC_SECRET: ENC[AES256_GCM,data:+qBGj16CjYP5zaFw6QVPzQaa3a8ZIvDPZhi7hXZWtZ8=,iv:6XXAkTFEo7WudZimYSGXxx5fhsUJNs8Clj87Veio2qk=,tag:C02l9For1dBCyTMkKzwH/Q==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBCSll1R0RZYUZaeVZ5RnVt
+            MTJueXcrc0JYeEw2a0JHV3dDeUZad2d6Nm5ZCjFkNGJpS005MnZyZFFVN3ZEOUgx
+            Rzl6Mm84RTlpaGNoMm1Na2cvbkU3RFkKLS0tIE1XVE5CZmhEbjNUenJ5dXl0U0RI
+            SVpucjF1WWYwT3JTMGZnSSs5T3pBVTQKKGKt//UpnLUTzaeSXgfZ5NAR8vnT7Ogm
+            RuNh4hPfa7Qy3sEUVRdV0MuV37tFoKQTJcRX0rbnNLnKYAhE2Z6bOw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-27T19:07:06Z"
+    mac: ENC[AES256_GCM,data:uOcLC/cCVyPnqbna6YlGdsqewzcGHHWo5pLy2/RQl4+LQSjENYAIJNbZq+HpkOx7I59iUvuVy8qXqP6TWV2RUmbu2VBIoLZnvE2ttd5CZvRvzAPnE/S5ApdlGHrtD8atkNPpKTWKvfDJlySm4DM1tiBuRxiZNAFIUGmlZ6uylVI=,iv:M2ctX25VBoZZo8nFC6+tble66GJ9Lum5ilvm1tw6vPY=,tag:s7ILXIJEK5h2RRch6Ut8/A==,type:str]
+    version: 3.13.3
