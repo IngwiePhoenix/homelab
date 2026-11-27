@@ -13,15 +13,24 @@ spec:
   path: ./kubernetes/photoprism
   prune: true
   dependsOn:
-    - name: postgres-instance
+    - name: db-operator-instance
     - name: traefik-ingress
     - name: voidauth
     - name: reloader
   healthChecks:
+    - apiVersion: kinda.rocks/v1beta1
+      kind: Database
+      name: photoprism
+      namespace: photoprism
     - apiVersion: apps/v1
       kind: Deployment
       name: photoprism-app
       namespace: photoprism
+  healthCheckExprs:
+    - apiVersion: kinda.rocks/v1beta1
+      kind: Database
+      current: >-
+        has(status.status) && status.status == true
   decryption:
     provider: sops
     secretRef:
