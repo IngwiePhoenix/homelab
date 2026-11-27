@@ -59,33 +59,33 @@ spec:
             - secretRef:
                 name: linkwarden-oidc-creds
           env:
-            - name: HOST
+            - name: DB_HOST
               valueFrom:
                 secretKeyRef:
                   name: linkwarden-db-creds
                   key: HOST
-            - name: PORT
+            - name: DB_PORT
               valueFrom:
                 secretKeyRef:
                   name: linkwarden-db-creds
                   key: PORT
-            - name: DATABASE
+            - name: DB_DATABASE
               valueFrom:
                 secretKeyRef:
                   name: linkwarden-db-creds
                   key: DATABASE
-            - name: LOGIN
+            - name: DB_LOGIN
               valueFrom:
                 secretKeyRef:
                   name: linkwarden-db-creds
                   key: LOGIN
-            - name: PASSWORD
+            - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: linkwarden-db-creds
                   key: PASSWORD
             - name: DATABASE_URL
-              value: postgresql://$(LOGIN):$(PASSWORD)@$(HOST):$(PORT)/$(DATABASE)
+              value: postgresql://$(DB_LOGIN):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)
           ports:
             - name: http
               containerPort: 3000
