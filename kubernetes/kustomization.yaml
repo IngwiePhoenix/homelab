@@ -17,6 +17,7 @@ resources:
   - reloader/flux.yaml
   - clustersecret-operator/flux.yaml
   - postgres/flux.yaml
+  - mariadb/flux.yaml
   - mongodb/flux.yaml
   - common-secrets/flux.yaml
   - traefik/flux.yaml
