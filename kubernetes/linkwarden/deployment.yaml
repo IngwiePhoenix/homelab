@@ -59,6 +59,20 @@ spec:
             - secretRef:
                 name: linkwarden-oidc-creds
           env:
+            - name: MAX_WORKERS
+              value: "8"
+            - name: MAX_LINKS_PER_USER
+              value: "1000000" # 1mil baby!
+            - name: NEXT_PUBLIC_MAX_FILE_BUFFER
+              value: "50"
+            - name: PDF_MAX_BUFFER
+              value: "1024"
+            - name: SCREENSHOT_MAX_BUFFER
+              value: "1024"
+            - name: READABILITY_MAX_BUFFER
+              value: "1024"
+            - name: IMPORT_LIMIT
+              value: "100"
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:
