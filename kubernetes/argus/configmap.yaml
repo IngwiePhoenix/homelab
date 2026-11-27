@@ -8,14 +8,13 @@ data:
     settings:
       auth:
         enabled: true
-        local:
-          enabled: true
+        session:
+          secure_cookie: true
       data:
         database_file: data/argus.db
       web:
         listen_host: 0.0.0.0
         listen_port: 8080
-        secure_cookie: true
         trusted_proxies:
           - 10.100.0.0/16
           - fd00:10:100::/108
