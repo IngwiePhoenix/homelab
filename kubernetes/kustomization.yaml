@@ -39,3 +39,8 @@ resources:
   - rustical/flux.yaml
   - nametag/flux.yaml
   - mitra/flux.yaml
+  #- pkvault/flux.yaml
+  - linkwarden/flux.yaml
+  - homebox/flux.yaml
+  - firefly-iii/flux.yaml
+  - homepage/flux.yaml
