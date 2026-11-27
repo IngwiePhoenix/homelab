@@ -6,7 +6,7 @@ metadata:
 spec:
   image: mariadb:11.8.10
   imagePullPolicy: IfNotPresent
-  replicas: 1
+  replicas: 2
 
   # Generate and retain the root credential in this namespace. DB Operator
   # consumes this Secret through its cluster-scoped DbInstance resource.
@@ -15,8 +15,22 @@ spec:
     key: password
     generate: true
 
+  # Both database pods must run on nodes explicitly labelled as internal.
   nodeSelector:
     homelab/location: internal
+
+  # Keep the primary and replica on separate physical Kubernetes nodes.
+  # This is required anti-affinity, not a best-effort preference.
+  affinity:
+    antiAffinityEnabled: true
+
+  # One primary plus one replica. Semi-sync is enabled by default; keep it
+  # explicit so a transaction is acknowledged by the replica before commit.
+  replication:
+    enabled: true
+    semiSyncEnabled: true
+    primary:
+      autoFailover: true
 
   storage:
     volumeClaimTemplate:
