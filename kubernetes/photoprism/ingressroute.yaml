@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: photoprism-ir
+  namespace: photoprism
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`photos.birb.it`)
+      kind: Rule
+      services:
+        - name: photoprism-svc
+          port: http

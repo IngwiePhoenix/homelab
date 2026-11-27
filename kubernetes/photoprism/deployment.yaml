@@ -1,0 +1,179 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: photoprism-app
+  namespace: photoprism
+  labels:
+    app: photoprism
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: photoprism
+  template:
+    metadata:
+      labels:
+        app: photoprism
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: originals
+          hostPath:
+            path: "/mnt/bunker/Photos/Photo Library"
+            type: Directory
+        - name: import
+          hostPath:
+            path: "/mnt/bunker/Photos/Photo Import"
+            type: Directory
+        - name: storage
+          hostPath:
+            path: "/mnt/bunker/Photos/Photoprism Cache"
+            type: Directory
+      initContainers:
+        - name: wait-for-postgres
+          image: wait4x/wait4x:latest@sha256:aae91ea65a38117ac07c84c7e1122691ac91c3b60529edcb8fe62292d105d8ff
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: photoprism-db-creds
+          args:
+            - postgres
+            - "postgres://$(LOGIN):$(PASSWORD)@$(HOST):$(PORT)/$(DATABASE)"
+            - --timeout
+            - 10m
+        # The old SQLite index lives under the NFS-backed storage directory.
+        # Transfer it once into the new, empty PostgreSQL database before app start.
+        - name: migrate-sqlite-index
+          image: photoprism/photoprism:261029-ce
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ec
+          args:
+            - |
+              marker="/photoprism/storage/.photoprism-postgres-transfer-complete"
+              source_db="/photoprism/storage/index.db"
+
+              if [ -f "$marker" ]; then
+                echo "PhotoPrism database transfer already completed."
+                exit 0
+              fi
+
+              if [ ! -s "$source_db" ]; then
+                echo "No legacy SQLite index found at $source_db." >&2
+                echo "Refusing to initialize an empty PostgreSQL database." >&2
+                echo "If the old instance used MariaDB, follow the migration notes in README.md." >&2
+                exit 1
+              fi
+
+              /opt/photoprism/bin/photoprism database transfer                 --target-driver postgres                 --target-server "${PP_PG_HOST}:${PP_PG_PORT}"                 --target-name "${PP_PG_DATABASE}"                 --target-user "${PP_PG_LOGIN}"                 --target-password "${PP_PG_PASSWORD}"
+
+              touch "$marker"
+          envFrom:
+            - configMapRef:
+                name: photoprism-cm
+          env:
+            - name: PHOTOPRISM_DATABASE_DRIVER
+              value: "sqlite"
+            - name: PP_PG_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-db-creds
+                  key: HOST
+            - name: PP_PG_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-db-creds
+                  key: PORT
+            - name: PP_PG_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-db-creds
+                  key: DATABASE
+            - name: PP_PG_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-db-creds
+                  key: LOGIN
+            - name: PP_PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-db-creds
+                  key: PASSWORD
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+      containers:
+        - name: app
+          image: photoprism/photoprism:261029-ce
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: photoprism-cm
+            - secretRef:
+                name: photoprism-oidc-creds
+                optional: true
+          env:
+            - name: PHOTOPRISM_PG_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-db-creds
+                  key: HOST
+            - name: PHOTOPRISM_PG_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-db-creds
+                  key: PORT
+            - name: PHOTOPRISM_DATABASE_SERVER
+              value: "$(PHOTOPRISM_PG_HOST):$(PHOTOPRISM_PG_PORT)"
+            - name: PHOTOPRISM_DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-db-creds
+                  key: DATABASE
+            - name: PHOTOPRISM_DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-db-creds
+                  key: LOGIN
+            - name: PHOTOPRISM_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-db-creds
+                  key: PASSWORD
+          ports:
+            - name: http
+              containerPort: 2342
+              protocol: TCP
+          volumeMounts:
+            - name: originals
+              mountPath: /photoprism/originals
+            - name: import
+              mountPath: /photoprism/import
+            - name: storage
+              mountPath: /photoprism/storage
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 180
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
