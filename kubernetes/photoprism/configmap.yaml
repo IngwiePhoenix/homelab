@@ -5,7 +5,7 @@ metadata:
   namespace: photoprism
 data:
   PHOTOPRISM_AUTH_MODE: "password"
-  PHOTOPRISM_DATABASE_DRIVER: "sqlite"
+  PHOTOPRISM_DATABASE_DRIVER: "postgres"
   PHOTOPRISM_STORAGE_PATH: "/photoprism/storage"
   PHOTOPRISM_ORIGINALS_PATH: "/photoprism/originals"
   PHOTOPRISM_IMPORT_PATH: "/photoprism/import"
@@ -27,6 +27,11 @@ data:
   PHOTOPRISM_FFMPEG_ENCODER: "software"
   PHOTOPRISM_DISABLE_FACES: "false"
   PHOTOPRISM_DISABLE_TENSORFLOW: "false"
+
+  # Back up PhotoPrism's PostgreSQL database to the storage directory daily.
+  PHOTOPRISM_BACKUP_DATABASE: "true"
+  PHOTOPRISM_BACKUP_SCHEDULE: "daily"
+  PHOTOPRISM_BACKUP_RETAIN: "7"
 
   # VoidAuth OIDC. Credentials are supplied by an optional Secret.
   PHOTOPRISM_DISABLE_OIDC: "false"

@@ -10,17 +10,29 @@ The Deployment mounts the existing directories directly:
 | --- | --- | --- |
 | /mnt/bunker/Photos/Photo Library | /photoprism/originals | Original photo and video library |
 | /mnt/bunker/Photos/Photo Import | /photoprism/import | Files waiting to be imported |
-| /mnt/bunker/Photos/Photoprism Cache | /photoprism/storage | PhotoPrism storage, index database, cache, and sidecars |
+| /mnt/bunker/Photos/Photoprism Cache | /photoprism/storage | PhotoPrism storage, cache, and sidecars |
 
 All three host paths use hostPath.type: Directory. Kubernetes will not create a missing directory, and the Pod cannot start on a node where one of the paths is absent. This relies on the Ansible-managed /mnt/bunker mount being in place on the node before the Pod is scheduled. A Directory check verifies that the directory exists; it does not independently verify that the directory is backed by the NFS mount rather than a local directory underneath the mount point.
 
-The mounts are writable: PhotoPrism moves files from the import directory, updates metadata, and creates sidecar files. The container entrypoint starts with the permissions needed for initialization and then runs the application as UID/GID 1000:1000. Recursive ownership changes are disabled to avoid walking/changing the entire NFS library on startup. Make sure all three paths are writable by UID/GID 1000:1000, or adjust PHOTOPRISM_UID and PHOTOPRISM_GID in configmap.yaml to match the ownership already used on the share.
+The mounts are writable: PhotoPrism moves files from the import directory, updates metadata, and creates sidecar files. The container runs the application as UID/GID 1000:1000. Recursive ownership changes are disabled to avoid walking/changing the entire NFS library on startup. Make sure all three paths are writable by UID/GID 1000:1000, or adjust PHOTOPRISM_UID and PHOTOPRISM_GID in configmap.yaml to match the ownership already used on the share.
 
-**Before the first start**, stop the old PhotoPrism instance and take a backup of all three directories, especially Photoprism Cache. The storage directory is mounted in place so the old SQLite index, configuration, cache, and sidecar data remain available to the new instance. The first run may perform database migrations; do not run two PhotoPrism versions against the same storage directory concurrently.
+**Before the first start**, stop the old PhotoPrism instance and take a backup of all three directories, especially Photoprism Cache. Do not run two PhotoPrism versions against the same storage directory concurrently.
 
-## Database choice
+## Database choice and migration
 
-The Deployment uses SQLite in the existing storage directory. PhotoPrism's newly added PostgreSQL backend is explicitly experimental, and its maintainers warn against using it for a library you depend on. Keeping the old SQLite index also avoids an unnecessary database transfer during recovery. The cluster's PostgreSQL instance is therefore intentionally not used for this application.
+The cluster's existing EasyMile PostgreSQL operator and CNPG instance are reused. The database is called photoprism, and its generated credentials are stored in photoprism-db-creds. The database object has dropOnDelete=false so deleting the Flux component does not intentionally drop the database.
+
+PhotoPrism's PostgreSQL backend was introduced in 2026 and is still explicitly experimental. Its maintainers warn against using it for a library you depend on, because schema changes may not have corresponding migrations. This deployment uses it to avoid placing SQLite's live index on the shared NFS mount: PhotoPrism explicitly warns that SQLite on NFS/CIFS can suffer locking issues and database corruption. This is a deliberate trade-off; make sure the PhotoPrism database backup directory and the entire photo tree are included in your independent backups.
+
+The first Pod startup performs a one-time transfer from the legacy SQLite index at /photoprism/storage/index.db into the new, empty PostgreSQL database, using PhotoPrism's database transfer command. It writes a marker file into the storage directory after success. The source SQLite file is not deleted or modified by this process. If the marker exists, later Pod restarts skip the transfer.
+
+Before applying the component, verify that the old index file exists:
+
+~~~sh
+test -s "/mnt/bunker/Photos/Photoprism Cache/index.db"
+~~~
+
+The old PhotoPrism process must be stopped before this transfer. If the command above fails because the old instance used MariaDB/MySQL instead of SQLite, the init container will intentionally fail rather than start against an empty database. In that case, migrate from the old database using PhotoPrism's documented database transfer procedure and adjust the migration init container to match the source database. Keep the old database backup until you have verified the new instance.
 
 ## CPU-only processing
 
@@ -62,5 +74,3 @@ sops --encrypt /tmp/photoprism-oidc-creds.yaml \
 Add - oidc-creds.sops.yaml to the resources list in this directory's kustomization.yaml. The unencrypted counterpart oidc-creds.yaml is ignored by Git. Do not commit the plaintext manifest.
 
 OIDC self-registration is enabled. In the Community Edition, newly registered OIDC accounts receive the Guest role by default; review/promote accounts from the existing administrator account as appropriate. Automatic redirection is left off so the local login option remains available.
-
-The deployment intentionally does not set a new admin password: it expects the existing SQLite index from Photoprism Cache to contain the old account. Do not start it against an empty or incorrect storage directory as a substitute for restoring the old data.

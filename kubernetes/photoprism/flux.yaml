@@ -13,6 +13,7 @@ spec:
   path: ./kubernetes/photoprism
   prune: true
   dependsOn:
+    - name: postgres-instance
     - name: traefik-ingress
     - name: voidauth
     - name: reloader
