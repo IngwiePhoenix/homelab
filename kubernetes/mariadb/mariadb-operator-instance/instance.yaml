@@ -1,0 +1,36 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  name: mariadb
+  namespace: mariadb
+spec:
+  image: mariadb:11.8.10
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+
+  # Generate and retain the root credential in this namespace. DB Operator
+  # consumes this Secret through its cluster-scoped DbInstance resource.
+  rootPasswordSecretKeyRef:
+    name: mariadb-root-creds
+    key: password
+    generate: true
+
+  nodeSelector:
+    homelab/location: internal
+
+  storage:
+    volumeClaimTemplate:
+      metadata:
+        annotations:
+          local-path-provisioner/uid: "999"
+          local-path-provisioner/gid: "999"
+          local-path-provisioner/perm: "0700"
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-bunker
+      resources:
+        requests:
+          storage: 10Gi
+    pvcRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
