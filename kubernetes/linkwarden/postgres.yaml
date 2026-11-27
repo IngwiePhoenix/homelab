@@ -1,0 +1,27 @@
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlDatabase
+metadata:
+  name: linkwarden-db
+  namespace: linkwarden
+spec:
+  engineConfiguration:
+    name: default-cluster-instance
+    namespace: postgres
+  database: linkwarden
+  masterRole: linkwarden-role
+  dropOnDelete: true
+  waitLinkedResourcesDeletion: true
+---
+apiVersion: postgresql.easymile.com/v1alpha1
+kind: PostgresqlUserRole
+metadata:
+  name: linkwarden-db-user
+  namespace: linkwarden
+spec:
+  mode: MANAGED
+  rolePrefix: linkwarden
+  privileges:
+    - privilege: OWNER
+      database:
+        name: linkwarden-db
+      generatedSecretName: linkwarden-db-creds

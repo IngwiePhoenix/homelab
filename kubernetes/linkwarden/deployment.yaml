@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linkwarden-app
+  namespace: linkwarden
+  labels:
+    app: linkwarden
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: linkwarden
+  template:
+    metadata:
+      labels:
+        app: linkwarden
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      initContainers:
+        - name: wait-for-postgres
+          image: wait4x/wait4x:latest@sha256:aae91ea65a38117ac07c84c7e1122691ac91c3b60529edcb8fe62292d105d8ff
+          imagePullPolicy: IfNotPresent
+          args:
+            - postgres
+            - postgresql://$(LOGIN):$(PASSWORD)@$(HOST):$(PORT)/$(DATABASE)
+            - --timeout
+            - 10m
+          envFrom:
+            - secretRef:
+                name: linkwarden-db-creds
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+      containers:
+        - name: app
+          image: ghcr.io/linkwarden/linkwarden:v2.16.3
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: linkwarden-cm
+            - secretRef:
+                name: linkwarden-env
+            - secretRef:
+                name: linkwarden-oidc-creds
+          env:
+            - name: HOST
+              valueFrom:
+                secretKeyRef:
+                  name: linkwarden-db-creds
+                  key: HOST
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: linkwarden-db-creds
+                  key: PORT
+            - name: DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: linkwarden-db-creds
+                  key: DATABASE
+            - name: LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: linkwarden-db-creds
+                  key: LOGIN
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: linkwarden-db-creds
+                  key: PASSWORD
+            - name: DATABASE_URL
+              value: postgresql://$(LOGIN):$(PASSWORD)@$(HOST):$(PORT)/$(DATABASE)
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /data/data
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: linkwarden-data-pvc

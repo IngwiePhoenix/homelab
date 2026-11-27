@@ -1,0 +1,9 @@
+# Bootstrap template. Set NEXTAUTH_SECRET and SOPS-encrypt this file before activation.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: linkwarden-env
+  namespace: linkwarden
+type: Opaque
+stringData:
+  NEXTAUTH_SECRET: ""
