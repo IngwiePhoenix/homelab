@@ -1,0 +1,11 @@
+# Bootstrap template. Replace both values with distinct 32-character strings,
+# then encrypt this file with SOPS before enabling the Flux Kustomization.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: firefly-iii-env
+  namespace: firefly-iii
+type: Opaque
+stringData:
+  APP_KEY: ""
+  STATIC_CRON_TOKEN: ""

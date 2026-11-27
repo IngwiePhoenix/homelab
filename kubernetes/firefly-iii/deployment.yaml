@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: firefly-iii-app
+  namespace: firefly-iii
+  labels:
+    app: firefly-iii
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: firefly-iii
+  template:
+    metadata:
+      labels:
+        app: firefly-iii
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+        fsGroupChangePolicy: OnRootMismatch
+      initContainers:
+        - name: wait-for-postgres
+          image: wait4x/wait4x:latest@sha256:aae91ea65a38117ac07c84c7e1122691ac91c3b60529edcb8fe62292d105d8ff
+          imagePullPolicy: IfNotPresent
+          args:
+            - postgres
+            - postgresql://$(LOGIN):$(PASSWORD)@$(HOST):$(PORT)/$(DATABASE)
+            - --timeout
+            - 10m
+          envFrom:
+            - secretRef:
+                name: firefly-iii-db-creds
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+      containers:
+        - name: app
+          image: fireflyiii/core:version-6.7.9
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: firefly-iii-cm
+            - secretRef:
+                name: firefly-iii-env
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-db-creds
+                  key: HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-db-creds
+                  key: PORT
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-db-creds
+                  key: DATABASE
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-db-creds
+                  key: LOGIN
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-db-creds
+                  key: PASSWORD
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: upload
+              mountPath: /var/www/html/storage/upload
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+      volumes:
+        - name: upload
+          persistentVolumeClaim:
+            claimName: firefly-iii-upload-pvc
