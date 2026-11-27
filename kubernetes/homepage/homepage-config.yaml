@@ -6,6 +6,7 @@ data:
         - abbr: GH
           href: https://github.com/
   custom.css: "/* empty */\r\n"
+  custom.js: "// empty\r\n"
   docker.yaml: |
     # empty
   kubernetes.yaml: |
