@@ -14,8 +14,10 @@ spec:
           name: mariadb-root-creds
           key: password
   endpoint:
+    # Use the operator-managed primary Service so this endpoint follows
+    # automatic primary failovers.
     host:
-      value: mariadb.mariadb.svc.cluster.local
+      value: mariadb-primary.mariadb.svc.cluster.local
     port:
       value: "3306"
     # MariaDB Operator enables TLS with an automatically managed certificate.
