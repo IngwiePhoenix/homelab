@@ -60,7 +60,9 @@ spec:
                 name: linkwarden-oidc-creds
           env:
             - name: MAX_WORKERS
-              value: "8"
+              value: "10"
+            - name: ARCHIVE_TAKE_COUNT
+              value: "10"
             - name: MAX_LINKS_PER_USER
               value: "1000000" # 1mil baby!
             - name: NEXT_PUBLIC_MAX_FILE_BUFFER
