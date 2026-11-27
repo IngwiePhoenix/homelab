@@ -4,5 +4,3 @@
 /kubernetes/linkwarden/linkwarden-env.yaml
 /kubernetes/linkwarden/oidc-creds.yaml
 
-# Raw Firefly III secret manifest must not be committed.
-/kubernetes/firefly-iii/firefly-iii-env.yaml

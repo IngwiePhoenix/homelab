@@ -1,0 +1,2 @@
+# Raw Firefly III secret manifest must not be committed.
+/firefly-iii-env.yaml

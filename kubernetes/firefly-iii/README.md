@@ -19,7 +19,7 @@ Encrypt the manifest in place:
 sops -e -i kubernetes/firefly-iii/firefly-iii-env.sops.yaml
 ```
 
-The root `.gitignore` excludes the corresponding plaintext filename
+The component-local `.gitignore` excludes the corresponding plaintext filename
 `firefly-iii-env.yaml`.
 
 The scheduled task calls Firefly III's static cron endpoint daily at 03:00

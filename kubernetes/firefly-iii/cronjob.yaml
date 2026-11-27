@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: firefly-iii-cron
-  namespace: firefly-iii
+  namespace: firefly
 spec:
   schedule: "0 3 * * *"
   timeZone: Europe/Berlin
@@ -29,7 +29,7 @@ spec:
               args:
                 - >-
                   wget -qO-
-                  "http://firefly-iii-svc.firefly-iii.svc.cluster.local:8080/api/v1/cron/${STATIC_CRON_TOKEN}"
+                  "http://firefly-iii-svc.firefly.svc.cluster.local:8080/api/v1/cron/${STATIC_CRON_TOKEN}"
                   >/dev/null
               securityContext:
                 runAsNonRoot: true

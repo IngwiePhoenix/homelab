@@ -2,7 +2,7 @@ apiVersion: postgresql.easymile.com/v1alpha1
 kind: PostgresqlDatabase
 metadata:
   name: firefly-iii-db
-  namespace: firefly-iii
+  namespace: firefly
 spec:
   engineConfiguration:
     name: default-cluster-instance
@@ -16,7 +16,7 @@ apiVersion: postgresql.easymile.com/v1alpha1
 kind: PostgresqlUserRole
 metadata:
   name: firefly-iii-db-user
-  namespace: firefly-iii
+  namespace: firefly
 spec:
   mode: MANAGED
   rolePrefix: firefly-iii

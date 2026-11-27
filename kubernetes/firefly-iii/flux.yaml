@@ -22,7 +22,7 @@ spec:
     - apiVersion: apps/v1
       kind: Deployment
       name: firefly-iii-app
-      namespace: firefly-iii
+      namespace: firefly
   decryption:
     provider: sops
     secretRef:
