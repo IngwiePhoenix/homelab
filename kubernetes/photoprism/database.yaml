@@ -1,28 +1,17 @@
-apiVersion: postgresql.easymile.com/v1alpha1
-kind: PostgresqlDatabase
+apiVersion: kinda.rocks/v1beta1
+kind: Database
 metadata:
-  name: photoprism-db
+  name: photoprism
   namespace: photoprism
 spec:
-  engineConfiguration:
-    name: default-cluster-instance
-    namespace: postgres
-  database: photoprism
-  masterRole: photoprism-role
-  # Keep the database if this GitOps object is ever removed accidentally.
-  dropOnDelete: false
-  waitLinkedResourcesDeletion: true
----
-apiVersion: postgresql.easymile.com/v1alpha1
-kind: PostgresqlUserRole
-metadata:
-  name: photoprism-db-user
-  namespace: photoprism
-spec:
-  mode: MANAGED
-  rolePrefix: photoprism
-  privileges:
-    - privilege: OWNER
-      database:
-        name: photoprism-db
-      generatedSecretName: photoprism-db-creds
+  # DB Operator connects through the registered MariaDB instance and its
+  # operator-managed primary Service.
+  instance: mariadb
+  secretName: photoprism-mariadb-creds
+  # Keep the MariaDB database and user if this CR is ever removed.
+  deletionProtected: true
+  credentials:
+    templates:
+      - name: PHOTOPRISM_DATABASE_SERVER
+        secret: true
+        template: "{{ .Hostname }}:{{ .Port }}"
