@@ -15,6 +15,7 @@ spec:
   dependsOn:
     - name: local-path-provisioner
     - name: traefik-ingress
+    - name: voidauth
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
