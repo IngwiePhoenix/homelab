@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: argus-ir
+  namespace: argus
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`argus.birb.it`)
+      kind: Rule
+      middlewares:
+        - name: voidauth-tm
+          namespace: voidauth
+      services:
+        - name: argus-svc
+          port: http
