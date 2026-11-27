@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: homebox-ir
+  namespace: homebox
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`stuff.birb.it`)
+      kind: Rule
+      services:
+        - name: homebox-svc
+          port: http
