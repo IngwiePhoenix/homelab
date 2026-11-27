@@ -7,8 +7,6 @@ spec:
   image: mariadb:11.8.9
   imagePullPolicy: IfNotPresent
   replicas: 2
-  replica:
-      maxLagSeconds: 10
 
   myCnf: |
     [mariadb]
@@ -37,6 +35,8 @@ spec:
     semiSyncEnabled: true
     primary:
       autoFailover: true
+    replica:
+      maxLagSeconds: 10
 
   storage:
     volumeClaimTemplate:
