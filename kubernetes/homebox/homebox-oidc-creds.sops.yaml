@@ -1,10 +1,24 @@
-# Bootstrap template. Add the VoidAuth client credentials and SOPS-encrypt this file before activation.
 apiVersion: v1
 kind: Secret
 metadata:
-  name: homebox-oidc-creds
-  namespace: homebox
+    name: homebox-oidc-creds
+    namespace: homebox
 type: Opaque
 stringData:
-  HBOX_OIDC_CLIENT_ID: ""
-  HBOX_OIDC_CLIENT_SECRET: ""
+    HBOX_OIDC_CLIENT_ID: ENC[AES256_GCM,data:ObB49aLtyg==,iv:DrMgAWI3OtOdlqwus15zFQkIa4eS2/ZgPIrXbVWSUXQ=,tag:i6Y6iLcH3Gi+aLuLIjKo7A==,type:str]
+    HBOX_OIDC_CLIENT_SECRET: ENC[AES256_GCM,data:a1qQBfYH3Ezew2fT4rKBmT6cZ5BO4ERmUC21WPYy3os=,iv:2KTRI6PHs8nAOQxOcXvzSpffd0wf8pNGjmChz/ioAAc=,tag:QB3tbFxPjrA3vDZ6qspa8w==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBvRnhDNmo2cHQvRjhXMkFC
+            OGdmb1hIdVlNSG9LazhhelM2VkZpK2VVclh3CmVGNWhuTDZET08vQnNQRGJMRjdk
+            R3B5dXpFNVJSWlZrazl6R3lTbzlkS1EKLS0tIHI3N1JZZkdKUGl6b1NPSUVsck1j
+            bXFmZXdaVzdBbTRHSWNOUTVYYzdhR0kKLzq74JMAZeE02luUI/ePzTDWlskIFxsS
+            WlcssQ7W6e+4kZkIb8yGFH43NYhTjrid1aHpd51YEuEjljy2tv02YA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-27T09:59:38Z"
+    mac: ENC[AES256_GCM,data:pAIuXtisJUNcdOGQ/lOBP0Ox5iZj8AcNof5RCp6kM3Jfa0MEl5UcivUGtSd13jvju4KImbM5rlN/aLu2Cu9YgTNeA9b9A/P+/x7sGhobmAxOHNhYSgboZQxHcfHN6ZKb+QqWe2/FjQRu3RDsUI20I3sVhD4ePYELCwx9K3fXO/8=,iv:u6zveQ/lPyj9gxkVT8bkKW4mMfTo4OmKNVGi9nB8gIg=,tag:FunAIOBWJ8nZgQuMlxtrgA==,type:str]
+    version: 3.13.3

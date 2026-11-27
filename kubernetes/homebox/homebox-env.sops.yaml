@@ -1,10 +1,23 @@
-# Bootstrap template. Generate the API key pepper, then SOPS-encrypt this file before activation.
-# Generate with: openssl rand -base64 48
 apiVersion: v1
 kind: Secret
 metadata:
-  name: homebox-env
-  namespace: homebox
+    name: homebox-env
+    namespace: homebox
 type: Opaque
 stringData:
-  HBOX_AUTH_API_KEY_PEPPER: ""
+    HBOX_AUTH_API_KEY_PEPPER: ENC[AES256_GCM,data:l+bNcLX67d5mJdELpauuSmhhqqLpCPAA8wreL/WauZcACA5Xq3d9vbz4qgoSR6iVBF7SzOn6D9D0R1yeW+eXHw==,iv:Yyu274d0NN2eyjuj5c9Gdmqn4ZwsCQzIV61grvhHjYw=,tag:qKUAZe8GJUUHG/fKPPw3wg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBodFhZcDN3cXZXa001dzJE
+            NWVXK3hwNnh0aHphSjFHVG1oN1NkQlNPUWdBCkh0em9RWkI0bXhFTFZPY2ZXR1da
+            Rm5xNnh6b2V4TVg4VTA1MXphb1daQzgKLS0tIE5rbWxZQVNURU1XVmk2czBhUDA2
+            WFFnbkhDbUNKbGx4d2FlcjVvV1pvQW8Kko2puOmv6/ELEBXH+l8D7l87Uolvfkkj
+            53opybsdodWJtge6dRFQ8ksepynuRu6H2uKD/JUgqd+tlFPxNkpY+g==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-27T09:58:26Z"
+    mac: ENC[AES256_GCM,data:wLS4TVOhCXIG7GseHZnHmghpqUTlrbJWLz6pT5T1Mo5MWSCS9tsD8qa+3wr0W3R7K6vtQRPqn2JIJiDY1InNH0E07nyjyBgS8dGYiCgRmM1E4M0rkhSzGR9lDTgZ3+wJayRNhNGN4h/+otv+Khu5D0TmGdi++qup0msoH9LwW6I=,iv:/L3A4FSZR6fO6Yo1PHfpLQ6wWVLCTH/ppAUs9FFH9tc=,tag:7tgAwJKNVQBf2sOp0lh23Q==,type:str]
+    version: 3.13.3

@@ -1,9 +1,1 @@
 .tmp/*
-
-# Raw Linkwarden secret manifests must not be committed.
-/kubernetes/linkwarden/linkwarden-env.yaml
-/kubernetes/linkwarden/oidc-creds.yaml
-
-# Raw Homebox secret manifests must not be committed.
-/kubernetes/homebox/homebox-env.yaml
-/kubernetes/homebox/homebox-oidc-creds.yaml

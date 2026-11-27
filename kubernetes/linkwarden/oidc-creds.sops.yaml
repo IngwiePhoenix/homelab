@@ -1,10 +1,24 @@
-# Bootstrap template. Set the VoidAuth client credentials and SOPS-encrypt this file before activation.
 apiVersion: v1
 kind: Secret
 metadata:
-  name: linkwarden-oidc-creds
-  namespace: linkwarden
+    name: linkwarden-oidc-creds
+    namespace: linkwarden
 type: Opaque
 stringData:
-  OIDC_CLIENT_ID: ""
-  OIDC_CLIENT_SECRET: ""
+    OIDC_CLIENT_ID: ENC[AES256_GCM,data:UFEVnvgK87/TKQ==,iv:g50kfVKGjLGzgVEpJDKkKVQ5PDxeSvmVOOGyCi7jAX4=,tag:qfPz9NXiMeD5hFe0bFHMnw==,type:str]
+    OIDC_CLIENT_SECRET: ENC[AES256_GCM,data:7d7y5HmCrU9CuNirf3tecVikNRJLJ/k30QQPDpQxkGg=,iv:kZ3QMMY6G6xbxn+YX9/xHorO0mVQLDw54T/BOmdoXVI=,tag:UlN+tZ7hjzrepiLs8qt02w==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBublhzdkxIZEYzZmUrWjI4
+            blZpMjh4aGhEdUdIQWNhVUVpTDRsM0JiV0ZNCkZsa2gxOGdnV1hZR2ZOem1HS1FF
+            eDZwcDNtM2hITXZ5Y1JiS1U2WkpnMnMKLS0tIHNWU2pYK2lVdnBUaDVFRHN5UWZv
+            bkM4aXU4dmJyelcwUGcwNGJMeCtCbTgKpHsFkMHBZblhwm950QwJK8Z/KFApbZkL
+            9Y+mQRMb2++fUp6Zkx4IUQjlwXTl/b3DruLRKJfT2qTIiiw2W2T6Ew==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-27T09:55:39Z"
+    mac: ENC[AES256_GCM,data:apL3waYT4EmlUhQemxjpLeHtAtPcxSMbsxpQX1i0/XfYvKwFM+a2o9gyjJ34EGbXthWg9+eN4KIOY7KkeXI1hSfND3BZ+JMA2HlRazb3VSEteUkw74VFO7Z/wsswg0n4mdJ5m/RoB4tUIYhWOfeRLazPoYCNaK0siz2U8T4ZpSY=,iv:OljzoG5BEd/UAQjB1fZ0c3TK8IheIgP/mtdbsQt52kc=,tag:IO57ijQTgKEmZUSGpASVNw==,type:str]
+    version: 3.13.3

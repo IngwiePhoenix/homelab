@@ -1,9 +1,23 @@
-# Bootstrap template. Set NEXTAUTH_SECRET and SOPS-encrypt this file before activation.
 apiVersion: v1
 kind: Secret
 metadata:
-  name: linkwarden-env
-  namespace: linkwarden
+    name: linkwarden-env
+    namespace: linkwarden
 type: Opaque
 stringData:
-  NEXTAUTH_SECRET: ""
+    NEXTAUTH_SECRET: ENC[AES256_GCM,data:bNQOYVkBnFPzyg8O9ecHwT08UT+qlzjGODXSpsdEkgiZJN5L7XE50Z+hqpJwBSEuj5XTCDrzHfZsF+AJunwzbg==,iv:liX9C74xeI1imgHUrUz0CgAcwVqq54kYoaXqH0SvxyI=,tag:BTp8WNLl7G7n/wTg+6R5mg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBneXNvUzkvUEtsWWQwSmRr
+            U3ZMYmdoYnZINWhEZEx6UDhUZmh0d05ieENjClFta0dzM2tZV0hWWWk1UG5jdTE3
+            YTVUb3E4aHhaRU80VERUSWcyY2lzQm8KLS0tIEtwL2tUS3RoZk9GTjNoT2o0QUlX
+            QThPTG5oK3YzbnRqK1NEd3MrVTNqNlEKtDmC22ewEtzSHG7VXRg75P+VJOWzRTps
+            PHMy95m1MNnV5g9y1HQuZEotBohXm1u13dxuPgPRdyVZpWoC5YuBRQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xjn3s84lvkfgrrhxu3crl8xy08ysf4l7h9cudgz6ch8uvsq8jfnst3e7l8
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-27T09:56:18Z"
+    mac: ENC[AES256_GCM,data:gXF12/WGP++z14Aig5wYe81k7bfiail1cKvpqJr3tF8R35JrMals91go8NXN2LCfefXqS9N3I5OWm5s93W7xCxkRjdwyznx3TAndj8XwEX6o2vtKk//439U5uZf3AzjQDwn5vA0eX41HpAHLv5fRYclN5zgUw1Ae3DRxROu/41A=,iv:TIiH5dfngKvs4PPIPeiO3XzcLPGSgmDuLtapNzWloWw=,tag:ZKOERP3w+9OR0iz90wCjgA==,type:str]
+    version: 3.13.3
