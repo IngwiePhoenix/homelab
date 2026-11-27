@@ -1,0 +1,10 @@
+# Bootstrap template. Set the VoidAuth client credentials and SOPS-encrypt this file before activation.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: linkwarden-oidc-creds
+  namespace: linkwarden
+type: Opaque
+stringData:
+  OIDC_CLIENT_ID: ""
+  OIDC_CLIENT_SECRET: ""
