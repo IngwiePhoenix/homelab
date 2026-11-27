@@ -1,0 +1,48 @@
+apiVersion: v1
+data:
+  bookmarks.yaml: |
+    - Developer:
+      - Github:
+        - abbr: GH
+          href: https://github.com/
+  docker.yaml: |
+    # empty
+  kubernetes.yaml: |
+    mode: cluster
+    ingress: true
+    traefik: true
+    gateway: false
+  services.yaml: "- My First Group:\n  - My First Service:\n    href: http://localhost/\n
+    \   description: Homepage is awesome\n\n- My Second Group:\n  - My Second Service:\n
+    \   href: http://localhost/\n    description: Homepage is the best\n\n- My Third
+    Group:\n  - My Third Service:\n    href: http://localhost/\n    description: Homepage
+    is \U0001F60E\n"
+  settings.yaml: |
+    # empty
+  widgets.yaml: |
+    - kubernetes:
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+          label: "cluster"
+        nodes:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+    - resources:
+        backend: resources
+        expanded: true
+        cpu: true
+        memory: true
+        network: default
+    - search:
+        provider: duckduckgo
+        target: _blank
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: homepage-config
+  namespace: homepage

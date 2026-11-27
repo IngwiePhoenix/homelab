@@ -8,8 +8,5 @@ resources:
   - oidc-creds.sops.yaml
   - deployment.yaml
   - service.yaml
-
-configMapGenerator:
-- name: homepage-config
-  files:
-  - config/
+  # Generated via make-config.sh
+  - homepage-config.yaml
