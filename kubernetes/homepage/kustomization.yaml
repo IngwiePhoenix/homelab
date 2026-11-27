@@ -8,5 +8,6 @@ resources:
   - oidc-creds.sops.yaml
   - deployment.yaml
   - service.yaml
+  - ingressroute.yaml
   # Generated via make-config.sh
   - homepage-config.yaml
