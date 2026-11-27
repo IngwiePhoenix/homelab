@@ -10,3 +10,5 @@ data:
   OIDC_CUSTOM_NAME: "VoidAuth"
   OIDC_WELLKNOWN_URL: "https://auth.birb.it/oidc/.well-known/openid-configuration"
   OIDC_SCOPES: "openid email profile"
+  NEXT_PUBLIC_CREDENTIALS_ENABLED: "false"
+  NEXT_PUBLIC_DISABLE_REGISTRATION: "true"

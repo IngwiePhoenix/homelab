@@ -8,9 +8,8 @@ data:
   HBOX_OPTIONS_TRUST_PROXY: "true"
   # Homebox expects a hostname here, without the https:// scheme.
   HBOX_OPTIONS_HOSTNAME: "stuff.birb.it"
-  HBOX_OPTIONS_ALLOW_LOCAL_LOGIN: "true"
+  HBOX_OPTIONS_ALLOW_LOCAL_LOGIN: "false"
+  HBOX_OIDC_AUTO_REDIRECT: "true"
   HBOX_OIDC_ENABLED: "true"
   HBOX_OIDC_ISSUER_URL: "https://auth.birb.it/oidc"
   HBOX_OIDC_SCOPE: "openid profile email"
-  # Register this callback URL in the VoidAuth OIDC client:
-  # https://stuff.birb.it/api/v1/users/login/oidc/callback
