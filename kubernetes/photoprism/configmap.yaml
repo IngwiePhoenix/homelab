@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: photoprism-cm
+  namespace: photoprism
+data:
+  PHOTOPRISM_AUTH_MODE: "password"
+  PHOTOPRISM_DATABASE_DRIVER: "sqlite"
+  PHOTOPRISM_STORAGE_PATH: "/photoprism/storage"
+  PHOTOPRISM_ORIGINALS_PATH: "/photoprism/originals"
+  PHOTOPRISM_IMPORT_PATH: "/photoprism/import"
+
+  PHOTOPRISM_SITE_URL: "https://photos.birb.it/"
+  PHOTOPRISM_SITE_TITLE: "PhotoPrism"
+  PHOTOPRISM_HTTP_HOST: "0.0.0.0"
+  PHOTOPRISM_HTTP_PORT: "2342"
+  PHOTOPRISM_DISABLE_TLS: "true"
+  PHOTOPRISM_DEFAULT_TLS: "false"
+  PHOTOPRISM_TRUSTED_PROXY: "10.200.0.0/16"
+
+  # Do not recursively chown the full NFS library at startup.
+  PHOTOPRISM_DISABLE_CHOWN: "true"
+  PHOTOPRISM_UID: "1000"
+  PHOTOPRISM_GID: "1000"
+
+  # No GPU is available in this cluster.
+  PHOTOPRISM_FFMPEG_ENCODER: "software"
+  PHOTOPRISM_DISABLE_FACES: "false"
+  PHOTOPRISM_DISABLE_TENSORFLOW: "false"
+
+  # VoidAuth OIDC. Credentials are supplied by an optional Secret.
+  PHOTOPRISM_DISABLE_OIDC: "false"
+  PHOTOPRISM_OIDC_URI: "https://auth.birb.it/oidc"
+  PHOTOPRISM_OIDC_PROVIDER: "VoidAuth"
+  PHOTOPRISM_OIDC_SCOPES: "openid email profile"
+  PHOTOPRISM_OIDC_USERNAME: "preferred_username"
+  PHOTOPRISM_OIDC_REGISTER: "true"
+  PHOTOPRISM_OIDC_REDIRECT: "false"

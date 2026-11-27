@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: photoprism-app
+  namespace: photoprism
+  labels:
+    app: photoprism
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: photoprism
+  template:
+    metadata:
+      labels:
+        app: photoprism
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: originals
+          hostPath:
+            path: "/mnt/bunker/Photos/Photo Library"
+            type: Directory
+        - name: import
+          hostPath:
+            path: "/mnt/bunker/Photos/Photo Import"
+            type: Directory
+        - name: storage
+          hostPath:
+            path: "/mnt/bunker/Photos/Photoprism Cache"
+            type: Directory
+      containers:
+        - name: app
+          image: photoprism/photoprism:261029-ce
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: photoprism-cm
+            - secretRef:
+                name: photoprism-oidc-creds
+                optional: true
+          ports:
+            - name: http
+              containerPort: 2342
+              protocol: TCP
+          volumeMounts:
+            - name: originals
+              mountPath: /photoprism/originals
+            - name: import
+              mountPath: /photoprism/import
+            - name: storage
+              mountPath: /photoprism/storage
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 180
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3

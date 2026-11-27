@@ -44,3 +44,4 @@ resources:
   - homebox/flux.yaml
   - firefly-iii/flux.yaml
   - homepage/flux.yaml
+  - photoprism/flux.yaml
