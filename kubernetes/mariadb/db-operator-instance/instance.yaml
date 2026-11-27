@@ -1,0 +1,27 @@
+apiVersion: kinda.rocks/v1
+kind: DbInstance
+metadata:
+  name: mariadb
+spec:
+  engine: mysql
+  auth:
+    username:
+      value: root
+    password:
+      valueFrom:
+        secret:
+          namespace: mariadb
+          name: mariadb-root-creds
+          key: password
+  endpoint:
+    # Use the operator-managed primary Service so this endpoint follows
+    # automatic primary failovers.
+    host:
+      value: mariadb-primary.mariadb.svc.cluster.local
+    port:
+      value: "3306"
+    # MariaDB Operator enables TLS with an automatically managed certificate.
+    # Skip CA verification here; traffic remains encrypted inside the cluster.
+    sslConnection:
+      enabled: true
+      skip-verify: true
