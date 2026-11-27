@@ -101,6 +101,10 @@ spec:
           volumeMounts:
             - name: storage
               mountPath: /photoprism/storage
+            - name: originals
+              mountPath: /photoprism/originals
+            - name: import
+              mountPath: /photoprism/import
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
