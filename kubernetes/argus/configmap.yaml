@@ -6,10 +6,10 @@ metadata:
 data:
   config.yml: |
     settings:
+      # Authentication is enforced at the Traefik entrypoint by VoidAuth.
+      # Argus itself has no OIDC support, so keep its native login disabled.
       auth:
-        enabled: true
-        session:
-          secure_cookie: true
+        enabled: false
       data:
         database_file: data/argus.db
       web:
