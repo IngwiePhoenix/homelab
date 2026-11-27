@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: "Host(\`links.birb.it\`)"
+    - match: Host(`links.birb.it`)
       kind: Rule
       services:
         - name: linkwarden-svc
