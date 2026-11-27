@@ -36,20 +36,19 @@ spec:
             path: "/mnt/bunker/Photos/Photoprism Cache"
             type: Directory
       initContainers:
-        - name: wait-for-postgres
+        - name: wait-for-mariadb
           image: wait4x/wait4x:latest@sha256:aae91ea65a38117ac07c84c7e1122691ac91c3b60529edcb8fe62292d105d8ff
           imagePullPolicy: IfNotPresent
-          envFrom:
-            - secretRef:
-                name: photoprism-db-creds
+          command:
+            - wait4x
           args:
-            - postgres
-            - "postgres://$(LOGIN):$(PASSWORD)@$(HOST):$(PORT)/$(DATABASE)"
+            - tcp
+            - mariadb-primary.mariadb.svc.cluster.local:3306
             - --timeout
             - 10m
-        # The old SQLite index lives under the NFS-backed storage directory.
-        # Transfer it once into the new, empty PostgreSQL database before app start.
-        - name: migrate-sqlite-index
+        # Restore the selected historical MariaDB dump exactly once. PhotoPrism's
+        # restore command also applies the schema migrations shipped in this image.
+        - name: restore-mariadb-backup
           image: photoprism/photoprism:261029-ce
           imagePullPolicy: IfNotPresent
           command:
@@ -57,55 +56,51 @@ spec:
             - -ec
           args:
             - |
-              marker="/photoprism/storage/.photoprism-postgres-transfer-complete"
-              source_db="/photoprism/storage/index.db"
+              marker="/photoprism/storage/.photoprism-mariadb-restore-20240614-complete"
+              dump="/photoprism/storage/backups/mysql/2024-06-14.sql"
 
               if [ -f "$marker" ]; then
-                echo "PhotoPrism database transfer already completed."
+                echo "PhotoPrism MariaDB restore already completed."
                 exit 0
               fi
 
-              if [ ! -s "$source_db" ]; then
-                echo "No legacy SQLite index found at $source_db." >&2
-                echo "Refusing to initialize an empty PostgreSQL database." >&2
-                echo "If the old instance used MariaDB, follow the migration notes in README.md." >&2
+              if [ ! -s "$dump" ]; then
+                echo "Required PhotoPrism MariaDB backup is missing or empty: $dump" >&2
                 exit 1
               fi
 
-              /opt/photoprism/bin/photoprism database transfer                 --target-driver postgres                 --target-server "${PP_PG_HOST}:${PP_PG_PORT}"                 --target-name "${PP_PG_DATABASE}"                 --target-user "${PP_PG_LOGIN}"                 --target-password "${PP_PG_PASSWORD}"
+              echo "Restoring PhotoPrism database and album metadata from $dump"
+              /opt/photoprism/bin/photoprism restore --albums --database --force --albums-path /photoprism/storage/backups/serial "$dump"
 
               touch "$marker"
+              echo "PhotoPrism MariaDB restore completed."
           envFrom:
             - configMapRef:
                 name: photoprism-cm
           env:
-            - name: PHOTOPRISM_DATABASE_DRIVER
-              value: "sqlite"
-            - name: PP_PG_HOST
+            - name: PHOTOPRISM_DATABASE_SERVER
               valueFrom:
                 secretKeyRef:
-                  name: photoprism-db-creds
-                  key: HOST
-            - name: PP_PG_PORT
+                  name: photoprism-mariadb-creds
+                  key: PHOTOPRISM_DATABASE_SERVER
+            - name: PHOTOPRISM_DATABASE_NAME
               valueFrom:
                 secretKeyRef:
-                  name: photoprism-db-creds
-                  key: PORT
-            - name: PP_PG_DATABASE
+                  name: photoprism-mariadb-creds
+                  key: DB
+            - name: PHOTOPRISM_DATABASE_USER
               valueFrom:
                 secretKeyRef:
-                  name: photoprism-db-creds
-                  key: DATABASE
-            - name: PP_PG_LOGIN
+                  name: photoprism-mariadb-creds
+                  key: USER
+            - name: PHOTOPRISM_DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: photoprism-db-creds
-                  key: LOGIN
-            - name: PP_PG_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: photoprism-db-creds
+                  name: photoprism-mariadb-creds
                   key: PASSWORD
+          volumeMounts:
+            - name: storage
+              mountPath: /photoprism/storage
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
@@ -121,32 +116,25 @@ spec:
                 name: photoprism-oidc-creds
                 optional: true
           env:
-            - name: PHOTOPRISM_PG_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: photoprism-db-creds
-                  key: HOST
-            - name: PHOTOPRISM_PG_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: photoprism-db-creds
-                  key: PORT
             - name: PHOTOPRISM_DATABASE_SERVER
-              value: "$(PHOTOPRISM_PG_HOST):$(PHOTOPRISM_PG_PORT)"
+              valueFrom:
+                secretKeyRef:
+                  name: photoprism-mariadb-creds
+                  key: PHOTOPRISM_DATABASE_SERVER
             - name: PHOTOPRISM_DATABASE_NAME
               valueFrom:
                 secretKeyRef:
-                  name: photoprism-db-creds
-                  key: DATABASE
+                  name: photoprism-mariadb-creds
+                  key: DB
             - name: PHOTOPRISM_DATABASE_USER
               valueFrom:
                 secretKeyRef:
-                  name: photoprism-db-creds
-                  key: LOGIN
+                  name: photoprism-mariadb-creds
+                  key: USER
             - name: PHOTOPRISM_DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: photoprism-db-creds
+                  name: photoprism-mariadb-creds
                   key: PASSWORD
           ports:
             - name: http

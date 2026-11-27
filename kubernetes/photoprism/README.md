@@ -10,37 +10,65 @@ The Deployment mounts the existing directories directly:
 | --- | --- | --- |
 | /mnt/bunker/Photos/Photo Library | /photoprism/originals | Original photo and video library |
 | /mnt/bunker/Photos/Photo Import | /photoprism/import | Files waiting to be imported |
-| /mnt/bunker/Photos/Photoprism Cache | /photoprism/storage | PhotoPrism storage, cache, and sidecars |
+| /mnt/bunker/Photos/Photoprism Cache | /photoprism/storage | PhotoPrism storage, cache, sidecars, and backups |
 
-All three host paths use hostPath.type: Directory. Kubernetes will not create a missing directory, and the Pod cannot start on a node where one of the paths is absent. This relies on the Ansible-managed /mnt/bunker mount being in place on the node before the Pod is scheduled. A Directory check verifies that the directory exists; it does not independently verify that the directory is backed by the NFS mount rather than a local directory underneath the mount point.
+The paths are on the existing /mnt/bunker NFS mount, which is synchronously and hard mounted on every Kubernetes node by Ansible. The local-bunker StorageClass also uses this backing tree; this Deployment intentionally mounts the established PhotoPrism directories directly.
+
+All three host paths use hostPath.type: Directory. Kubernetes will not create a missing directory, and the Pod cannot start on a node where one of the paths is absent. The Ansible-managed NFS mount must therefore be in place before the Pod is scheduled. A Directory check verifies that the directory exists; it does not independently verify the mounted filesystem.
 
 The mounts are writable: PhotoPrism moves files from the import directory, updates metadata, and creates sidecar files. The container runs the application as UID/GID 1000:1000. Recursive ownership changes are disabled to avoid walking/changing the entire NFS library on startup. Make sure all three paths are writable by UID/GID 1000:1000, or adjust PHOTOPRISM_UID and PHOTOPRISM_GID in configmap.yaml to match the ownership already used on the share.
 
 **Before the first start**, stop the old PhotoPrism instance and take a backup of all three directories, especially Photoprism Cache. Do not run two PhotoPrism versions against the same storage directory concurrently.
 
-## Database choice and migration
+## MariaDB database and one-time restore
 
-The cluster's existing EasyMile PostgreSQL operator and CNPG instance are reused. The database is called photoprism, and its generated credentials are stored in photoprism-db-creds. The database object has dropOnDelete=false so deleting the Flux component does not intentionally drop the database.
+The existing MariaDB Operator instance and DB Operator registration are reused. The namespaced DB Operator Database resource creates the database named photoprism and its primary user on the registered mariadb instance. The generated credentials Secret is photoprism-mariadb-creds in the photoprism namespace. The primary user receives full privileges on this database, which PhotoPrism needs for schema migrations.
 
-PhotoPrism's PostgreSQL backend was introduced in 2026 and is still explicitly experimental. Its maintainers warn against using it for a library you depend on, because schema changes may not have corresponding migrations. This deployment uses it to avoid placing SQLite's live index on the shared NFS mount: PhotoPrism explicitly warns that SQLite on NFS/CIFS can suffer locking issues and database corruption. This is a deliberate trade-off; make sure the PhotoPrism database backup directory and the entire photo tree are included in your independent backups.
+The connection endpoint is generated from the DB Operator instance configuration, which points at mariadb-primary.mariadb.svc.cluster.local:3306. That Service follows the MariaDB Operator's current primary after failover.
 
-The first Pod startup performs a one-time transfer from the legacy SQLite index at /photoprism/storage/index.db into the new, empty PostgreSQL database, using PhotoPrism's database transfer command. It writes a marker file into the storage directory after success. The source SQLite file is not deleted or modified by this process. If the marker exists, later Pod restarts skip the transfer.
+### Selected backup
 
-Before applying the component, verify that the old index file exists:
+The first Pod startup restores this specific dump:
 
-~~~sh
-test -s "/mnt/bunker/Photos/Photoprism Cache/index.db"
+~~~text
+/photoprism/storage/backups/mysql/2024-06-14.sql
 ~~~
 
-The old PhotoPrism process must be stopped before this transfer. If the command above fails because the old instance used MariaDB/MySQL instead of SQLite, the init container will intentionally fail rather than start against an empty database. In that case, migrate from the old database using PhotoPrism's documented database transfer procedure and adjust the migration init container to match the source database. Keep the old database backup until you have verified the new instance.
+The restore init container waits for the MariaDB primary Service, checks that the dump exists and is non-empty, then runs:
 
-## CPU-only processing
+~~~sh
+photoprism restore --albums --database --force --albums-path /photoprism/storage/backups/serial /photoprism/storage/backups/mysql/2024-06-14.sql
+~~~
 
-Video encoding is explicitly set to FFmpeg's software encoder. Face detection/recognition is not disabled. No GPU devices are mounted, and the Deployment deliberately has **no CPU or memory requests or limits** so the initial indexing and recovery are not constrained by Kubernetes resource settings.
+This restores the index database from the 2024-06-14 SQL dump and restores album metadata from the YAML backups in the configured serial-backup directory. PhotoPrism's restore command also runs the schema migrations shipped with the same PhotoPrism image. The application then runs any remaining schema migrations automatically during startup.
+
+The init container writes this marker into the shared storage directory only after the restore command succeeds:
+
+~~~text
+/photoprism/storage/.photoprism-mariadb-restore-20240614-complete
+~~~
+
+Subsequent Pod starts skip the restore when the marker exists. If the restore command fails, the marker is not written and the init container fails instead of starting PhotoPrism against an empty or partially restored index. The force flag allows the restore command to replace an existing target index when it retries.
+
+The restored database includes PhotoPrism user accounts, passwords, sessions, and settings. Existing local accounts may therefore require the passwords that were in use when the 2024-06-14 backup was made.
+
+After the application is ready, inspect the migration history with:
+
+~~~sh
+kubectl exec -n photoprism deploy/photoprism-app -- photoprism migrations ls
+~~~
+
+Keep the original SQL and YAML backups, and retain an independent backup of the full storage and originals directories until the restored library has been checked.
+
+## PhotoPrism version and processing
+
+The Deployment uses the stable Community Edition image 261029-ce. The newer 261126 build is a development preview, so the stable build is retained for this recovery.
+
+Video encoding is explicitly set to FFmpeg's software encoder. Face detection/recognition is not disabled. No GPU devices are mounted, and the Deployment deliberately has **no CPU or memory requests or limits** so initial indexing and recovery are not constrained by Kubernetes resource settings.
 
 ## VoidAuth OpenID Connect
 
-The Community Edition supports OpenID Connect. The issuer and callback configuration are already present, and the Deployment optionally loads credentials from the photoprism-oidc-creds Secret. OIDC becomes active when both client credentials are supplied.
+The Community Edition supports OpenID Connect. The issuer and callback configuration are already present, and the Deployment optionally loads credentials from the photoprism-oidc-creds Secret.
 
 Create a confidential OIDC client in VoidAuth with:
 
@@ -71,6 +99,6 @@ sops --encrypt /tmp/photoprism-oidc-creds.yaml \
   > kubernetes/photoprism/oidc-creds.sops.yaml
 ~~~
 
-Add - oidc-creds.sops.yaml to the resources list in this directory's kustomization.yaml. The unencrypted counterpart oidc-creds.yaml is ignored by Git. Do not commit the plaintext manifest.
+The plaintext counterpart oidc-creds.yaml is gitignored. Do not commit the plaintext manifest.
 
 OIDC self-registration is enabled. In the Community Edition, newly registered OIDC accounts receive the Guest role by default; review/promote accounts from the existing administrator account as appropriate. Automatic redirection is left off so the local login option remains available.
