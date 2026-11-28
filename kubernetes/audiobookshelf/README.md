@@ -43,9 +43,47 @@ on correct filesystem locking and cache-coherency behavior. The NFS client/serve
 combination must provide those semantics. Keep independent backups of the
 `/config` and `/metadata` data.
 
+## OpenID Connect with VoidAuth
+
+Audiobookshelf's OIDC settings are configured by an administrator in the web
+interface and persisted in its database. The application does not currently
+provide supported OIDC environment variables, so these settings cannot be
+wired in with `envFrom` or a Kubernetes Secret.
+
+The VoidAuth issuer used by this homelab is:
+
+```text
+https://auth.birb.it/oidc
+```
+
+The VoidAuth OIDC application must allow these redirect URIs (the deployment
+uses a dedicated hostname, not an Audiobookshelf subfolder):
+
+```text
+https://audiobooks.birb.it/auth/openid/callback
+https://audiobooks.birb.it/auth/openid/mobile-redirect
+```
+
+After creating the initial Audiobookshelf administrator account:
+
+1. Open **Settings → Authentication**.
+2. Enable **OpenID Connect Authentication**.
+3. Enter `https://auth.birb.it/oidc` as the **Issuer URL** and use **Auto-populate**
+   to load the provider endpoints and signing algorithm.
+4. Enter the **Client ID** and **Client Secret** from the pre-created
+   Audiobookshelf application in VoidAuth.
+5. Configure **Match existing users by** to the stable user attribute/claim
+   shared by the existing Audiobookshelf account and the VoidAuth identity.
+6. Save and test an OIDC login while local authentication is still enabled.
+   Keep local authentication enabled until OIDC login has been verified.
+
+Audiobookshelf documents the web and mobile callback URLs and the
+administrator-driven OIDC setup in its
+[OIDC authentication guide](https://audiobookshelf.org/docs/documentation/server-management/oidc-authentication/).
+
 ## Initial setup
 
 Open `https://audiobooks.birb.it`, create the initial administrator account,
-and add an Audiobooks library whose path is `/audiobooks`. The original
-Audiobookshelf database and listening progress cannot be reconstructed from
-the media files alone.
+and add an Audiobooks library whose path is `/audiobooks`. Then configure
+OIDC as described above. The original Audiobookshelf database and listening
+progress cannot be reconstructed from the media files alone.
