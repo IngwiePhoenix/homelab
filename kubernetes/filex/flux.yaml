@@ -1,0 +1,25 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: filex
+  namespace: flux-system
+spec:
+  interval: 1h
+  path: ./kubernetes/filex
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+  dependsOn:
+    - name: external-secrets-install
+    - name: local-path-provisioner
+    - name: traefik-ingress
+  healthChecks:
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
+      name: filex-env
+      namespace: filex
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: filex-helmrelease
+      namespace: flux-system

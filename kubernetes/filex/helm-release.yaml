@@ -1,0 +1,81 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: filex-helmrelease
+  namespace: flux-system
+spec:
+  interval: 30m
+  releaseName: filex
+  targetNamespace: filex
+  chart:
+    spec:
+      chart: filex
+      version: "0.2.77"
+      interval: 1h
+      sourceRef:
+        kind: HelmRepository
+        name: filex-helmrepo
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: Deployment
+              labelSelector: app.kubernetes.io/name=filex
+            patch: |
+              - op: add
+                path: /spec/template/spec/containers/0/env/-
+                value:
+                  name: FILEX_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: filex-env
+                      key: password
+  values:
+    image:
+      repository: ghcr.io/brf-tech/filex
+      tag: full-v0.62.0
+      pullPolicy: IfNotPresent
+
+    publicURL: https://files.birb.it
+    trustedProxies: "auto, 10.100.0.0/16"
+
+    replicaCount: 1
+    service:
+      type: ClusterIP
+      port: 5212
+
+    # Keep the application database, index, thumbnails, SSH host keys and
+    # default local file store on the persistent local-bunker volume.
+    persistence:
+      enabled: true
+      size: 100Gi
+      storageClass: local-bunker
+      accessMode: ReadWriteOnce
+
+    storage:
+      type: local
+      name: Files
+      mountPath: "/"
+      local:
+        volume:
+          type: data
+
+    # Keep local login enabled until OIDC credentials are configured.
+    auth:
+      drivers: local
+
+    # SFTP and NFSv3 are separate TCP listeners. S3 and WebDAV are
+    # served by the regular HTTP endpoint and remain enabled explicitly.
+    extraEnv:
+      FILEX_S3: "1"
+      FILEX_DAV: "1"
+      FILEX_SFTP: "1"
+      FILEX_NFS: "1"
