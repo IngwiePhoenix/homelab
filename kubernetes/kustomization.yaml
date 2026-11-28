@@ -46,3 +46,4 @@ resources:
   - firefly-iii/flux.yaml
   - homepage/flux.yaml
   - photoprism/flux.yaml
+  - audiobookshelf/flux.yaml

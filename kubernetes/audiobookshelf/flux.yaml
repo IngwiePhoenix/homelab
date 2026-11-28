@@ -1,0 +1,22 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: audiobookshelf
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 1m
+  timeout: 10m
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+  path: ./kubernetes/audiobookshelf
+  prune: true
+  dependsOn:
+    - name: local-path-provisioner
+    - name: traefik-ingress
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: audiobookshelf-app
+      namespace: audiobookshelf
