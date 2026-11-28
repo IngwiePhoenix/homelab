@@ -10,17 +10,21 @@ to reconcile.
 - WebDAV: `https://files.birb.it/dav`
 - S3-compatible API: `https://files.birb.it/s3` (path-style)
 - SFTP: `10.10.10.11:2022`
-- Explicit FTPS: `10.10.10.11:2121`, passive TCP ports `30000-30100`
 - NFSv3: `10.10.10.11:2049`
 
-SFTP, FTPS and NFSv3 are exposed by the Calico LoadBalancer service at
-`10.10.10.11`. The FTPS passive range is also advertised using that address.
-FTPS starts with a self-signed certificate; configure/trust a proper certificate
-before relying on strict client certificate validation. NFSv3 is unencrypted and
-unauthenticated on the wire; because this subnet is routed, restrict it to trusted
-LAN/VPN clients and do not forward it to the public internet. FileX does not run
-a portmapper, so NFS clients must specify both `port=2049` and `mountport=2049`.
-The NFS export path itself is a bearer credential; keep it private.
+SFTP and NFSv3 are exposed by the Calico LoadBalancer service at
+`10.10.10.11`. No FTP or FTPS listener is enabled. If a legacy device later
+needs plain FTP, FileX can allow it on its FTPS listener with
+`FILEX_FTPS_ALLOW_PLAIN`; that would also require enabling the listener and
+exposing its control and passive data ports. Plain FTP sends credentials and
+file contents without encryption, so only consider it for a specific device
+on a trusted home LAN, never as an internet-facing service.
+
+NFSv3 is unencrypted and unauthenticated on the wire; because this subnet is
+routed, restrict it to trusted LAN/VPN clients and do not forward it to the
+public internet. FileX does not run a portmapper, so NFS clients must specify
+both `port=2049` and `mountport=2049`. The NFS export path itself is a bearer
+credential; keep it private.
 
 The `FILEX_SECRET_KEY` is generated once by External Secrets Operator and
 stored as an immutable, orphaned Kubernetes Secret in `flux-system`. Back it
