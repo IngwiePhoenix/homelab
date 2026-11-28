@@ -4,6 +4,12 @@ FileX is intentionally staged but not yet registered in the cluster root
 `kubernetes/kustomization.yaml`. Add it there only when the deployment is ready
 to reconcile.
 
+The `namespace.yaml` resource creates the dedicated `filex` namespace when
+the component is registered. Application resources, including the External
+Secrets Operator Password generator, ExternalSecret and generated `filex-env`
+Secret, live there. Flux management resources (the HelmRepository,
+HelmRelease and Flux Kustomization) remain in `flux-system`.
+
 ## Endpoints
 
 - Web UI: `https://files.birb.it`
@@ -27,10 +33,13 @@ both `port=2049` and `mountport=2049`. The NFS export path itself is a bearer
 credential; keep it private.
 
 The `FILEX_SECRET_KEY` is generated once by External Secrets Operator and
-stored as an immutable, orphaned Kubernetes Secret in `flux-system`. Back it
-up with the FileX database; losing it makes previously stored S3 credentials
-unusable. The application data PVC also holds the local file store and SFTP
-host keys.
+stored as an immutable, orphaned Kubernetes Secret named `filex-env` in the
+`filex` namespace. The HelmRelease remains in `flux-system`; its Flux
+post-renderer adds a `secretKeyRef` to the FileX Deployment, so the secret
+value is never copied into Helm values or into the management namespace. Back
+up `filex/filex-env` with the FileX database; losing `FILEX_SECRET_KEY` makes
+previously stored S3 credentials unusable. The application data PVC also holds
+the local file store and SFTP host keys.
 
 OIDC is deliberately not configured. Local authentication remains enabled so
 OIDC credentials can be added before the component is registered in the root
