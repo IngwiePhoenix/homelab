@@ -50,3 +50,4 @@ resources:
   - argus/flux.yaml
   - rsshub/flux.yaml
   - grocy/flux.yaml
+  - filex/flux.yaml
