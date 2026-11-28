@@ -22,6 +22,22 @@ spec:
   upgrade:
     remediation:
       retries: 3
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: Deployment
+              labelSelector: app.kubernetes.io/name=filex
+            patch: |
+              - op: add
+                path: /spec/template/spec/containers/0/env/-
+                value:
+                  name: FILEX_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: filex-env
+                      key: password
   values:
     image:
       repository: ghcr.io/brf-tech/filex
@@ -63,25 +79,3 @@ spec:
       FILEX_DAV: "1"
       FILEX_SFTP: "1"
       FILEX_NFS: "1"
-
-  # HelmRelease valuesFrom can only read Secrets in flux-system. Keep the
-  # generated secret in filex and inject it into the rendered Deployment
-  # with a pod-level SecretKeyRef instead.
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              group: apps
-              version: v1
-              kind: Deployment
-              namespace: filex
-              labelSelector: app.kubernetes.io/name=filex,app.kubernetes.io/instance=filex
-            patch: |-
-              - op: add
-                path: /spec/template/spec/containers/0/env/-
-                value:
-                  name: FILEX_SECRET_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: filex-env
-                      key: password
