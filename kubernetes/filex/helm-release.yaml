@@ -61,14 +61,10 @@ spec:
     auth:
       drivers: local
 
-    # SFTP, FTPS and NFSv3 are separate TCP listeners. S3 and WebDAV are
+    # SFTP and NFSv3 are separate TCP listeners. S3 and WebDAV are
     # served by the regular HTTP endpoint and remain enabled explicitly.
     extraEnv:
       FILEX_S3: "1"
       FILEX_DAV: "1"
       FILEX_SFTP: "1"
-      FILEX_FTPS: "1"
-      FILEX_FTPS_PUBLIC_HOST: "10.10.10.11"
-      FILEX_FTPS_PASV_MIN: "30000"
-      FILEX_FTPS_PASV_MAX: "30100"
       FILEX_NFS: "1"
