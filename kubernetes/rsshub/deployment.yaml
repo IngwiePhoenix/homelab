@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rsshub-app
+  namespace: rsshub
+  labels:
+    app: rsshub
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: rsshub
+  template:
+    metadata:
+      labels:
+        app: rsshub
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: wait-for-valkey
+          image: wait4x/wait4x:latest@sha256:aae91ea65a38117ac07c84c7e1122691ac91c3b60529edcb8fe62292d105d8ff
+          imagePullPolicy: IfNotPresent
+          command: ["wait4x"]
+          args: ["tcp", "cache-valkey:6379", "--timeout", "10m"]
+      containers:
+        - name: app
+          image: ghcr.io/diygod/rsshub:chromium-bundled-ef3f6b1268a7f2ffd9b6af83a7cd97f19c98b70b@sha256:a2b3a249f14a67dce7750bc1fae68ef62658882360c3e30a1a4b0694ab549
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: TZ
+              value: Europe/Berlin
+            - name: CACHE_TYPE
+              value: redis
+            - name: VALKEY_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cache-connection
+                  key: host
+            - name: VALKEY_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cache-connection
+                  key: port
+            - name: VALKEY_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: cache-connection
+                  key: username
+            - name: VALKEY_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: cache-connection
+                  key: db
+            - name: VALKEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cache-auth
+                  key: password
+            - name: REDIS_URL
+              value: "redis://$(VALKEY_USERNAME):$(VALKEY_PASSWORD)@$(VALKEY_HOST):$(VALKEY_PORT)/$(VALKEY_DB)"
+          ports:
+            - name: http
+              containerPort: 1200
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
