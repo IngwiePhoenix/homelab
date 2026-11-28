@@ -4,11 +4,18 @@ FileX is intentionally staged but not yet registered in the cluster root
 `kubernetes/kustomization.yaml`. Add it there only when the deployment is ready
 to reconcile.
 
-The `namespace.yaml` resource creates the dedicated `filex` namespace when
-the component is registered. Application resources, including the External
-Secrets Operator Password generator, ExternalSecret and generated `filex-env`
-Secret, live there. Flux management resources (the HelmRepository,
-HelmRelease and Flux Kustomization) remain in `flux-system`.
+## Namespace ownership
+
+The `filex` Namespace is declared in `namespace.yaml` and included by this
+component's Kustomization. Application resources, including the ESO Password
+generator, ExternalSecret and generated `filex-env` Secret, live in `filex`.
+Flux management resources (the Flux Kustomization, HelmRepository and
+HelmRelease) remain in `flux-system`.
+
+The HelmRelease uses a Flux Kustomize post-renderer to add
+`FILEX_SECRET_KEY` as a Secret-backed environment variable to the rendered
+FileX Deployment. This avoids moving or mirroring the application Secret into
+`flux-system`, because HelmRelease `valuesFrom` references are namespace-local.
 
 ## Endpoints
 
@@ -33,13 +40,9 @@ both `port=2049` and `mountport=2049`. The NFS export path itself is a bearer
 credential; keep it private.
 
 The `FILEX_SECRET_KEY` is generated once by External Secrets Operator and
-stored as an immutable, orphaned Kubernetes Secret named `filex-env` in the
-`filex` namespace. The HelmRelease remains in `flux-system`; its Flux
-post-renderer adds a `secretKeyRef` to the FileX Deployment, so the secret
-value is never copied into Helm values or into the management namespace. Back
-up `filex/filex-env` with the FileX database; losing `FILEX_SECRET_KEY` makes
-previously stored S3 credentials unusable. The application data PVC also holds
-the local file store and SFTP host keys.
+stored as an immutable, orphaned Secret in `filex`. Back it up with the FileX
+database; losing it makes previously stored S3 credentials unusable. The
+application data PVC also holds the local file store and SFTP host keys.
 
 OIDC is deliberately not configured. Local authentication remains enabled so
 OIDC credentials can be added before the component is registered in the root
