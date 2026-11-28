@@ -4,7 +4,7 @@ metadata:
   name: mariadb
   namespace: mariadb
 spec:
-  image: mariadb:11.8.9
+  image: mariadb:13.1.2
   imagePullPolicy: IfNotPresent
   replicas: 2
 
