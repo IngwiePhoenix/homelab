@@ -1,0 +1,24 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: grocy
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 1m
+  timeout: 10m
+  sourceRef:
+    kind: GitRepository
+    name: homelab-repo
+  path: ./kubernetes/grocy
+  prune: true
+  dependsOn:
+    - name: local-path-provisioner
+    - name: traefik-ingress
+    - name: voidauth
+    - name: reloader
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: grocy-app
+      namespace: grocy

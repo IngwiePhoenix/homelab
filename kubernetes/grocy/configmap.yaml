@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grocy-cm
+  namespace: grocy
+data:
+  # Grocy delegates browser authentication to the existing VoidAuth forward-auth middleware.
+  # API requests use Grocy API keys and are routed separately in ingressroute.yaml.
+  GROCY_MODE: "production"
+  GROCY_DEFAULT_LOCALE: "de"
+  GROCY_CURRENCY: "EUR"
+  GROCY_AUTH_CLASS: 'Grocy\\Middleware\\Auth\\ReverseProxyAuthMiddleware'
+  GROCY_REVERSE_PROXY_AUTH_HEADER: "Remote-User"
+  PUID: "911"
+  PGID: "911"
+  TZ: "Europe/Berlin"
