@@ -1,0 +1,9 @@
+apiVersion: kro.k8s.birb.it/v1alpha1
+kind: Valkey
+metadata:
+  name: cache
+  namespace: rsshub
+spec:
+  values:
+    persistence:
+      size: 1Gi
