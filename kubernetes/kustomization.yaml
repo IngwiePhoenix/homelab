@@ -47,3 +47,6 @@ resources:
   - homepage/flux.yaml
   - photoprism/flux.yaml
   - audiobookshelf/flux.yaml
+  - argus/flux.yaml
+  - rsshub/flux.yaml
+  - grocy/flux.yaml
