@@ -1,0 +1,27 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: grocy-ir
+  namespace: grocy
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    # Grocy's API authenticates these requests with API keys itself. Do not send
+    # mobile clients through browser-oriented OIDC forward authentication.
+    - match: Host(`grocy.birb.it`) && PathPrefix(`/api/`)
+      kind: Rule
+      priority: 100
+      services:
+        - name: grocy-svc
+          port: http
+    # All browser-facing pages require a VoidAuth-authenticated Remote-User header.
+    - match: Host(`grocy.birb.it`)
+      kind: Rule
+      priority: 10
+      middlewares:
+        - name: voidauth-tm
+          namespace: voidauth
+      services:
+        - name: grocy-svc
+          port: http
