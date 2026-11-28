@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: renovate-operator
-      version: 6.10.0
+      version: 7.0.0
       interval: 1h
       sourceRef:
         kind: HelmRepository
@@ -70,10 +70,15 @@ spec:
         redirectUrl: https://renovate.birb.it/auth/callback
 
     authorization:
-      # Single-operator homelab: anyone who can log in is admin. This also avoids
-      # the fail-closed trap where group rules match nothing and every job is hidden.
-      enabled: false
+      # Access is granted through OIDC groups; kubernetes-admin is the default
+      # administrator group used across the Kubernetes environment.
+      enabled: true
       suspendFromUI: false
+      defaults:
+        adminGroups:
+          - kubernetes-admin
 
+    # v7 removed valkey.existingSecret and valkey.existingSecretKey. This
+    # installation does not configure an external Valkey connection.
     valkey:
       enabled: false

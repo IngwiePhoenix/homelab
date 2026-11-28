@@ -5,7 +5,7 @@ metadata:
   namespace: renovate-operator
 spec:
   schedule: "CRON_TZ=Europe/Berlin 17 */6 * * *"
-  image: renovate/renovate:44.262.2   # multi-arch incl. arm64; slim, not -full
+  image: renovate/renovate:45.3.2   # multi-arch incl. arm64; slim, not -full
   parallelism: 1
 
   provider:
