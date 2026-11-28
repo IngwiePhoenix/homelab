@@ -9,7 +9,7 @@ data:
   GROCY_MODE: "production"
   GROCY_DEFAULT_LOCALE: "de"
   GROCY_CURRENCY: "EUR"
-  GROCY_AUTH_CLASS: 'Grocy\\Middleware\\Auth\\ReverseProxyAuthMiddleware'
+  GROCY_AUTH_CLASS: 'Grocy\Middleware\Auth\ReverseProxyAuthMiddleware'
   GROCY_REVERSE_PROXY_AUTH_HEADER: "Remote-User"
   PUID: "911"
   PGID: "911"
