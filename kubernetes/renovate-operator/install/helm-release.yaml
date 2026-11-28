@@ -74,6 +74,12 @@ spec:
       # the fail-closed trap where group rules match nothing and every job is hidden.
       enabled: false
       suspendFromUI: false
+      defaults:
+        # v7 replaces auth.defaultAllowedGroups with authorization.defaults.adminGroups.
+        # No default groups were configured previously, so retain the empty default.
+        adminGroups: []
 
+    # v7 removed valkey.existingSecret and valkey.existingSecretKey. This
+    # installation does not configure an external Valkey connection.
     valkey:
       enabled: false
