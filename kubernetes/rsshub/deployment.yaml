@@ -29,7 +29,7 @@ spec:
           args: ["tcp", "cache-valkey:6379", "--timeout", "10m"]
       containers:
         - name: app
-          image: ghcr.io/diygod/rsshub:chromium-bundled-ef3f6b1268a7f2ffd9b6af83a7cd97f19c98b70b@sha256:a2b3a249f14a67dce7750bc1fae68ef62658882360c3e30a1a4b0694ab549
+          image: ghcr.io/diygod/rsshub:2026-11-28
           imagePullPolicy: IfNotPresent
           env:
             - name: NODE_ENV
