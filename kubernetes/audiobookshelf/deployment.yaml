@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audiobookshelf-app
+  namespace: audiobookshelf
+  labels:
+    app: audiobookshelf
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    # Audiobookshelf uses SQLite. Do not have two server processes share it
+    # during a rolling update.
+    type: Recreate
+  selector:
+    matchLabels:
+      app: audiobookshelf
+  template:
+    metadata:
+      labels:
+        app: audiobookshelf
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      initContainers:
+        # Audiobookshelf does not expose a journal-mode environment variable.
+        # Force DELETE mode before the server opens the database; its default
+        # mode for a newly-created database is already DELETE.
+        - name: sqlite-journal-mode
+          image: ghcr.io/advplyr/audiobookshelf:2.38.0 # renovate: datasource=docker depName=ghcr.io/advplyr/audiobookshelf
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command:
+            - node
+            - -e
+            - |
+              const fs = require('node:fs');
+              const sqlite3 = require('sqlite3');
+              const databasePath = '/config/absdatabase.sqlite';
+
+              if (!fs.existsSync(databasePath)) {
+                console.log('No existing database; SQLite will create it in DELETE journal mode.');
+                process.exit(0);
+              }
+
+              const db = new sqlite3.Database(databasePath);
+              db.get('PRAGMA journal_mode=DELETE', (error, result) => {
+                if (error) {
+                  console.error('Failed to set SQLite journal mode to DELETE:', error);
+                  db.close(() => process.exit(1));
+                  return;
+                }
+
+                const mode = String(result?.journal_mode || '').toLowerCase();
+                console.log('SQLite journal_mode=' + mode);
+                db.close((closeError) => {
+                  if (closeError || mode !== 'delete') {
+                    console.error(closeError || ('Expected DELETE journal mode, got ' + mode));
+                    process.exit(1);
+                  }
+                });
+              });
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      containers:
+        - name: app
+          image: ghcr.io/advplyr/audiobookshelf:2.38.0 # renovate: datasource=docker depName=ghcr.io/advplyr/audiobookshelf
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: Europe/Berlin
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: metadata
+              mountPath: /metadata
+            - name: audiobooks
+              mountPath: /audiobooks
+              readOnly: true
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: audiobookshelf-config-pvc
+        - name: metadata
+          persistentVolumeClaim:
+            claimName: audiobookshelf-metadata-pvc
+        - name: audiobooks
+          hostPath:
+            path: /mnt/bunker/Audiobooks
+            type: Directory

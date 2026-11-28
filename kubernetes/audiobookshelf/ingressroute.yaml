@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: audiobookshelf-ir
+  namespace: audiobookshelf
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`audiobooks.birb.it`)
+      kind: Rule
+      services:
+        - name: audiobookshelf-svc
+          port: http
