@@ -1,6 +1,8 @@
 # Task
 
 You will be asked to write Kubernetes manifests for a variety of applications.
+Create a Pull Request to install the deployment into the repository.
+Importantly, do not modify `kubernetes/kustomization.yaml` unless given express permission by the user; once a deployment is added here, Flux will pick it up, leaving no time for any additional adjustments inbetween for the user to perform (like creating and storing OIDC credentials for the app).
 
 ## Structure
 
@@ -68,6 +70,8 @@ When writing plain Kubernetes objects, follow the following naming convention
   * The definition is in `kubernetes/kro/rgd-valkey`.
 - When you need a MongoDB, use the MongoDBCommunity operator's CRDs for users and passwords and databases.
   * The default instance is in namespace `mongodb` and called `default-cluster`.
+- When you need a MariaDB/MySQL instance, you can use the "DB Operator". The details are within `kubernetes/mariadb`.
+  * It is configured to behave similiar to the Postgres setup - those, too, get a `-db` suffix.
 - The External Secrets Operator can generate secrets for you, if you need any.
 - Should you introduce additional or special stanzas that describe remote versions, you should integrate that with Renovate.
   * You can find the repository config in `(repo)/renovate.json5`
@@ -117,6 +121,26 @@ spec:
       database:
         name: $(name)-db
       generatedSecretName: $(name)-db-creds
+```
+
+Example MariaDB:
+```
+apiVersion: kinda.rocks/v1beta1
+kind: Database
+metadata:
+  name: $(name)-db
+  namespace: $(namespace)
+spec:
+  # This is the only, global, replicating instance.
+  instance: mariadb
+  secretName: $(name)-creds
+  deletionProtected: false
+  credentials:
+    templates:
+      # Use templates for custom keys. Can save some `envFrom...` entries in Deployments!
+      - name: SERVER
+        secret: true
+        template: "{{ .Hostname }}:{{ .Port }}"
 ```
 
 ## When to pick Helm over plain objects
